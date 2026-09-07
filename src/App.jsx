@@ -1,0 +1,1136 @@
+﻿import { useEffect, useState } from "react";
+import AdminLogin from "./admin/AdminLogin";
+import AdminPanel from "./admin/AdminPanel";
+import "./styles/glowrush.css";
+
+const products = [
+  {
+    id: 1,
+    brand: "SKIN1004",
+    name: "Madagascar Centella Ampoule",
+    category: "Сыворотки",
+    price: 129000,
+    image: "/products/product-1.jpg",
+  },
+  {
+    id: 2,
+    brand: "ANUA",
+    name: "Heartleaf 77% Soothing Toner",
+    category: "Тонеры",
+    price: 145000,
+    image: "/products/product-2.jpg",
+  },
+  {
+    id: 3,
+    brand: "BEAUTY OF JOSEON",
+    name: "Relief Sun SPF50+",
+    category: "SPF",
+    price: 159000,
+    image: "/products/product-3.jpg",
+  },
+  {
+    id: 4,
+    brand: "COSRX",
+    name: "Advanced Snail 96 Mucin Power Essence",
+    category: "Эссенции",
+    price: 139000,
+    image: "/products/product-4.jpg",
+  },
+];
+
+const categories = [
+  "Все",
+  "Очищение",
+  "Тонеры",
+  "Эссенции",
+  "Сыворотки",
+  "Кремы",
+  "SPF",
+  "Маски",
+];
+
+function App() {
+  const [selectedCategory, setSelectedCategory] = useState("Все");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [checkoutStatus, setCheckoutStatus] = useState("form");
+  const [checkoutForm, setCheckoutForm] = useState({
+    name: "",
+    phone: "",
+    city: "Ташкент",
+    comment: "",
+  });
+  const [confirmedOrder, setConfirmedOrder] = useState(null);
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("glowrush-orders")) || [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("glowrush-orders", JSON.stringify(orders));
+  }, [orders]);
+
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [adminLoggedIn, setAdminLoggedIn] = useState(
+    () => sessionStorage.getItem("glowrush-admin") === "true"
+  );
+
+  const filteredProducts = products.filter((product) => {
+    const categoryMatch =
+      selectedCategory === "Все" ||
+      product.category === selectedCategory;
+
+    const query = search.toLowerCase().trim();
+
+    const searchMatch =
+      !query ||
+      product.name.toLowerCase().includes(query) ||
+      product.brand.toLowerCase().includes(query) ||
+      product.category.toLowerCase().includes(query);
+
+    return categoryMatch && searchMatch;
+  });
+
+  const cartCount = cart.reduce(
+    (total, product) => total + product.quantity,
+    0
+  );
+
+  const cartTotal = cart.reduce(
+    (total, product) => total + product.price * product.quantity,
+    0
+  );
+
+  const cityOptions = [
+  "Ташкент",
+  "Самарканд",
+  "Бухара",
+  "Андижан",
+  "Наманган",
+];
+const deliveryOptions = [
+    {
+      id: "courier",
+      name: "Курьер",
+      description: "Доставка до двери по городу",
+      price: cartTotal >= 300000 ? 0 : 20000,
+    },
+    {
+      id: "pickup",
+      name: "Самовывоз",
+      description: "Из шоурума GlowRush",
+      price: 0,
+    },
+  ];
+
+  const [selectedDelivery, setSelectedDelivery] = useState(
+    deliveryOptions[0]
+  );
+
+  const deliveryFee = selectedDelivery.price;
+  const orderTotal = cartTotal + deliveryFee;
+
+  const openCheckout = () => {
+    setCheckoutStatus("form");
+    setCheckoutOpen(true);
+  };
+
+  const confirmCheckout = (event) => {
+    event.preventDefault();
+
+    const existingNumbers = orders
+      .map((order) =>
+        Number(String(order.number || "").replace("GR-", ""))
+      )
+      .filter((number) => Number.isFinite(number));
+
+    const nextNumber =
+      existingNumbers.length > 0
+        ? Math.max(...existingNumbers) + 1
+        : 1;
+
+    const orderNumber = `GR-${String(nextNumber).padStart(4, "0")}`;
+
+    const order = {
+      id: crypto.randomUUID(),
+      number: orderNumber,
+      createdAt: new Date().toISOString(),
+      items: cart,
+      subtotal: cartTotal,
+      deliveryFee,
+      total: orderTotal,
+      customer: checkoutForm,
+      delivery: selectedDelivery,
+    };
+
+    setOrders((current) => [order, ...current]);
+    setConfirmedOrder(order);
+    setCheckoutStatus("success");
+    setCart([]);
+  };
+  const addToCart = (product) => {
+    setCart((current) => {
+      const existing = current.find((item) => item.id === product.id);
+
+      if (existing) {
+        return current.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+
+      return [...current, { ...product, quantity: 1 }];
+    });
+
+    setCartOpen(true);
+  };
+
+  const decreaseQuantity = (id) => {
+    setCart((current) =>
+      current
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const increaseQuantity = (id) => {
+    setCart((current) =>
+      current.map((item) =>
+        item.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  };
+
+  const removeFromCart = (id) => {
+    setCart((current) => current.filter((item) => item.id !== id));
+  };
+
+  const toggleFavorite = (id) => {
+    setFavorites((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  };
+
+  const scrollToCatalog = () => {
+    document.getElementById("catalog")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="glowrush">
+
+      <header className="site-header">
+        <div className="header-inner">
+
+          <button
+            type="button"
+            className="brand-logo"
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
+          >
+            Glow<span>Rush</span>
+          </button>
+
+          <nav className="main-nav">
+            <a
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              Главная
+            </a>
+
+            <a
+              href="#catalog"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToCatalog();
+              }}
+            >
+              Каталог
+            </a>
+
+            <a href="#new">Новинки</a>
+            <a href="#care">Уход</a>
+          </nav>
+
+          <div className="header-actions">
+
+            {searchOpen && (
+              <div className="search-field">
+                <input
+                  autoFocus
+                  type="search"
+                  placeholder="Поиск косметики..."
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+
+                <button
+                  type="button"
+                  aria-label="Закрыть поиск"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchOpen(false);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Поиск"
+              onClick={() => setSearchOpen((value) => !value)}
+            >
+              ⌕
+            </button>
+
+            <button
+              type="button"
+              className="icon-button favorites-button"
+              aria-label="Избранное"
+              onClick={() => setFavoritesOpen(true)}
+            >
+              ♡
+
+              {favorites.length > 0 && (
+                <span className="favorites-count">
+                  {favorites.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="cart-button"
+              aria-label="Корзина"
+              onClick={() => setCartOpen(true)}
+            >
+              🛒
+
+              {cartCount > 0 && (
+                <span className="cart-count">{cartCount}</span>
+              )}
+            </button>
+
+          </div>
+        </div>
+      </header>
+
+      <main>
+
+        <section className="hero">
+          <div className="hero-content">
+
+            <p className="eyebrow">KOREAN BEAUTY</p>
+
+            <h1>
+              Твоя кожа.
+              <br />
+              Твоё <span>сияние.</span>
+            </h1>
+
+            <p className="hero-description">
+              Корейская косметика для ежедневного ухода,
+              здоровой кожи и естественного сияния.
+            </p>
+
+            <button
+              type="button"
+              className="primary-button"
+              onClick={scrollToCatalog}
+            >
+              Смотреть каталог
+            </button>
+
+          </div>
+
+          <div className="hero-visual">
+            <div className="hero-orb">
+              <span>GLOW</span>
+              <strong>RUSH</strong>
+            </div>
+          </div>
+        </section>
+
+        <section className="benefits">
+
+          <div>
+            <span>01</span>
+            <strong>Оригинальная косметика</strong>
+            <p>Только проверенные продукты.</p>
+          </div>
+
+          <div>
+            <span>02</span>
+            <strong>Корейский уход</strong>
+            <p>Средства для ежедневной рутины.</p>
+          </div>
+
+          <div>
+            <span>03</span>
+            <strong>Быстрая доставка</strong>
+            <p>Доставляем заказы по Узбекистану.</p>
+          </div>
+
+          <div>
+            <span>04</span>
+            <strong>Безопасная покупка</strong>
+            <p>Ваши данные защищены.</p>
+          </div>
+
+        </section>
+
+        <section className="category-section">
+
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">SHOP BY CATEGORY</p>
+              <h2>Категории</h2>
+            </div>
+          </div>
+
+          <div className="category-list">
+
+            {categories.map((category) => (
+              <button
+                type="button"
+                key={category}
+                className={
+                  selectedCategory === category
+                    ? "category active"
+                    : "category"
+                }
+                onClick={() => {
+                  setSelectedCategory(category);
+                  scrollToCatalog();
+                }}
+              >
+                {category}
+              </button>
+            ))}
+
+          </div>
+
+        </section>
+
+        <section className="catalog-section" id="catalog">
+
+          <div className="section-heading">
+
+            <div>
+              <p className="eyebrow">GLOWRUSH COLLECTION</p>
+              <h2>Популярное</h2>
+            </div>
+
+            <span className="product-count">
+              {filteredProducts.length} товара
+            </span>
+
+          </div>
+
+          {filteredProducts.length > 0 ? (
+
+            <div className="products-grid">
+
+              {filteredProducts.map((product) => {
+                const favorite = favorites.includes(product.id);
+
+                return (
+                  <article
+                    className="product-card"
+                    key={product.id}
+                  >
+
+                    <div className="product-image">
+
+                      <img
+                        className="product-photo"
+                        src={product.image}
+                        alt={product.name}
+                      />
+
+                      <button
+                        type="button"
+                        className={
+                          favorite
+                            ? "favorite active"
+                            : "favorite"
+                        }
+                        aria-label="Добавить в избранное"
+                        onClick={() =>
+                          toggleFavorite(product.id)
+                        }
+                      >
+                        {favorite ? "♥" : "♡"}
+                      </button>
+
+                    </div>
+
+                    <div className="product-info">
+
+                      <p className="product-brand">
+                        {product.brand}
+                      </p>
+
+                      <h3>{product.name}</h3>
+
+                      <p className="product-category">
+                        {product.category}
+                      </p>
+
+                      <div className="product-footer">
+
+                        <strong>
+                          {product.price.toLocaleString("ru-RU")} сум
+                        </strong>
+
+                        <button
+                          type="button"
+                          className="add-button"
+                          onClick={() => addToCart(product)}
+                        >
+                          +
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </article>
+                );
+              })}
+
+            </div>
+
+          ) : (
+
+            <div className="empty-result">
+              <h3>Ничего не нашли</h3>
+              <p>
+                Попробуйте изменить поиск или категорию.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        <section className="simple-section" id="new">
+          <p className="eyebrow">JUST ARRIVED</p>
+          <h2>Новинки</h2>
+          <p>
+            Скоро здесь появятся новые продукты GlowRush.
+          </p>
+        </section>
+
+        <section className="simple-section" id="care">
+          <p className="eyebrow">DAILY SKINCARE</p>
+          <h2>Уход</h2>
+          <p>
+            Подборка средств для ежедневного ухода.
+          </p>
+        </section>
+
+      </main>
+
+      <footer className="site-footer">
+
+        <div className="footer-logo">
+          Glow<span>Rush</span>
+        </div>
+
+        <p>
+          © 2026 GlowRush. Корейская косметика.
+        </p>
+
+              <button
+          type="button"
+          className="admin-access"
+          onClick={() => setAdminOpen(true)}
+        >
+          Админ
+        </button>
+</footer>
+
+
+      {selectedProduct && (
+        <div
+          className="product-modal-overlay"
+          onClick={() => setSelectedProduct(null)}
+        >
+          <div
+            className="product-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+
+            <button
+              type="button"
+              className="product-modal-close"
+              aria-label="Закрыть"
+              onClick={() => setSelectedProduct(null)}
+            >
+              ×
+            </button>
+
+            <div className="product-modal-image">
+              <img
+                src={selectedProduct.image}
+                alt={selectedProduct.name}
+              />
+
+              <button
+                type="button"
+                className={
+                  favorites.includes(selectedProduct.id)
+                    ? "product-modal-favorite active"
+                    : "product-modal-favorite"
+                }
+                onClick={() =>
+                  toggleFavorite(selectedProduct.id)
+                }
+              >
+                {favorites.includes(selectedProduct.id) ? "♥" : "♡"}
+              </button>
+            </div>
+
+            <div className="product-modal-info">
+
+              <p className="product-brand">
+                {selectedProduct.brand}
+              </p>
+
+              <h2>{selectedProduct.name}</h2>
+
+              <p className="product-modal-category">
+                {selectedProduct.category}
+              </p>
+
+              <div className="product-modal-price">
+                {selectedProduct.price.toLocaleString("ru-RU")} сум
+              </div>
+
+              <p className="product-modal-description">
+                Средство для ежедневного ухода за кожей.
+                Подходит для создания комфортной и эффективной
+                корейской skincare-рутины.
+              </p>
+
+              <div className="product-modal-actions">
+
+                <button
+                  type="button"
+                  className="product-modal-cart"
+                  onClick={() => {
+                    addToCart(selectedProduct);
+                  }}
+                >
+                  Добавить в корзину
+                </button>
+
+                <button
+                  type="button"
+                  className="product-modal-continue"
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  Продолжить покупки
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {cartOpen && (
+        <div
+          className="cart-overlay"
+          onClick={() => setCartOpen(false)}
+        >
+
+          <aside
+            className="cart-drawer"
+            onClick={(event) => event.stopPropagation()}
+          >
+
+            <div className="cart-header">
+              <div>
+                <p className="eyebrow">YOUR BAG</p>
+                <h2>Корзина</h2>
+              </div>
+
+              <button
+                type="button"
+                className="cart-close"
+                aria-label="Закрыть корзину"
+                onClick={() => setCartOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            {cart.length === 0 ? (
+
+              <div className="cart-empty">
+                <div className="cart-empty-icon">🛒</div>
+                <h3>Корзина пока пуста</h3>
+                <p>
+                  Добавьте понравившиеся товары,
+                  и они появятся здесь.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={() => {
+                    setCartOpen(false);
+                    scrollToCatalog();
+                  }}
+                >
+                  Перейти в каталог
+                </button>
+              </div>
+
+            ) : (
+
+              <>
+                <div className="cart-items">
+
+                  {cart.map((item) => (
+
+                    <div className="cart-item" key={item.id}>
+
+                      <div className="cart-item-image">
+                        <span>{item.brand}</span>
+                      </div>
+
+                      <div className="cart-item-info">
+
+                        <p className="product-brand">
+                          {item.brand}
+                        </p>
+
+                        <h3>{item.name}</h3>
+
+                        <strong>
+                          {item.price.toLocaleString("ru-RU")} сум
+                        </strong>
+
+                        <div className="quantity-control">
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              decreaseQuantity(item.id)
+                            }
+                          >
+                            −
+                          </button>
+
+                          <span>{item.quantity}</span>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              increaseQuantity(item.id)
+                            }
+                          >
+                            +
+                          </button>
+
+                        </div>
+
+                      </div>
+
+                      <button
+                        type="button"
+                        className="remove-cart-item"
+                        aria-label="Удалить товар"
+                        onClick={() =>
+                          removeFromCart(item.id)
+                        }
+                      >
+                        ×
+                      </button>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+                <div className="cart-footer">
+
+                  <div className="cart-total">
+                    <span>Итого</span>
+                    <strong>
+                      {cartTotal.toLocaleString("ru-RU")} сум
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="primary-button checkout-button" onClick={openCheckout}
+                  >
+                    Оформить заказ
+                  </button>
+
+                </div>
+
+              </>
+
+            )}
+
+          </aside>
+
+        </div>
+      )}
+
+      
+      {favoritesOpen && (
+        <div
+          className="favorites-overlay"
+          onClick={() => setFavoritesOpen(false)}
+        >
+          <aside
+            className="favorites-drawer"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="favorites-header">
+              <div>
+                <p className="eyebrow">YOUR FAVORITES</p>
+                <h2>Избранное</h2>
+              </div>
+
+              <button
+                type="button"
+                className="favorites-close"
+                aria-label="Закрыть избранное"
+                onClick={() => setFavoritesOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            {favorites.length === 0 ? (
+              <div className="favorites-empty">
+                <div className="favorites-empty-icon">♡</div>
+
+                <h3>Избранное пока пусто</h3>
+
+                <p>
+                  Нажимайте ♡ на товарах, которые хотите сохранить.
+                </p>
+
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={() => {
+                    setFavoritesOpen(false)
+                    scrollToCatalog()
+                  }}
+                >
+                  Перейти в каталог
+                </button>
+              </div>
+            ) : (
+              <div className="favorites-items">
+                {products
+                  .filter((product) => favorites.includes(product.id))
+                  .map((product) => (
+                    <div className="favorite-item" key={product.id}>
+
+                      <div className="favorite-item-image">
+                        <span>{product.brand}</span>
+                      </div>
+
+                      <div className="favorite-item-info">
+                        <p className="product-brand">
+                          {product.brand}
+                        </p>
+
+                        <h3>{product.name}</h3>
+
+                        <strong>
+                          {product.price.toLocaleString("ru-RU")} сум
+                        </strong>
+
+                        <button
+                          type="button"
+                          className="favorite-add-cart"
+                          onClick={() => addToCart(product)}
+                        >
+                          Добавить в корзину
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="remove-favorite"
+                        aria-label="Удалить из избранного"
+                        onClick={() => toggleFavorite(product.id)}
+                      >
+                        ♥
+                      </button>
+
+                    </div>
+                  ))}
+              </div>
+            )}
+
+          </aside>
+        </div>
+      )}
+  {adminOpen && (
+    <div className="admin-screen">
+      <button
+        type="button"
+        className="admin-back"
+        onClick={() => setAdminOpen(false)}
+      >
+        ← Вернуться в магазин
+      </button>
+
+      {adminLoggedIn ? (
+        <AdminPanel
+          orders={orders}
+          onLogout={() => {
+            sessionStorage.removeItem("glowrush-admin");
+            setAdminLoggedIn(false);
+          }}
+        />
+      ) : (
+        <AdminLogin
+          onLogin={() => setAdminLoggedIn(true)}
+        />
+      )}
+    </div>
+  )}
+  {checkoutOpen && (
+    <div className="checkout-overlay">
+      <div className="checkout-modal">
+        <button
+          type="button"
+          className="checkout-close"
+          onClick={() => setCheckoutOpen(false)}
+        >
+          ×
+        </button>
+
+        {checkoutStatus === "form" ? (
+          <>
+            <p className="eyebrow">GLOWRUSH CHECKOUT</p>
+            <h2>Оформление заказа</h2>
+
+            <form onSubmit={confirmCheckout} className="checkout-form">
+              <label>
+                Имя
+                <input
+                  type="text"
+                  required
+                  value={checkoutForm.name}
+                  onChange={(event) =>
+                    setCheckoutForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
+                  placeholder="Ваше имя"
+                />
+              </label>
+
+              <label>
+                Телефон
+                <input
+                  type="tel"
+                  required
+                  value={checkoutForm.phone}
+                  onChange={(event) =>
+                    setCheckoutForm((current) => ({
+                      ...current,
+                      phone: event.target.value,
+                    }))
+                  }
+                  placeholder="+998 90 123 45 67"
+                />
+              </label>
+
+              <label>
+                Город
+                <select
+                  value={checkoutForm.city}
+                  onChange={(event) =>
+                    setCheckoutForm((current) => ({
+                      ...current,
+                      city: event.target.value,
+                    }))
+                  }
+                >
+                  {cityOptions.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="checkout-delivery">
+                <span>Способ получения</span>
+
+                <div className="checkout-delivery-options">
+                  {deliveryOptions.map((option) => (
+                    <button
+                      type="button"
+                      key={option.id}
+                      className={`checkout-delivery-option ${
+                        selectedDelivery.id === option.id
+                          ? "checkout-delivery-option-active"
+                          : ""
+                      }`}
+                      onClick={() => setSelectedDelivery(option)}
+                    >
+                      <strong>{option.name}</strong>
+                      <small>{option.description}</small>
+                      <b>
+                        {option.price === 0
+                          ? "Бесплатно"
+                          : `${option.price.toLocaleString("ru-RU")} сум`}
+                      </b>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <label>
+                Комментарий
+                <textarea
+                  value={checkoutForm.comment}
+                  onChange={(event) =>
+                    setCheckoutForm((current) => ({
+                      ...current,
+                      comment: event.target.value,
+                    }))
+                  }
+                  placeholder="Комментарий к заказу"
+                  rows="3"
+                />
+              </label>
+
+              <div className="checkout-summary">
+                <div>
+                  <span>Товары</span>
+                  <strong>
+                    {cartTotal.toLocaleString("ru-RU")} сум
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Доставка</span>
+                  <strong>
+                    {deliveryFee === 0
+                      ? "Бесплатно"
+                      : `${deliveryFee.toLocaleString("ru-RU")} сум`}
+                  </strong>
+                </div>
+
+                <div className="checkout-summary-total">
+                  <span>Итого</span>
+                  <strong>
+                    {orderTotal.toLocaleString("ru-RU")} сум
+                  </strong>
+                </div>
+              </div>
+
+              <button type="submit" className="primary-button">
+                Подтвердить заказ
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="checkout-success">
+            <div className="checkout-success-icon">✓</div>
+
+            <p className="eyebrow">ЗАКАЗ ПРИНЯТ</p>
+
+            <h2>Спасибо за заказ!</h2>
+
+            <p>
+              Ваш заказ{" "}
+              <strong>{confirmedOrder?.number}</strong>{" "}
+              успешно оформлен.
+            </p>
+
+            <p>
+              Мы свяжемся с вами по указанному номеру телефона.
+            </p>
+
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => {
+                setCheckoutOpen(false);
+                setConfirmedOrder(null);
+              }}
+            >
+              Вернуться в магазин
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
