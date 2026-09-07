@@ -469,6 +469,7 @@ const deliveryOptions = [
                   <article
                     className="product-card"
                     key={product.id}
+                    onClick={() => setSelectedProduct(product)}
                   >
 
                     <div className="product-image">
@@ -517,7 +518,10 @@ const deliveryOptions = [
                         <button
                           type="button"
                           className="add-button"
-                          onClick={() => addToCart(product)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            addToCart(product);
+                          }}
                         >
                           +
                         </button>
@@ -889,7 +893,10 @@ const deliveryOptions = [
                         <button
                           type="button"
                           className="favorite-add-cart"
-                          onClick={() => addToCart(product)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            addToCart(product);
+                          }}
                         >
                           Добавить в корзину
                         </button>
@@ -1115,6 +1122,9 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
 
 
 
