@@ -1,42 +1,8 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
 import AdminLogin from "./admin/AdminLogin";
 import AdminPanel from "./admin/AdminPanel";
 import "./styles/glowrush.css";
-
-const products = [
-  {
-    id: 1,
-    brand: "SKIN1004",
-    name: "Madagascar Centella Ampoule",
-    category: "Сыворотки",
-    price: 129000,
-    image: "/products/product-1.jpg",
-  },
-  {
-    id: 2,
-    brand: "ANUA",
-    name: "Heartleaf 77% Soothing Toner",
-    category: "Тонеры",
-    price: 145000,
-    image: "/products/product-2.jpg",
-  },
-  {
-    id: 3,
-    brand: "BEAUTY OF JOSEON",
-    name: "Relief Sun SPF50+",
-    category: "SPF",
-    price: 159000,
-    image: "/products/product-3.jpg",
-  },
-  {
-    id: 4,
-    brand: "COSRX",
-    name: "Advanced Snail 96 Mucin Power Essence",
-    category: "Эссенции",
-    price: 139000,
-    image: "/products/product-4.jpg",
-  },
-];
 
 const categories = [
   "Все",
@@ -47,7 +13,7 @@ const categories = [
   "Кремы",
   "SPF",
   "Маски",
-];
+]
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("Все");
@@ -58,6 +24,110 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState("");
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setProductsLoading(true);
+      setProductsError("");
+
+      const { data, error } = await supabase
+        .from("Product")
+        .select(`
+          id,
+          sku,
+          slug,
+          price,
+          oldPrice,
+          stockStatus,
+          isActive,
+          brand:Brand (
+            slug,
+            translations:BrandTranslation (
+              locale,
+              name
+            )
+          ),
+          category:Category (
+            slug,
+            translations:CategoryTranslation (
+              locale,
+              name
+            )
+          ),
+          translations:ProductTranslation (
+            locale,
+            name,
+            description
+          ),
+          images:ProductImage (
+            url,
+            altText,
+            position,
+            isPrimary
+          )
+        `)
+        .eq("isActive", true)
+        .order("createdAt", { ascending: false });
+
+      if (error) {
+        console.error("Supabase products error:", error);
+        setProductsError(error.message);
+        setProducts([]);
+        setProductsLoading(false);
+        return;
+      }
+
+      const mappedProducts = (data || []).map((product) => {
+        const brandTranslation =
+          product.brand?.translations?.find(
+            (translation) => translation.locale === "RU"
+          ) || product.brand?.translations?.[0];
+
+        const categoryTranslation =
+          product.category?.translations?.find(
+            (translation) => translation.locale === "RU"
+          ) || product.category?.translations?.[0];
+
+        const productTranslation =
+          product.translations?.find(
+            (translation) => translation.locale === "RU"
+          ) || product.translations?.[0];
+
+        const primaryImage =
+          product.images?.find((image) => image.isPrimary) ||
+          [...(product.images || [])].sort(
+            (a, b) => a.position - b.position
+          )[0];
+
+        return {
+          id: product.id,
+          sku: product.sku,
+          slug: product.slug,
+          brand: brandTranslation?.name || product.brand?.slug || "",
+          name: productTranslation?.name || product.slug,
+          category:
+            categoryTranslation?.name ||
+            product.category?.slug ||
+            "",
+          price: product.price,
+          oldPrice: product.oldPrice,
+          image: primaryImage?.url || "",
+          description:
+            productTranslation?.description ||
+            "Средство для ежедневного ухода за кожей.",
+          stockStatus: product.stockStatus,
+        };
+      });
+
+      setProducts(mappedProducts);
+      setProductsLoading(false);
+    };
+
+    loadProducts();
+  }, []);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState("form");
   const [checkoutForm, setCheckoutForm] = useState({
@@ -145,24 +215,20 @@ const deliveryOptions = [
     setCheckoutOpen(true);
   };
 
-  const confirmCheckout = (event) => {
+  const confirmCheckout = async (event) => {
     event.preventDefault();
 
-    const existingNumbers = orders
-      .map((order) =>
-        Number(String(order.number || "").replace("GR-", ""))
-      )
-      .filter((number) => Number.isFinite(number));
+    if (!cart.length) {
+      alert("������� �����.");
+      return;
+    }
 
-    const nextNumber =
-      existingNumbers.length > 0
-        ? Math.max(...existingNumbers) + 1
-        : 1;
-
-    const orderNumber = `GR-${String(nextNumber).padStart(4, "0")}`;
+    const orderId = crypto.randomUUID();
+    const orderNumber = `GR-${Date.now().toString().slice(-8)}`;
+    const now = new Date().toISOString();
 
     const order = {
-      id: crypto.randomUUID(),
+      id: orderId,
       number: orderNumber,
       createdAt: new Date().toISOString(),
       items: cart,
@@ -173,10 +239,85 @@ const deliveryOptions = [
       delivery: selectedDelivery,
     };
 
-    setOrders((current) => [order, ...current]);
-    setConfirmedOrder(order);
-    setCheckoutStatus("success");
-    setCart([]);
+    try {
+      const { error: orderError } = await supabase
+        .from("Order")
+        .insert({
+          id: orderId,
+          orderNumber,
+          guestName: checkoutForm.name.trim(),
+          guestPhone: checkoutForm.phone.trim(),
+          status: "PENDING",
+          currency: "UZS",
+          subtotal: cartTotal,
+          discountAmount: 0,
+          deliveryFee,
+          giftWrapFee: 0,
+          totalAmount: orderTotal,
+          localeAtOrder: "RU",
+          createdAt: now,
+          updatedAt: now,
+          notes: [
+            checkoutForm.city?.trim(),
+            checkoutForm.comment?.trim(),
+          ]
+            .filter(Boolean)
+            .join(" � ") || null,
+        });
+
+      if (orderError) throw orderError;
+
+      const orderItems = cart.map((item) => ({
+        id: crypto.randomUUID(),
+        orderId,
+        productId: item.id,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        totalPrice: item.price * item.quantity,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("OrderItem")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      const { error: deliveryError } = await supabase
+        .from("Delivery")
+        .insert({
+          id: crypto.randomUUID(),
+          orderId,
+          provider: "MANUAL",
+          status: "READY_FOR_DELIVERY",
+          fee: deliveryFee,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+      if (deliveryError) throw deliveryError;
+
+      const { error: historyError } = await supabase
+        .from("OrderStatusHistory")
+        .insert({
+          id: crypto.randomUUID(),
+          orderId,
+          fromStatus: null,
+          toStatus: "PENDING",
+          note: "����� ������ � �����",
+        });
+
+      if (historyError) throw historyError;
+
+      setOrders((current) => [order, ...current]);
+      setConfirmedOrder(order);
+      setCheckoutStatus("success");
+      setCart([]);
+    } catch (error) {
+      console.error("Supabase order creation error:", error);
+      alert(
+        `�� ������� �������� �����.\n\n${error.message || "����������� ������"}`
+      );
+    }
   };
   const addToCart = (product) => {
     setCart((current) => {
@@ -1122,6 +1263,10 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
 
 
 

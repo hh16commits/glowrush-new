@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 const ORDER_STATUSES = [
   { id: "new", label: "Новый" },
@@ -9,7 +10,145 @@ const ORDER_STATUSES = [
   { id: "cancelled", label: "Отменён" },
 ];
 
-function AdminPanel({ orders = [], onLogout }) {
+function AdminPanel({ onLogout }) {
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadOrders() {
+      setOrdersLoading(true);
+      setOrdersError("");
+
+      try {
+        const { data, error } = await supabase
+          .from("Order")
+          .select(`
+            id,
+            orderNumber,
+            guestName,
+            guestPhone,
+            status,
+            subtotal,
+            deliveryFee,
+            giftWrapFee,
+            discountAmount,
+            totalAmount,
+            notes,
+            createdAt,
+            items:OrderItem (
+              id,
+              quantity,
+              unitPrice,
+              totalPrice,
+              product:Product (
+                id,
+                sku,
+                brand:Brand (
+                  translations:BrandTranslation (
+                    name,
+                    locale
+                  )
+                ),
+                translations:ProductTranslation (
+                  name,
+                  locale
+                ),
+                images:ProductImage (
+                  url,
+                  isPrimary
+                )
+              )
+            ),
+            delivery:Delivery (
+              id,
+              provider,
+              status
+            )
+          `)
+          .order("createdAt", { ascending: false });
+
+        if (error) throw error;
+
+        const mappedOrders = (data || []).map((order) => ({
+          id: order.id,
+          number: order.orderNumber,
+          createdAt: order.createdAt,
+          total: order.totalAmount || 0,
+          subtotal: order.subtotal || 0,
+          deliveryFee: order.deliveryFee || 0,
+          customer: {
+            name: order.guestName || "Без имени",
+            phone: order.guestPhone || "",
+            city: "",
+            comment: order.notes || "",
+          },
+          delivery: {
+            name:
+              order.delivery?.[0]?.provider === "MANUAL"
+                ? "Курьер"
+                : "Доставка",
+          },
+          dbStatus: order.status,
+          items: (order.items || []).map((item) => {
+            const ruTranslation =
+              item.product?.translations?.find(
+                (translation) => translation.locale === "RU"
+              );
+
+            const translation =
+              ruTranslation ||
+              item.product?.translations?.[0];
+
+            const primaryImage =
+              item.product?.images?.find(
+                (image) => image.isPrimary
+              ) ||
+              item.product?.images?.[0];
+
+            return {
+              id: item.id,
+              name: translation?.name || item.product?.sku || "Товар",
+              brand:
+                item.product?.brand?.translations?.find(
+                  (translation) => translation.locale === "RU"
+                )?.name ||
+                item.product?.brand?.translations?.[0]?.name ||
+                "",
+              image: primaryImage?.url || "",
+              quantity: item.quantity || 1,
+              price: item.unitPrice || 0,
+            };
+          }),
+        }));
+
+        if (!cancelled) {
+          setOrders(mappedOrders);
+        }
+      } catch (error) {
+        console.error("Failed to load orders:", error);
+
+        if (!cancelled) {
+          setOrdersError(
+            error?.message || "Не удалось загрузить заказы"
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setOrdersLoading(false);
+        }
+      }
+    }
+
+    loadOrders();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const formatItemsCount = (count) => {
     const lastTwo = count % 100;
     const lastOne = count % 10;
@@ -24,39 +163,75 @@ function AdminPanel({ orders = [], onLogout }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const [statuses, setStatuses] = useState(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("glowrush-order-statuses")
-      ) || {};
-    } catch {
-      return {};
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(
-      "glowrush-order-statuses",
-      JSON.stringify(statuses)
-    );
-  }, [statuses]);
 
   const formatPrice = (price) =>
     `${Number(price || 0).toLocaleString("ru-RU")} сум`;
 
-  const getStatus = (orderId) =>
-    statuses[orderId] || "new";
+  const dbStatusToAdminStatus = {
+    PENDING: "new",
+    AWAITING_PAYMENT: "new",
+    PAYMENT_PROOF_SUBMITTED: "new",
+    PAID: "confirmed",
+    CONFIRMED: "confirmed",
+    PICKING: "packed",
+    PACKING: "packed",
+    READY_FOR_DELIVERY: "delivery",
+    COURIER_ASSIGNED: "delivery",
+    IN_TRANSIT: "delivery",
+    DELIVERED: "completed",
+    CANCELLED: "cancelled",
+    REFUND_REQUESTED: "cancelled",
+    REFUNDED: "cancelled",
+  };
+
+  const adminStatusToDbStatus = {
+    new: "PENDING",
+    confirmed: "CONFIRMED",
+    packed: "PACKING",
+    delivery: "IN_TRANSIT",
+    completed: "DELIVERED",
+    cancelled: "CANCELLED",
+  };
+
+  const getStatus = (orderId) => {
+    const order = orders.find((item) => item.id === orderId);
+    return dbStatusToAdminStatus[order?.dbStatus] || "new";
+  };
 
   const getStatusLabel = (orderId) =>
     ORDER_STATUSES.find(
       (status) => status.id === getStatus(orderId)
     )?.label || "Новый";
 
-  const changeStatus = (orderId, status) => {
-    setStatuses((current) => ({
-      ...current,
-      [orderId]: status,
-    }));
+  const changeStatus = async (orderId, status) => {
+    const dbStatus = adminStatusToDbStatus[status];
+
+    if (!dbStatus) return;
+
+    const { error } = await supabase
+      .from("Order")
+      .update({ status: dbStatus })
+      .eq("id", orderId);
+
+    if (error) {
+      console.error("Failed to update order status:", error);
+      alert("Не удалось изменить статус заказа.");
+      return;
+    }
+
+    setOrders((current) =>
+      current.map((order) =>
+        order.id === orderId
+          ? { ...order, dbStatus }
+          : order
+      )
+    );
+
+    setSelectedOrder((current) =>
+      current?.id === orderId
+        ? { ...current, dbStatus }
+        : current
+    );
   };
 
   const exportOrders = () => {
@@ -372,7 +547,19 @@ function AdminPanel({ orders = [], onLogout }) {
         </button>
       </div>
 
-      {filteredOrders.length === 0 ? (
+      {ordersLoading ? (
+        <div className="admin-empty">
+          <div className="admin-empty-icon">⏳</div>
+          <h2>Загрузка заказов...</h2>
+          <p>Получаем заказы из Supabase.</p>
+        </div>
+      ) : ordersError ? (
+        <div className="admin-empty">
+          <div className="admin-empty-icon">⚠️</div>
+          <h2>Ошибка загрузки заказов</h2>
+          <p>{ordersError}</p>
+        </div>
+      ) : filteredOrders.length === 0 ? (
         <div className="admin-empty">
           <div className="admin-empty-icon">🔎</div>
           <h2>Заказы не найдены</h2>
