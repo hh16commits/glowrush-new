@@ -208,15 +208,47 @@ function AdminPanel({ onLogout }) {
 
     if (!dbStatus) return;
 
-    const { error } = await supabase
+    const order = orders.find((item) => item.id === orderId);
+
+    if (!order) return;
+
+    const fromStatus = order.dbStatus || "PENDING";
+
+    if (fromStatus === dbStatus) return;
+
+    const { error: updateError } = await supabase
       .from("Order")
       .update({ status: dbStatus })
       .eq("id", orderId);
 
-    if (error) {
-      console.error("Failed to update order status:", error);
+    if (updateError) {
+      console.error(
+        "Failed to update order status:",
+        updateError
+      );
       alert("Не удалось изменить статус заказа.");
       return;
+    }
+
+    const { error: historyError } = await supabase
+      .from("OrderStatusHistory")
+      .insert({
+        id: crypto.randomUUID(),
+        orderId,
+        fromStatus,
+        toStatus: dbStatus,
+        note: "Статус изменён администратором",
+      });
+
+    if (historyError) {
+      console.error(
+        "Failed to save order status history:",
+        historyError
+      );
+
+      alert(
+        "Статус заказа изменён, но история не сохранилась."
+      );
     }
 
     setOrders((current) =>
