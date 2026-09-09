@@ -224,7 +224,7 @@ const deliveryOptions = [
     }
 
     const orderId = crypto.randomUUID();
-    const orderNumber = `GR-${Date.now().toString().slice(-8)}`;
+    const orderNumber = `GR-${new Date().getTime().toString().slice(-8)}`;
     const now = new Date().toISOString();
 
     const order = {
@@ -599,7 +599,17 @@ const deliveryOptions = [
 
           </div>
 
-          {filteredProducts.length > 0 ? (
+          {productsLoading ? (
+            <div className="empty-state">
+              <h3>Загрузка каталога...</h3>
+              <p>Получаем товары из Supabase.</p>
+            </div>
+          ) : productsError ? (
+            <div className="empty-state">
+              <h3>Не удалось загрузить каталог</h3>
+              <p>{productsError}</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
 
             <div className="products-grid">
 
