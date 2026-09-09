@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
 import AdminLogin from "./admin/AdminLogin";
 import AdminPanel from "./admin/AdminPanel";
+import AuthModal from "./AuthModal";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -24,10 +25,32 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState("");
 
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) {
+        setUser(data.session?.user ?? null);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
   useEffect(() => {
     const loadProducts = async () => {
       setProductsLoading(true);
@@ -219,7 +242,7 @@ const deliveryOptions = [
     event.preventDefault();
 
     if (!cart.length) {
-      alert("������� �����.");
+      alert("Корзина пуста.");
       return;
     }
 
@@ -639,9 +662,11 @@ const deliveryOptions = [
                             : "favorite"
                         }
                         aria-label="Добавить в избранное"
-                        onClick={() =>
-                          toggleFavorite(product.id)
-                        }
+                        onClick={(event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  toggleFavorite(product.id);
+}}
                       >
                         {favorite ? "♥" : "♡"}
                       </button>
@@ -1057,7 +1082,10 @@ const deliveryOptions = [
                         type="button"
                         className="remove-favorite"
                         aria-label="Удалить из избранного"
-                        onClick={() => toggleFavorite(product.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
                       >
                         ♥
                       </button>
