@@ -1,247 +1,235 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { supabase } from "./lib/supabase";
 
 export default function AuthModal({ user, onClose }) {
-  const [mode, setMode] = useState(user ? "account" : "login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [step, setStep] = useState("phone");
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [requestId, setRequestId] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const resetMessages = () => {
-    setMessage("");
-    setError("");
-  };
-
-  const handleLogin = async (event) => {
+  const handleSendCode = async (event) => {
     event.preventDefault();
 
-    resetMessages();
     setLoading(true);
+    setError("");
+    setMessage("");
 
-    const { error: loginError } =
-      await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+    const { data, error: functionError } =
+      await supabase.functions.invoke("telegram-send-code", {
+        body: {
+          action: "send",
+          phone,
+        },
       });
 
     setLoading(false);
 
-    if (loginError) {
-      setError(loginError.message);
+    if (functionError) {
+      setError(functionError.message || "Не удалось отправить код");
+      return;
+    }
+
+    if (!data?.success || !data?.request_id) {
+      setError(data?.error || "Не удалось отправить код");
+      return;
+    }
+
+    setRequestId(data.request_id);
+    setStep("code");
+    setMessage("Код отправлен в Telegram. Проверьте чат «Verification Codes».");
+  };
+
+  const handleVerifyCode = async (event) => {
+    event.preventDefault();
+
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    const { data, error: functionError } =
+      await supabase.functions.invoke("telegram-send-code", {
+        body: {
+          action: "verify",
+          phone,
+          request_id: requestId,
+          code,
+        },
+      });
+
+    setLoading(false);
+
+    if (functionError) {
+      setError(functionError.message || "Не удалось проверить код");
+      return;
+    }
+
+    if (!data?.success || !data?.session) {
+      setError(data?.error || "Не удалось войти");
+      return;
+    }
+
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: data.session.access_token,
+      refresh_token: data.session.refresh_token,
+    });
+
+    if (sessionError) {
+      setError(sessionError.message || "Не удалось создать сессию");
       return;
     }
 
     onClose();
-  };
-
-  const handleSignup = async (event) => {
-    event.preventDefault();
-
-    resetMessages();
-
-    if (password.length < 6) {
-      setError("Пароль должен содержать минимум 6 символов.");
-      return;
-    }
-
-    setLoading(true);
-
-    const {
-      data,
-      error: signupError,
-    } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    });
-
-    setLoading(false);
-
-    if (signupError) {
-      setError(signupError.message);
-      return;
-    }
-
-    if (data.session) {
-      onClose();
-      return;
-    }
-
-    setMessage(
-      "Регистрация выполнена. Проверьте почту для подтверждения аккаунта."
-    );
   };
 
   const handleLogout = async () => {
-    setLoading(true);
-
-    const { error: logoutError } = await supabase.auth.signOut();
-
-    setLoading(false);
-
-    if (logoutError) {
-      setError(logoutError.message);
-      return;
-    }
-
+    await supabase.auth.signOut();
     onClose();
   };
 
+  const displayPhone =
+    user?.user_metadata?.phone ||
+    user?.phone ||
+    "Телефон не указан";
+
+  if (user) {
+    return (
+      <div className="auth-overlay" onMouseDown={onClose}>
+        <div
+          className="auth-modal"
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            className="auth-close"
+            onClick={onClose}
+            aria-label="Закрыть"
+          >
+            ×
+          </button>
+
+          <div className="auth-header">
+            <div className="auth-icon">♡</div>
+            <h2>Мой аккаунт</h2>
+            <p>Вы вошли в GlowRush</p>
+          </div>
+
+          <div className="auth-account">
+            <div className="auth-account-label">Телефон</div>
+            <div className="auth-account-value">{displayPhone}</div>
+          </div>
+
+          <button
+            type="button"
+            className="auth-submit"
+            onClick={handleLogout}
+          >
+            Выйти
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="auth-overlay"
-      onClick={onClose}
-    >
+    <div className="auth-overlay" onMouseDown={onClose}>
       <div
         className="auth-modal"
-        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
       >
         <button
           type="button"
           className="auth-close"
-          aria-label="Закрыть"
           onClick={onClose}
+          aria-label="Закрыть"
         >
           ×
         </button>
 
-        {mode === "account" && user ? (
-          <>
-            <div className="auth-header">
-              <span className="auth-icon">👤</span>
-              <h2>Мой аккаунт</h2>
-              <p>{user.email}</p>
-            </div>
+        <div className="auth-header">
+          <div className="auth-icon">♡</div>
+          <h2>Вход в GlowRush</h2>
+          <p>
+            {step === "phone"
+              ? "Введите номер телефона"
+              : "Введите код из Telegram"}
+          </p>
+        </div>
 
-            {error && (
-              <div className="auth-error">
-                {error}
-              </div>
-            )}
+        {step === "phone" ? (
+          <form className="auth-form" onSubmit={handleSendCode}>
+            <label htmlFor="auth-phone">Номер телефона</label>
+
+            <input
+              id="auth-phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="+998901234567"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              required
+            />
+
+            {error && <div className="auth-error">{error}</div>}
+
+            {message && <div className="auth-message">{message}</div>}
+
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={loading}
+            >
+              {loading ? "Отправляем..." : "Получить код в Telegram"}
+            </button>
+          </form>
+        ) : (
+          <form className="auth-form" onSubmit={handleVerifyCode}>
+            <label htmlFor="auth-code">Код из Telegram</label>
+
+            <input
+              id="auth-code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="123456"
+              maxLength={8}
+              value={code}
+              onChange={(event) =>
+                setCode(event.target.value.replace(/\D/g, ""))
+              }
+              required
+            />
+
+            {message && <div className="auth-message">{message}</div>}
+
+            {error && <div className="auth-error">{error}</div>}
+
+            <button
+              type="submit"
+              className="auth-submit"
+              disabled={loading}
+            >
+              {loading ? "Проверяем..." : "Войти"}
+            </button>
 
             <button
               type="button"
-              className="auth-submit"
+              className="auth-switch"
+              onClick={() => {
+                setStep("phone");
+                setCode("");
+                setRequestId("");
+                setError("");
+                setMessage("");
+              }}
               disabled={loading}
-              onClick={handleLogout}
             >
-              {loading ? "Выходим..." : "Выйти"}
+              Изменить номер
             </button>
-          </>
-        ) : (
-          <>
-            <div className="auth-header">
-              <span className="auth-icon">👤</span>
-
-              <h2>
-                {mode === "login"
-                  ? "Вход"
-                  : "Регистрация"}
-              </h2>
-
-              <p>
-                {mode === "login"
-                  ? "Войдите в аккаунт GlowRush"
-                  : "Создайте аккаунт GlowRush"}
-              </p>
-            </div>
-
-            <form
-              className="auth-form"
-              onSubmit={
-                mode === "login"
-                  ? handleLogin
-                  : handleSignup
-              }
-            >
-              <label>
-                Email
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) =>
-                    setEmail(event.target.value)
-                  }
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                />
-              </label>
-
-              <label>
-                Пароль
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) =>
-                    setPassword(event.target.value)
-                  }
-                  placeholder="Минимум 6 символов"
-                  autoComplete={
-                    mode === "login"
-                      ? "current-password"
-                      : "new-password"
-                  }
-                  required
-                />
-              </label>
-
-              {error && (
-                <div className="auth-error">
-                  {error}
-                </div>
-              )}
-
-              {message && (
-                <div className="auth-message">
-                  {message}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="auth-submit"
-                disabled={loading}
-              >
-                {loading
-                  ? "Подождите..."
-                  : mode === "login"
-                    ? "Войти"
-                    : "Зарегистрироваться"}
-              </button>
-            </form>
-
-            <div className="auth-switch">
-              {mode === "login" ? (
-                <>
-                  <span>Нет аккаунта?</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      resetMessages();
-                      setMode("signup");
-                    }}
-                  >
-                    Зарегистрироваться
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span>Уже есть аккаунт?</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      resetMessages();
-                      setMode("login");
-                    }}
-                  >
-                    Войти
-                  </button>
-                </>
-              )}
-            </div>
-          </>
+          </form>
         )}
       </div>
     </div>
