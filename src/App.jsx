@@ -285,7 +285,7 @@ const deliveryOptions = [
             checkoutForm.comment?.trim(),
           ]
             .filter(Boolean)
-            .join(" � ") || null,
+            .join(" я┐╜ ") || null,
         });
 
       if (orderError) throw orderError;
@@ -326,7 +326,7 @@ const deliveryOptions = [
           orderId,
           fromStatus: null,
           toStatus: "PENDING",
-          note: "����� ������ � �����",
+          note: "я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜",
         });
 
       if (historyError) throw historyError;
@@ -338,7 +338,7 @@ const deliveryOptions = [
     } catch (error) {
       console.error("Supabase order creation error:", error);
       alert(
-        `�� ������� �������� �����.\n\n${error.message || "����������� ������"}`
+        `я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜.\n\n${error.message || "я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜"}`
       );
     }
   };
@@ -464,7 +464,7 @@ const deliveryOptions = [
                     setSearchOpen(false);
                   }}
                 >
-                  ×
+                  ├Ч
                 </button>
               </div>
             )}
@@ -779,7 +779,7 @@ const deliveryOptions = [
               aria-label="Закрыть"
               onClick={() => setSelectedProduct(null)}
             >
-              ×
+              ├Ч
             </button>
 
             <div className="product-modal-image">
@@ -876,7 +876,7 @@ const deliveryOptions = [
                 aria-label="Закрыть корзину"
                 onClick={() => setCartOpen(false)}
               >
-                ×
+                ├Ч
               </button>
             </div>
 
@@ -935,7 +935,7 @@ const deliveryOptions = [
                               decreaseQuantity(item.id)
                             }
                           >
-                            −
+                            тИТ
                           </button>
 
                           <span>{item.quantity}</span>
@@ -961,7 +961,7 @@ const deliveryOptions = [
                           removeFromCart(item.id)
                         }
                       >
-                        ×
+                        ├Ч
                       </button>
 
                     </div>
@@ -1019,7 +1019,7 @@ const deliveryOptions = [
                 aria-label="Закрыть избранное"
                 onClick={() => setFavoritesOpen(false)}
               >
-                ×
+                ├Ч
               </button>
             </div>
 
@@ -1131,7 +1131,7 @@ const deliveryOptions = [
           className="checkout-close"
           onClick={() => setCheckoutOpen(false)}
         >
-          ×
+          ├Ч
         </button>
 
         {checkoutStatus === "form" ? (
@@ -1265,7 +1265,7 @@ const deliveryOptions = [
           </>
         ) : (
           <div className="checkout-success">
-            <div className="checkout-success-icon">✓</div>
+            <div className="checkout-success-icon">тЬУ</div>
 
             <p className="eyebrow">ЗАКАЗ ПРИНЯТ</p>
 
@@ -1301,7 +1301,6 @@ const deliveryOptions = [
 }
 
 export default App;
-
 
 
 
