@@ -1,6 +1,5 @@
 ﻿import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
-import AdminLogin from "./admin/AdminLogin";
 import AdminPanel from "./admin/AdminPanel";
 import AuthModal from "./AuthModal";
 import "./styles/glowrush.css";
@@ -104,6 +103,7 @@ function App() {
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -252,9 +252,50 @@ function App() {
   }, [orders]);
 
   const [adminOpen, setAdminOpen] = useState(false);
-  const [adminLoggedIn, setAdminLoggedIn] = useState(
-    () => sessionStorage.getItem("glowrush-admin") === "true"
-  );
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminRoleLoading, setAdminRoleLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAdminRole = async () => {
+      if (!user) {
+        if (mounted) {
+          setIsAdmin(false);
+          setAdminRoleLoading(false);
+        }
+        return;
+      }
+
+      setAdminRoleLoading(true);
+
+      const { data, error } = await supabase
+        .from("User")
+        .select("role,status")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.error("Admin role check error:", error);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(
+          data?.status === "ACTIVE" &&
+            (data?.role === "OWNER" || data?.role === "ADMIN")
+        );
+      }
+
+      setAdminRoleLoading(false);
+    };
+
+    checkAdminRole();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
 
   const filteredProducts = products.filter((product) => {
     const categoryMatch =
@@ -529,6 +570,33 @@ const deliveryOptions = [
           </nav>
 
           <div className="header-actions">
+
+            {user ? (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => {
+                  if (isAdmin) {
+                    setAdminOpen(true);
+                  } else {
+                    setProfileOpen(true);
+                  }
+                }}
+                aria-label="Открыть профиль"
+              >
+                {user?.user_metadata?.name || user?.user_metadata?.preferred_username || user?.email?.split("@")[0] || "Профиль"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => setAuthOpen(true)}
+                aria-label="Войти"
+              >
+                Войти
+              </button>
+            )}
+
 
             {searchOpen && (
               <div className="search-field">
@@ -840,14 +908,6 @@ const deliveryOptions = [
         <p>
           © 2026 GlowRush. Корейская косметика.
         </p>
-
-              <button
-          type="button"
-          className="admin-access"
-          onClick={() => setAdminOpen(true)}
-        >
-          Админ
-        </button>
 </footer>
 
 
@@ -1190,6 +1250,127 @@ const deliveryOptions = [
           </aside>
         </div>
       )}
+  {profileOpen && (
+    <div
+      className="profile-overlay"
+      onClick={() => setProfileOpen(false)}
+    >
+      <section
+        className="profile-panel"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="profile-panel-header">
+          <div>
+            <p className="eyebrow">ЛИЧНЫЙ КАБИНЕТ</p>
+            <h2>
+              {user?.user_metadata?.name ||
+                user?.user_metadata?.preferred_username ||
+                user?.email?.split("@")[0] ||
+                "Ваш аккаунт"}
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            className="profile-panel-close"
+            onClick={() => setProfileOpen(false)}
+            aria-label="Закрыть профиль"
+          >
+            <Icon name="close" size={20} />
+          </button>
+        </div>
+
+        <div className="profile-panel-content">
+          <div className="profile-user-card">
+            <div className="profile-avatar">
+              {(
+                user?.user_metadata?.name ||
+                user?.user_metadata?.preferred_username ||
+                user?.email ||
+                "G"
+              )
+                .charAt(0)
+                .toUpperCase()}
+            </div>
+
+            <div>
+              <strong>
+                {user?.user_metadata?.name ||
+                  user?.user_metadata?.preferred_username ||
+                  user?.email?.split("@")[0] ||
+                  "Пользователь"}
+              </strong>
+
+              <p>{user?.email || "Telegram аккаунт"}</p>
+            </div>
+          </div>
+
+          <div className="profile-menu">
+            <button
+              type="button"
+              onClick={() => {
+                setProfileOpen(false);
+                setFavoritesOpen(true);
+              }}
+            >
+              <span>
+                <Icon name="heart" size={19} />
+              </span>
+              <div>
+                <strong>Избранное</strong>
+                <small>
+                  {favorites.length} сохраненных товаров
+                </small>
+              </div>
+              <b>→</b>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setProfileOpen(false);
+                setCartOpen(true);
+              }}
+            >
+              <span>
+                <Icon name="cart" size={19} />
+              </span>
+              <div>
+                <strong>Корзина</strong>
+                <small>
+                  {cartCount} товаров
+                </small>
+              </div>
+              <b>→</b>
+            </button>
+          </div>
+
+          <div className="profile-account-info">
+            <p className="eyebrow">АККАУНТ</p>
+
+            <div>
+              <span>Email</span>
+              <strong>{user?.email || "Не указан"}</strong>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="profile-logout"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setUser(null);
+              setIsAdmin(false);
+              setProfileOpen(false);
+              setAuthOpen(false);
+            }}
+          >
+            Выйти из аккаунта
+          </button>
+        </div>
+      </section>
+    </div>
+  )}
   {adminOpen && (
     <div className="admin-screen">
       <button
@@ -1200,19 +1381,27 @@ const deliveryOptions = [
         ← Вернуться в магазин
       </button>
 
-      {adminLoggedIn ? (
+      {adminRoleLoading ? (
+        <div className="admin-login">
+          <div className="admin-login-card">
+            <div className="admin-login-logo">GR</div>
+            <p className="eyebrow">GLOWRUSH ADMIN</p>
+            <h1>Проверка доступа</h1>
+            <p className="admin-login-text">
+              Проверяем права администратора...
+            </p>
+          </div>
+        </div>
+      ) : isAdmin ? (
         <AdminPanel
           orders={orders}
-          onLogout={() => {
-            sessionStorage.removeItem("glowrush-admin");
-            setAdminLoggedIn(false);
+          onLogout={async () => {
+            await supabase.auth.signOut();
+            setIsAdmin(false);
+            setAdminOpen(false);
           }}
         />
-      ) : (
-        <AdminLogin
-          onLogin={() => setAdminLoggedIn(true)}
-        />
-      )}
+      ) : null}
     </div>
   )}
   {checkoutOpen && (
@@ -1395,6 +1584,20 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
