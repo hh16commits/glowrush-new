@@ -312,6 +312,11 @@ const deliveryOptions = [
   const orderTotal = cartTotal + deliveryFee;
 
   const openCheckout = () => {
+    if (!user) {
+      setAuthOpen(true);
+      return;
+    }
+
     setCheckoutStatus("form");
     setCheckoutOpen(true);
   };
@@ -346,6 +351,7 @@ const deliveryOptions = [
         .insert({
           id: orderId,
           orderNumber,
+          userId: user.id,
           guestName: checkoutForm.name.trim(),
           guestPhone: checkoutForm.phone.trim(),
           status: "PENDING",
@@ -363,7 +369,7 @@ const deliveryOptions = [
             checkoutForm.comment?.trim(),
           ]
             .filter(Boolean)
-            .join(" � ") || null,
+            .join(" — ") || null,
         });
 
       if (orderError) throw orderError;
@@ -404,7 +410,7 @@ const deliveryOptions = [
           orderId,
           fromStatus: null,
           toStatus: "PENDING",
-          note: "����� ������ � �����",
+          note: "Новый заказ создан в магазине",
         });
 
       if (historyError) throw historyError;
@@ -416,7 +422,7 @@ const deliveryOptions = [
     } catch (error) {
       console.error("Supabase order creation error:", error);
       alert(
-        `�� ������� �������� �����.\n\n${error.message || "����������� ������"}`
+        `Не удалось оформить заказ.\n\n${error.message || "Неизвестная ошибка"}`
       );
     }
   };
@@ -1389,6 +1395,10 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
 
 
 
