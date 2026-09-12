@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
 import AdminLogin from "./admin/AdminLogin";
 import AdminPanel from "./admin/AdminPanel";
@@ -16,6 +16,84 @@ const categories = [
   "Маски",
 ]
 
+function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    "aria-hidden": "true",
+  };
+
+  switch (name) {
+    case "cart":
+      return (
+        <svg {...common}>
+          <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6" />
+          <circle cx="10" cy="20" r="1" />
+          <circle cx="18" cy="20" r="1" />
+        </svg>
+      );
+
+    case "heart":
+      return (
+        <svg {...common}>
+          <path d="M20.8 8.8c0 5.2-8.8 10.2-8.8 10.2S3.2 14 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z" />
+        </svg>
+      );
+
+    case "close":
+      return (
+        <svg {...common}>
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      );
+
+    case "plus":
+      return (
+        <svg {...common}>
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      );
+
+    case "minus":
+      return (
+        <svg {...common}>
+          <path d="M5 12h14" />
+        </svg>
+      );
+
+    case "trash":
+      return (
+        <svg {...common}>
+          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+        </svg>
+      );
+
+    case "check":
+      return (
+        <svg {...common}>
+          <path d="m5 12 4 4L19 6" />
+        </svg>
+      );
+
+    case "user":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 20a7 7 0 0 1 14 0" />
+        </svg>
+      );
+
+    default:
+      return null;
+  }
+}
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -285,7 +363,7 @@ const deliveryOptions = [
             checkoutForm.comment?.trim(),
           ]
             .filter(Boolean)
-            .join(" я┐╜ ") || null,
+            .join(" � ") || null,
         });
 
       if (orderError) throw orderError;
@@ -326,7 +404,7 @@ const deliveryOptions = [
           orderId,
           fromStatus: null,
           toStatus: "PENDING",
-          note: "я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜",
+          note: "����� ������ � �����",
         });
 
       if (historyError) throw historyError;
@@ -338,7 +416,7 @@ const deliveryOptions = [
     } catch (error) {
       console.error("Supabase order creation error:", error);
       alert(
-        `я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜.\n\n${error.message || "я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜"}`
+        `�� ������� �������� �����.\n\n${error.message || "����������� ������"}`
       );
     }
   };
@@ -464,7 +542,7 @@ const deliveryOptions = [
                     setSearchOpen(false);
                   }}
                 >
-                  ├Ч
+                  <Icon name="close" size={18} />
                 </button>
               </div>
             )}
@@ -484,7 +562,7 @@ const deliveryOptions = [
               aria-label="Избранное"
               onClick={() => setFavoritesOpen(true)}
             >
-              ♡
+              <Icon name="heart" size={20} />
 
               {favorites.length > 0 && (
                 <span className="favorites-count">
@@ -499,7 +577,7 @@ const deliveryOptions = [
               aria-label="Корзина"
               onClick={() => setCartOpen(true)}
             >
-              🛒
+              <Icon name="cart" size={20} />
 
               {cartCount > 0 && (
                 <span className="cart-count">{cartCount}</span>
@@ -510,6 +588,10 @@ const deliveryOptions = [
         </div>
       </header>
 
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+      />
       <main>
 
         <section className="hero">
@@ -668,7 +750,7 @@ const deliveryOptions = [
   toggleFavorite(product.id);
 }}
                       >
-                        {favorite ? "♥" : "♡"}
+                        {favorite ? <Icon name="heart" size={18} strokeWidth={2.2} /> : <Icon name="heart" size={18} /> }
                       </button>
 
                     </div>
@@ -699,7 +781,7 @@ const deliveryOptions = [
                             addToCart(product);
                           }}
                         >
-                          +
+                          <Icon name="plus" size={18} />
                         </button>
 
                       </div>
@@ -779,7 +861,7 @@ const deliveryOptions = [
               aria-label="Закрыть"
               onClick={() => setSelectedProduct(null)}
             >
-              ├Ч
+              <Icon name="close" size={20} />
             </button>
 
             <div className="product-modal-image">
@@ -799,7 +881,7 @@ const deliveryOptions = [
                   toggleFavorite(selectedProduct.id)
                 }
               >
-                {favorites.includes(selectedProduct.id) ? "♥" : "♡"}
+                {favorites.includes(selectedProduct.id) ? <Icon name="heart" size={20} strokeWidth={2.2} /> : <Icon name="heart" size={20} /> }
               </button>
             </div>
 
@@ -876,14 +958,16 @@ const deliveryOptions = [
                 aria-label="Закрыть корзину"
                 onClick={() => setCartOpen(false)}
               >
-                ├Ч
+                <Icon name="close" size={20} />
               </button>
             </div>
 
             {cart.length === 0 ? (
 
               <div className="cart-empty">
-                <div className="cart-empty-icon">🛒</div>
+                <div className="cart-empty-icon">
+                  <Icon name="cart" size={42} strokeWidth={1.5} />
+                </div>
                 <h3>Корзина пока пуста</h3>
                 <p>
                   Добавьте понравившиеся товары,
@@ -935,7 +1019,7 @@ const deliveryOptions = [
                               decreaseQuantity(item.id)
                             }
                           >
-                            тИТ
+                            <Icon name="minus" size={16} />
                           </button>
 
                           <span>{item.quantity}</span>
@@ -946,7 +1030,7 @@ const deliveryOptions = [
                               increaseQuantity(item.id)
                             }
                           >
-                            +
+                            <Icon name="plus" size={16} />
                           </button>
 
                         </div>
@@ -961,7 +1045,7 @@ const deliveryOptions = [
                           removeFromCart(item.id)
                         }
                       >
-                        ├Ч
+                        <Icon name="close" size={16} />
                       </button>
 
                     </div>
@@ -1019,13 +1103,15 @@ const deliveryOptions = [
                 aria-label="Закрыть избранное"
                 onClick={() => setFavoritesOpen(false)}
               >
-                ├Ч
+                <Icon name="close" size={20} />
               </button>
             </div>
 
             {favorites.length === 0 ? (
               <div className="favorites-empty">
-                <div className="favorites-empty-icon">♡</div>
+                <div className="favorites-empty-icon">
+                  <Icon name="heart" size={42} strokeWidth={1.5} />
+                </div>
 
                 <h3>Избранное пока пусто</h3>
 
@@ -1087,7 +1173,7 @@ const deliveryOptions = [
                           toggleFavorite(product.id);
                         }}
                       >
-                        ♥
+                        <Icon name="heart" size={18} strokeWidth={2.2} />
                       </button>
 
                     </div>
@@ -1131,7 +1217,7 @@ const deliveryOptions = [
           className="checkout-close"
           onClick={() => setCheckoutOpen(false)}
         >
-          ├Ч
+          <Icon name="close" size={20} />
         </button>
 
         {checkoutStatus === "form" ? (
@@ -1265,7 +1351,9 @@ const deliveryOptions = [
           </>
         ) : (
           <div className="checkout-success">
-            <div className="checkout-success-icon">тЬУ</div>
+            <div className="checkout-success-icon">
+              <Icon name="check" size={42} strokeWidth={1.8} />
+            </div>
 
             <p className="eyebrow">ЗАКАЗ ПРИНЯТ</p>
 
@@ -1301,6 +1389,12 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
+
+
 
 
 

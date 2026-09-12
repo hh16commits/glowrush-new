@@ -1,143 +1,51 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
 
-export default function AuthModal({ user, onClose }) {
-  const [step, setStep] = useState("phone");
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [requestId, setRequestId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+function AuthModal({ open, onClose }) {
+  const [user, setUser] = useState(null);
 
-  const handleSendCode = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    if (!open) return;
 
-    setLoading(true);
-    setError("");
-    setMessage("");
+    let mounted = true;
 
-    const { data, error: functionError } =
-      await supabase.functions.invoke("telegram-send-code", {
-        body: {
-          action: "send",
-          phone,
-        },
-      });
-
-    setLoading(false);
-
-    if (functionError) {
-      setError(functionError.message || "Не удалось отправить код");
-      return;
-    }
-
-    if (!data?.success || !data?.request_id) {
-      setError(data?.error || "Не удалось отправить код");
-      return;
-    }
-
-    setRequestId(data.request_id);
-    setStep("code");
-    setMessage("Код отправлен в Telegram. Проверьте чат «Verification Codes».");
-  };
-
-  const handleVerifyCode = async (event) => {
-    event.preventDefault();
-
-    setLoading(true);
-    setError("");
-    setMessage("");
-
-    const { data, error: functionError } =
-      await supabase.functions.invoke("telegram-send-code", {
-        body: {
-          action: "verify",
-          phone,
-          request_id: requestId,
-          code,
-        },
-      });
-
-    setLoading(false);
-
-    if (functionError) {
-      setError(functionError.message || "Не удалось проверить код");
-      return;
-    }
-
-    if (!data?.success || !data?.session) {
-      setError(data?.error || "Не удалось войти");
-      return;
-    }
-
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) {
+        setUser(data.user ?? null);
+      }
     });
 
-    if (sessionError) {
-      setError(sessionError.message || "Не удалось создать сессию");
-      return;
-    }
+    return () => {
+      mounted = false;
+    };
+  }, [open]);
 
-    onClose();
+  if (!open) return null;
+
+  const handleTelegramLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "custom:telegram",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      console.error("Telegram login error:", error);
+      alert("Не удалось открыть вход через Telegram.");
+    }
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    onClose();
+    setUser(null);
   };
 
-  const displayPhone =
-    user?.user_metadata?.phone ||
-    user?.phone ||
-    "Телефон не указан";
-
-  if (user) {
-    return (
-      <div className="auth-overlay" onMouseDown={onClose}>
-        <div
-          className="auth-modal"
-          onMouseDown={(event) => event.stopPropagation()}
-        >
-          <button
-            type="button"
-            className="auth-close"
-            onClick={onClose}
-            aria-label="Закрыть"
-          >
-            ×
-          </button>
-
-          <div className="auth-header">
-            <div className="auth-icon">♡</div>
-            <h2>Мой аккаунт</h2>
-            <p>Вы вошли в GlowRush</p>
-          </div>
-
-          <div className="auth-account">
-            <div className="auth-account-label">Телефон</div>
-            <div className="auth-account-value">{displayPhone}</div>
-          </div>
-
-          <button
-            type="button"
-            className="auth-submit"
-            onClick={handleLogout}
-          >
-            Выйти
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="auth-overlay" onMouseDown={onClose}>
+    <div className="auth-overlay" onClick={onClose}>
       <div
         className="auth-modal"
-        onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
@@ -145,93 +53,61 @@ export default function AuthModal({ user, onClose }) {
           onClick={onClose}
           aria-label="Закрыть"
         >
-          ×
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
         </button>
 
-        <div className="auth-header">
-          <div className="auth-icon">♡</div>
-          <h2>Вход в GlowRush</h2>
-          <p>
-            {step === "phone"
-              ? "Введите номер телефона"
-              : "Введите код из Telegram"}
-          </p>
-        </div>
+        <p className="eyebrow">GLOWRUSH</p>
 
-        {step === "phone" ? (
-          <form className="auth-form" onSubmit={handleSendCode}>
-            <label htmlFor="auth-phone">Номер телефона</label>
+        {user ? (
+          <>
+            <h2>Вы вошли</h2>
 
-            <input
-              id="auth-phone"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              placeholder="+998901234567"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-              required
-            />
-
-            {error && <div className="auth-error">{error}</div>}
-
-            {message && <div className="auth-message">{message}</div>}
-
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={loading}
-            >
-              {loading ? "Отправляем..." : "Получить код в Telegram"}
-            </button>
-          </form>
-        ) : (
-          <form className="auth-form" onSubmit={handleVerifyCode}>
-            <label htmlFor="auth-code">Код из Telegram</label>
-
-            <input
-              id="auth-code"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="123456"
-              maxLength={8}
-              value={code}
-              onChange={(event) =>
-                setCode(event.target.value.replace(/\D/g, ""))
-              }
-              required
-            />
-
-            {message && <div className="auth-message">{message}</div>}
-
-            {error && <div className="auth-error">{error}</div>}
-
-            <button
-              type="submit"
-              className="auth-submit"
-              disabled={loading}
-            >
-              {loading ? "Проверяем..." : "Войти"}
-            </button>
+            <p>
+              {user.user_metadata?.name ||
+                user.user_metadata?.preferred_username ||
+                "Аккаунт Telegram"}
+            </p>
 
             <button
               type="button"
-              className="auth-switch"
-              onClick={() => {
-                setStep("phone");
-                setCode("");
-                setRequestId("");
-                setError("");
-                setMessage("");
-              }}
-              disabled={loading}
+              className="hero-button"
+              onClick={handleLogout}
             >
-              Изменить номер
+              Выйти
             </button>
-          </form>
+          </>
+        ) : (
+          <>
+            <h2>Вход в GlowRush</h2>
+
+            <p>
+              Войдите через Telegram, чтобы оформить заказ.
+            </p>
+
+            <button
+              type="button"
+              className="hero-button"
+              onClick={handleTelegramLogin}
+            >
+              Войти через Telegram
+            </button>
+          </>
         )}
       </div>
     </div>
   );
 }
+
+export default AuthModal;

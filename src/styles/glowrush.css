@@ -3,6 +3,8 @@
    Main stylesheet
 ========================================================= */
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 :root {
   --bg: #fffafb;
   --surface: #ffffff;
@@ -3145,7 +3147,7 @@ input:focus-visible {
 }
 
 /* =====================================================
-   ADMIN — FULL SCREEN OVERRIDE
+   ADMIN РІР‚вЂќ FULL SCREEN OVERRIDE
    ===================================================== */
 
 .admin-screen {
@@ -3167,14 +3169,14 @@ input:focus-visible {
   margin: 34px auto 0;
 }
 
-/* Верхняя навигация админки */
+/* Р вЂ™Р ВµРЎР‚РЎвЂ¦Р Р…РЎРЏРЎРЏ Р Р…Р В°Р Р†Р С‘Р С–Р В°РЎвЂ Р С‘РЎРЏ Р В°Р Т‘Р СР С‘Р Р…Р С”Р С‘ */
 
 .admin-screen > .admin-back {
   position: relative;
   z-index: 2;
 }
 
-/* Не даём содержимому магазина влиять на админку */
+/* Р СњР Вµ Р Т‘Р В°РЎвЂР С РЎРѓР С•Р Т‘Р ВµРЎР‚Р В¶Р С‘Р СР С•Р СРЎС“ Р СР В°Р С–Р В°Р В·Р С‘Р Р…Р В° Р Р†Р В»Р С‘РЎРЏРЎвЂљРЎРЉ Р Р…Р В° Р В°Р Т‘Р СР С‘Р Р…Р С”РЎС“ */
 
 .admin-screen * {
   box-sizing: border-box;
@@ -3314,7 +3316,7 @@ input:focus-visible {
 
 
 /* =====================================================
-   ADMIN — ORDER ROW POLISH
+   ADMIN РІР‚вЂќ ORDER ROW POLISH
    ===================================================== */
 
 .admin-order-item {
@@ -3369,7 +3371,7 @@ input:focus-visible {
   font-weight: 700;
 }
 
-/* Строка заказа в общем списке */
+/* Р РЋРЎвЂљРЎР‚Р С•Р С”Р В° Р В·Р В°Р С”Р В°Р В·Р В° Р Р† Р С•Р В±РЎвЂ°Р ВµР С РЎРѓР С—Р С‘РЎРѓР С”Р Вµ */
 
 .admin-order {
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3392,7 +3394,7 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-/* Информация клиента */
+/* Р ВР Р…РЎвЂћР С•РЎР‚Р СР В°РЎвЂ Р С‘РЎРЏ Р С”Р В»Р С‘Р ВµР Р…РЎвЂљР В° */
 
 .admin-customer strong {
   margin-top: 3px;
@@ -3403,7 +3405,7 @@ input:focus-visible {
   min-height: 82px;
 }
 
-/* Итого */
+/* Р ВРЎвЂљР С•Р С–Р С• */
 
 .admin-order-modal .admin-total {
   display: flex;
@@ -3420,7 +3422,7 @@ input:focus-visible {
   font-size: 20px;
 }
 
-/* Комментарий */
+/* Р С™Р С•Р СР СР ВµР Р…РЎвЂљР В°РЎР‚Р С‘Р в„– */
 
 .admin-comment {
   line-height: 1.6;
@@ -3447,7 +3449,7 @@ input:focus-visible {
 
 
 /* =====================================================
-   ADMIN — CRM ORDER LIST
+   ADMIN РІР‚вЂќ CRM ORDER LIST
    ===================================================== */
 
 .admin-orders {
@@ -3479,7 +3481,7 @@ input:focus-visible {
   transform: translateY(-1px);
 }
 
-/* Левая часть */
+/* Р вЂєР ВµР Р†Р В°РЎРЏ РЎвЂЎР В°РЎРѓРЎвЂљРЎРЉ */
 
 .admin-order > div:first-child {
   display: grid;
@@ -3517,14 +3519,14 @@ input:focus-visible {
   font-size: 12px;
 }
 
-/* Статус */
+/* Р РЋРЎвЂљР В°РЎвЂљРЎС“РЎРѓ */
 
 .admin-order > div:first-child > .admin-status {
   justify-self: start;
   min-width: 96px;
 }
 
-/* Правая часть */
+/* Р СџРЎР‚Р В°Р Р†Р В°РЎРЏ РЎвЂЎР В°РЎРѓРЎвЂљРЎРЉ */
 
 .admin-order-right {
   display: flex;
@@ -3548,10 +3550,10 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-/* Заголовок списка — визуальная подсказка */
+/* Р вЂ”Р В°Р С–Р С•Р В»Р С•Р Р†Р С•Р С” РЎРѓР С—Р С‘РЎРѓР С”Р В° РІР‚вЂќ Р Р†Р С‘Р В·РЎС“Р В°Р В»РЎРЉР Р…Р В°РЎРЏ Р С—Р С•Р Т‘РЎРѓР С”Р В°Р В·Р С”Р В° */
 
 .admin-orders::before {
-  content: "ЗАКАЗ                         КЛИЕНТ                         КОНТАКТ                         СТАТУС                                                     СУММА";
+  content: "Р вЂ”Р С’Р С™Р С’Р вЂ”                         Р С™Р вЂєР ВР вЂўР СњР Сћ                         Р С™Р С›Р СњР СћР С’Р С™Р Сћ                         Р РЋР СћР С’Р СћР Р€Р РЋ                                                     Р РЋР Р€Р СљР СљР С’";
   display: block;
   padding: 0 22px 8px;
   color: #a09399;
@@ -3562,7 +3564,7 @@ input:focus-visible {
   pointer-events: none;
 }
 
-/* Убираем заголовок на мобильном */
+/* Р Р€Р В±Р С‘РЎР‚Р В°Р ВµР С Р В·Р В°Р С–Р С•Р В»Р С•Р Р†Р С•Р С” Р Р…Р В° Р СР С•Р В±Р С‘Р В»РЎРЉР Р…Р С•Р С */
 
 @media (max-width: 900px) {
   .admin-order {
@@ -3612,10 +3614,10 @@ input:focus-visible {
 
 
 /* =====================================================
-   ADMIN — FINAL ORDER ALIGNMENT
+   ADMIN РІР‚вЂќ FINAL ORDER ALIGNMENT
    ===================================================== */
 
-/* Ровные колонки в строке заказа */
+/* Р В Р С•Р Р†Р Р…РЎвЂ№Р Вµ Р С”Р С•Р В»Р С•Р Р…Р С”Р С‘ Р Р† РЎРѓРЎвЂљРЎР‚Р С•Р С”Р Вµ Р В·Р В°Р С”Р В°Р В·Р В° */
 
 .admin-order > div:first-child {
   display: grid;
@@ -3650,7 +3652,7 @@ input:focus-visible {
   justify-self: start;
 }
 
-/* Аккуратная правая часть */
+/* Р С’Р С”Р С”РЎС“РЎР‚Р В°РЎвЂљР Р…Р В°РЎРЏ Р С—РЎР‚Р В°Р Р†Р В°РЎРЏ РЎвЂЎР В°РЎРѓРЎвЂљРЎРЉ */
 
 .admin-order-right {
   min-width: 185px;
@@ -3660,7 +3662,7 @@ input:focus-visible {
   gap: 18px;
 }
 
-/* Разделяем бренд / название / количество */
+/* Р В Р В°Р В·Р Т‘Р ВµР В»РЎРЏР ВµР С Р В±РЎР‚Р ВµР Р…Р Т‘ / Р Р…Р В°Р В·Р Р†Р В°Р Р…Р С‘Р Вµ / Р С”Р С•Р В»Р С‘РЎвЂЎР ВµРЎРѓРЎвЂљР Р†Р С• */
 
 .admin-order-item {
   word-spacing: 2px;
@@ -3678,10 +3680,10 @@ input:focus-visible {
   margin-left: 12px;
 }
 
-/* Более чистый заголовок таблицы */
+/* Р вЂР С•Р В»Р ВµР Вµ РЎвЂЎР С‘РЎРѓРЎвЂљРЎвЂ№Р в„– Р В·Р В°Р С–Р С•Р В»Р С•Р Р†Р С•Р С” РЎвЂљР В°Р В±Р В»Р С‘РЎвЂ РЎвЂ№ */
 
 .admin-orders::before {
-  content: "ЗАКАЗ        КЛИЕНТ        ТЕЛЕФОН        ДЕТАЛИ        СТАТУС";
+  content: "Р вЂ”Р С’Р С™Р С’Р вЂ”        Р С™Р вЂєР ВР вЂўР СњР Сћ        Р СћР вЂўР вЂєР вЂўР В¤Р С›Р Сњ        Р вЂќР вЂўР СћР С’Р вЂєР В        Р РЋР СћР С’Р СћР Р€Р РЋ";
   display: block;
   padding: 0 22px 9px;
   color: #a09399;
@@ -3691,7 +3693,7 @@ input:focus-visible {
   white-space: pre;
 }
 
-/* На небольших экранах возвращаем адаптив */
+/* Р СњР В° Р Р…Р ВµР В±Р С•Р В»РЎРЉРЎв‚¬Р С‘РЎвЂ¦ РЎРЊР С”РЎР‚Р В°Р Р…Р В°РЎвЂ¦ Р Р†Р С•Р В·Р Р†РЎР‚Р В°РЎвЂ°Р В°Р ВµР С Р В°Р Т‘Р В°Р С—РЎвЂљР С‘Р Р† */
 
 @media (max-width: 1000px) {
   .admin-order {
@@ -3725,4 +3727,99 @@ input:focus-visible {
     min-width: 0;
   }
 }
+/* GlowRush authentication modal */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(35, 28, 32, 0.48);
+  backdrop-filter: blur(8px);
+}
 
+.auth-modal {
+  position: relative;
+  width: min(100%, 440px);
+  padding: 42px 36px 36px;
+  border: 1px solid rgba(224, 126, 158, 0.22);
+  border-radius: 28px;
+  background: #fffafb;
+  box-shadow: 0 28px 80px rgba(54, 35, 43, 0.22);
+  text-align: center;
+}
+
+.auth-modal .eyebrow {
+  margin-bottom: 12px;
+}
+
+.auth-modal h2 {
+  margin: 0 0 12px;
+}
+
+.auth-modal p:not(.eyebrow) {
+  margin: 0 auto 24px;
+  max-width: 340px;
+  line-height: 1.6;
+}
+
+.auth-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(35, 28, 32, 0.12);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.auth-close:hover {
+  background: rgba(224, 126, 158, 0.08);
+}
+
+.auth-modal .hero-button {
+  width: 100%;
+  min-height: 52px;
+}
+
+@media (max-width: 600px) {
+  .auth-overlay {
+    padding: 16px;
+  }
+
+  .auth-modal {
+    padding: 38px 22px 24px;
+    border-radius: 22px;
+  }
+}
+
+/* SVG icon alignment */
+.icon-button svg,
+.cart-button svg,
+.add-button svg,
+.cart-close svg,
+.favorites-close svg,
+.remove-cart-item svg,
+.product-modal-close svg,
+.product-modal-favorite svg,
+.quantity-control button svg,
+.checkout-close svg,
+.checkout-success-icon svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.product-modal-favorite,
+.checkout-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

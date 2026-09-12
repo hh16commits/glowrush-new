@@ -691,7 +691,19 @@ function AdminPanel({ onLogout }) {
                 setSelectedOrder(null)
               }
             >
-              ×
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
             </button>
 
             <p className="eyebrow">ORDER DETAILS</p>
@@ -834,3 +846,4 @@ function AdminPanel({ onLogout }) {
 }
 
 export default AdminPanel;
+
