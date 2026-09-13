@@ -1,9 +1,8 @@
 ﻿import React from "react";
-import Icon from "./Icon";
 
 export default function CartDrawer({
-  open,
-  onClose,
+  cartOpen,
+  setCartOpen,
   cart,
   cartTotal,
   decreaseQuantity,
@@ -12,37 +11,44 @@ export default function CartDrawer({
   openCheckout,
   scrollToCatalog,
 }) {
-  if (!open) return null;
+  if (!cartOpen) return null;
+
+  const closeCart = () => setCartOpen(false);
 
   return (
     <div
       className="cart-overlay"
-      onClick={onClose}
+      onClick={closeCart}
     >
       <aside
         className="cart-drawer"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="cart-header">
-          <h2>РљРѕСЂР·РёРЅР°</h2>
+          <h2>Корзина</h2>
 
-          <button onClick={onClose}>
-            Г—
+          <button
+            type="button"
+            onClick={closeCart}
+            aria-label="Закрыть корзину"
+          >
+            ×
           </button>
         </div>
 
         {cart.length === 0 ? (
           <div className="cart-empty">
-            <h3>РљРѕСЂР·РёРЅР° РїРѕРєР° РїСѓСЃС‚Р°</h3>
+            <h3>Корзина пока пуста</h3>
 
             <button
+              type="button"
               className="primary-button"
               onClick={() => {
-                onClose();
+                closeCart();
                 scrollToCatalog();
               }}
             >
-              РџРµСЂРµР№С‚Рё РІ РєР°С‚Р°Р»РѕРі
+              Перейти в каталог
             </button>
           </div>
         ) : (
@@ -55,27 +61,26 @@ export default function CartDrawer({
                 >
                   <div>
                     <h3>{item.name}</h3>
+
                     <strong>
-                      {item.price.toLocaleString("ru-RU")} СЃСѓРј
+                      {item.price.toLocaleString("ru-RU")} сум
                     </strong>
 
                     <div>
                       <button
-                        onClick={() =>
-                          decreaseQuantity(item.id)
-                        }
+                        type="button"
+                        onClick={() => decreaseQuantity(item.id)}
+                        aria-label="Уменьшить количество"
                       >
                         -
                       </button>
 
-                      <span>
-                        {item.quantity}
-                      </span>
+                      <span>{item.quantity}</span>
 
                       <button
-                        onClick={() =>
-                          increaseQuantity(item.id)
-                        }
+                        type="button"
+                        onClick={() => increaseQuantity(item.id)}
+                        aria-label="Увеличить количество"
                       >
                         +
                       </button>
@@ -83,11 +88,11 @@ export default function CartDrawer({
                   </div>
 
                   <button
-                    onClick={() =>
-                      removeFromCart(item.id)
-                    }
+                    type="button"
+                    onClick={() => removeFromCart(item.id)}
+                    aria-label={`Удалить ${item.name}`}
                   >
-                    Г—
+                    ×
                   </button>
                 </div>
               ))}
@@ -95,14 +100,15 @@ export default function CartDrawer({
 
             <div className="cart-footer">
               <strong>
-                {cartTotal.toLocaleString("ru-RU")} СЃСѓРј
+                {cartTotal.toLocaleString("ru-RU")} сум
               </strong>
 
               <button
+                type="button"
                 className="primary-button"
                 onClick={openCheckout}
               >
-                РћС„РѕСЂРјРёС‚СЊ Р·Р°РєР°Р·
+                Оформить заказ
               </button>
             </div>
           </>

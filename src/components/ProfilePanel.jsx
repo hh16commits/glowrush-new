@@ -12,8 +12,10 @@
   setAuthOpen,
   Icon
 }) {
+  if (!profileOpen) return null;
+
   return (
-<div
+    <div
       className="profile-overlay"
       onClick={() => setProfileOpen(false)}
     >
@@ -134,5 +136,6 @@
     </div>
   );
 }
+
 
 

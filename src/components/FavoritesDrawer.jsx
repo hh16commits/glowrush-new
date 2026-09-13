@@ -8,6 +8,8 @@
   scrollToCatalog,
   Icon
 }) {
+  if (!favoritesOpen) return null;
+
   return (
 <div
           className="favorites-overlay"
@@ -111,6 +113,8 @@
         </div>
   );
 }
+
+
 
 
 

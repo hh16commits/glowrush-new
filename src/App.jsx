@@ -5,6 +5,7 @@ import AuthModal from "./AuthModal";
 import CartDrawer from "./components/CartDrawer";
 import FavoritesDrawer from "./components/FavoritesDrawer";
 import ProfilePanel from "./components/ProfilePanel";
+import Icon from "./components/Icon";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -283,6 +284,7 @@ const deliveryOptions = [
       return;
     }
 
+    setCartOpen(false);
     setCheckoutStatus("form");
     setCheckoutOpen(true);
   };
@@ -295,91 +297,41 @@ const deliveryOptions = [
       return;
     }
 
-    const orderId = crypto.randomUUID();
-    const orderNumber = `GR-${new Date().getTime().toString().slice(-8)}`;
-    const now = new Date().toISOString();
-
-    const order = {
-      id: orderId,
-      number: orderNumber,
-      createdAt: new Date().toISOString(),
-      items: cart,
-      subtotal: cartTotal,
-      deliveryFee,
-      total: orderTotal,
-      customer: checkoutForm,
-      delivery: selectedDelivery,
-    };
+    if (!user) {
+      alert("Сначала войдите в аккаунт.");
+      setAuthOpen(true);
+      return;
+    }
 
     try {
-      const { error: orderError } = await supabase
-        .from("Order")
-        .insert({
-          id: orderId,
-          orderNumber,
-          userId: user.id,
-          guestName: checkoutForm.name.trim(),
-          guestPhone: checkoutForm.phone.trim(),
-          status: "PENDING",
-          currency: "UZS",
-          subtotal: cartTotal,
-          discountAmount: 0,
-          deliveryFee,
-          giftWrapFee: 0,
-          totalAmount: orderTotal,
-          localeAtOrder: "RU",
-          createdAt: now,
-          updatedAt: now,
-          notes: [
-            checkoutForm.city?.trim(),
-            checkoutForm.comment?.trim(),
-          ]
-            .filter(Boolean)
-            .join(" — ") || null,
-        });
+      const { data, error } = await supabase.rpc("create_order", {
+        p_items: cart.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+        })),
+        p_name: checkoutForm.name.trim(),
+        p_phone: checkoutForm.phone.trim(),
+        p_city: checkoutForm.city.trim(),
+        p_comment: checkoutForm.comment.trim() || null,
+        p_delivery_method: selectedDelivery.id,
+      });
 
-      if (orderError) throw orderError;
+      if (error) throw error;
 
-      const orderItems = cart.map((item) => ({
-        id: crypto.randomUUID(),
-        orderId,
-        productId: item.id,
-        quantity: item.quantity,
-        unitPrice: item.price,
-        totalPrice: item.price * item.quantity,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("OrderItem")
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      const { error: deliveryError } = await supabase
-        .from("Delivery")
-        .insert({
-          id: crypto.randomUUID(),
-          orderId,
-          provider: "MANUAL",
-          status: "READY_FOR_DELIVERY",
-          fee: deliveryFee,
-          createdAt: now,
-          updatedAt: now,
-        });
-
-      if (deliveryError) throw deliveryError;
-
-      const { error: historyError } = await supabase
-        .from("OrderStatusHistory")
-        .insert({
-          id: crypto.randomUUID(),
-          orderId,
-          fromStatus: null,
-          toStatus: "PENDING",
-          note: "Новый заказ создан в магазине",
-        });
-
-      if (historyError) throw historyError;
+      const order = {
+        id: data.orderId,
+        number: data.orderNumber,
+        createdAt: new Date().toISOString(),
+        items: cart,
+        subtotal: data.subtotal,
+        deliveryFee: data.deliveryFee,
+        total: data.total,
+        customer: checkoutForm,
+        delivery: {
+          ...selectedDelivery,
+          price: data.deliveryFee,
+        },
+      };
 
       setOrders((current) => [order, ...current]);
       setConfirmedOrder(order);
@@ -387,9 +339,18 @@ const deliveryOptions = [
       setCart([]);
     } catch (error) {
       console.error("Supabase order creation error:", error);
-      alert(
-        `Не удалось оформить заказ.\n\n${error.message || "Неизвестная ошибка"}`
-      );
+
+      const message = error?.message || "Неизвестная ошибка";
+
+      if (
+        message.includes("Недостаточно товара") ||
+        message.includes("Товар недоступен") ||
+        message.includes("Товар не найден")
+      ) {
+        alert("К сожалению, один из товаров сейчас недоступен.");
+      } else {
+        alert(`Не удалось оформить заказ.\n\n${message}`);
+      }
     }
   };
   const addToCart = (product) => {
@@ -1175,6 +1136,9 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
 
 
 
