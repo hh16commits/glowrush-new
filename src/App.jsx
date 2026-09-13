@@ -2,6 +2,7 @@
 import { supabase } from "./lib/supabase";
 import AdminPanel from "./admin/AdminPanel";
 import AuthModal from "./AuthModal";
+import CartDrawer from "./components/CartDrawer";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -1001,153 +1002,18 @@ const deliveryOptions = [
         </div>
       )}
 
-      {cartOpen && (
-        <div
-          className="cart-overlay"
-          onClick={() => setCartOpen(false)}
-        >
-
-          <aside
-            className="cart-drawer"
-            onClick={(event) => event.stopPropagation()}
-          >
-
-            <div className="cart-header">
-              <div>
-                <p className="eyebrow">YOUR BAG</p>
-                <h2>Корзина</h2>
-              </div>
-
-              <button
-                type="button"
-                className="cart-close"
-                aria-label="Закрыть корзину"
-                onClick={() => setCartOpen(false)}
-              >
-                <Icon name="close" size={20} />
-              </button>
-            </div>
-
-            {cart.length === 0 ? (
-
-              <div className="cart-empty">
-                <div className="cart-empty-icon">
-                  <Icon name="cart" size={42} strokeWidth={1.5} />
-                </div>
-                <h3>Корзина пока пуста</h3>
-                <p>
-                  Добавьте понравившиеся товары,
-                  и они появятся здесь.
-                </p>
-
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={() => {
-                    setCartOpen(false);
-                    scrollToCatalog();
-                  }}
-                >
-                  Перейти в каталог
-                </button>
-              </div>
-
-            ) : (
-
-              <>
-                <div className="cart-items">
-
-                  {cart.map((item) => (
-
-                    <div className="cart-item" key={item.id}>
-
-                      <div className="cart-item-image">
-                        <span>{item.brand}</span>
-                      </div>
-
-                      <div className="cart-item-info">
-
-                        <p className="product-brand">
-                          {item.brand}
-                        </p>
-
-                        <h3>{item.name}</h3>
-
-                        <strong>
-                          {item.price.toLocaleString("ru-RU")} сум
-                        </strong>
-
-                        <div className="quantity-control">
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              decreaseQuantity(item.id)
-                            }
-                          >
-                            <Icon name="minus" size={16} />
-                          </button>
-
-                          <span>{item.quantity}</span>
-
-                          <button
-                            type="button"
-                            onClick={() =>
-                              increaseQuantity(item.id)
-                            }
-                          >
-                            <Icon name="plus" size={16} />
-                          </button>
-
-                        </div>
-
-                      </div>
-
-                      <button
-                        type="button"
-                        className="remove-cart-item"
-                        aria-label="Удалить товар"
-                        onClick={() =>
-                          removeFromCart(item.id)
-                        }
-                      >
-                        <Icon name="close" size={16} />
-                      </button>
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-                <div className="cart-footer">
-
-                  <div className="cart-total">
-                    <span>Итого</span>
-                    <strong>
-                      {cartTotal.toLocaleString("ru-RU")} сум
-                    </strong>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="primary-button checkout-button" onClick={openCheckout}
-                  >
-                    Оформить заказ
-                  </button>
-
-                </div>
-
-              </>
-
-            )}
-
-          </aside>
-
-        </div>
-      )}
-
-      
+      <CartDrawer
+        cartOpen={cartOpen}
+        setCartOpen={setCartOpen}
+        cart={cart}
+        setCart={setCart}
+        cartTotal={cartTotal}
+        removeFromCart={removeFromCart}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
+        openCheckout={openCheckout}
+        scrollToCatalog={scrollToCatalog}
+      />
       {favoritesOpen && (
         <div
           className="favorites-overlay"
@@ -1584,6 +1450,9 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
 
 
 
