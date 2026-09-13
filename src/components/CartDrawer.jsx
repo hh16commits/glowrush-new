@@ -1,5 +1,5 @@
-import React from "react";
-import Icon from "../App";
+﻿import React from "react";
+import Icon from "./Icon";
 
 export default function CartDrawer({
   open,
@@ -24,16 +24,16 @@ export default function CartDrawer({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="cart-header">
-          <h2>Корзина</h2>
+          <h2>РљРѕСЂР·РёРЅР°</h2>
 
           <button onClick={onClose}>
-            ×
+            Г—
           </button>
         </div>
 
         {cart.length === 0 ? (
           <div className="cart-empty">
-            <h3>Корзина пока пуста</h3>
+            <h3>РљРѕСЂР·РёРЅР° РїРѕРєР° РїСѓСЃС‚Р°</h3>
 
             <button
               className="primary-button"
@@ -42,7 +42,7 @@ export default function CartDrawer({
                 scrollToCatalog();
               }}
             >
-              Перейти в каталог
+              РџРµСЂРµР№С‚Рё РІ РєР°С‚Р°Р»РѕРі
             </button>
           </div>
         ) : (
@@ -56,7 +56,7 @@ export default function CartDrawer({
                   <div>
                     <h3>{item.name}</h3>
                     <strong>
-                      {item.price.toLocaleString("ru-RU")} сум
+                      {item.price.toLocaleString("ru-RU")} СЃСѓРј
                     </strong>
 
                     <div>
@@ -87,7 +87,7 @@ export default function CartDrawer({
                       removeFromCart(item.id)
                     }
                   >
-                    ×
+                    Г—
                   </button>
                 </div>
               ))}
@@ -95,14 +95,14 @@ export default function CartDrawer({
 
             <div className="cart-footer">
               <strong>
-                {cartTotal.toLocaleString("ru-RU")} сум
+                {cartTotal.toLocaleString("ru-RU")} СЃСѓРј
               </strong>
 
               <button
                 className="primary-button"
                 onClick={openCheckout}
               >
-                Оформить заказ
+                РћС„РѕСЂРјРёС‚СЊ Р·Р°РєР°Р·
               </button>
             </div>
           </>
