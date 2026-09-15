@@ -6,8 +6,6 @@ import CartDrawer from "./components/CartDrawer";
 import FavoritesDrawer from "./components/FavoritesDrawer";
 import ProfilePanel from "./components/ProfilePanel";
 import Icon from "./components/Icon";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -25,13 +23,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
@@ -421,25 +413,140 @@ const deliveryOptions = [
 
   return (
     <div className="glowrush">
-      <Header
-        user={user}
-        isAdmin={isAdmin}
-        onAdminOpen={() => setAdminOpen(true)}
-        onProfileOpen={() => setProfileOpen(true)}
-        onAuthOpen={() => setAuthOpen(true)}
-        searchOpen={searchOpen}
-        search={search}
-        onSearchChange={(value) => setSearch(value)}
-        onSearchClose={() => {
-          setSearch("");
-          setSearchOpen(false);
-        }}
-        onSearchToggle={() => setSearchOpen((value) => !value)}
-        favorites={favorites}
-        cartCount={cartCount}
-        onFavoritesOpen={() => setFavoritesOpen(true)}
-        onCartOpen={() => setCartOpen(true)}
-      />
+
+      <header className="site-header">
+        <div className="header-inner">
+
+          <button
+            type="button"
+            className="brand-logo"
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
+          >
+            Glow<span>Rush</span>
+          </button>
+
+          <nav className="main-nav">
+            <a
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              Главная
+            </a>
+
+            <a
+              href="#catalog"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToCatalog();
+              }}
+            >
+              Каталог
+            </a>
+
+            <a href="#new">Новинки</a>
+            <a href="#care">Уход</a>
+          </nav>
+
+          <div className="header-actions">
+
+            {user ? (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => {
+                  if (isAdmin) {
+                    setAdminOpen(true);
+                  } else {
+                    setProfileOpen(true);
+                  }
+                }}
+                aria-label="Открыть профиль"
+              >
+                {user?.user_metadata?.name || user?.user_metadata?.preferred_username || user?.email?.split("@")[0] || "Профиль"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => setAuthOpen(true)}
+                aria-label="Войти"
+              >
+                Войти
+              </button>
+            )}
+
+
+            {searchOpen && (
+              <div className="search-field">
+                <input
+                  autoFocus
+                  type="search"
+                  placeholder="Поиск косметики..."
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+
+                <button
+                  type="button"
+                  aria-label="Закрыть поиск"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchOpen(false);
+                  }}
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Поиск"
+              onClick={() => setSearchOpen((value) => !value)}
+            >
+              ⌕
+            </button>
+
+            <button
+              type="button"
+              className="icon-button favorites-button"
+              aria-label="Избранное"
+              onClick={() => setFavoritesOpen(true)}
+            >
+              <Icon name="heart" size={20} />
+
+              {favorites.length > 0 && (
+                <span className="favorites-count">
+                  {favorites.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="cart-button"
+              aria-label="Корзина"
+              onClick={() => setCartOpen(true)}
+            >
+              <Icon name="cart" size={20} />
+
+              {cartCount > 0 && (
+                <span className="cart-count">{cartCount}</span>
+              )}
+            </button>
+
+          </div>
+        </div>
+      </header>
 
       <AuthModal
         open={authOpen}
@@ -677,7 +784,17 @@ const deliveryOptions = [
         </section>
 
       </main>
-      <Footer />
+
+      <footer className="site-footer">
+
+        <div className="footer-logo">
+          Glow<span>Rush</span>
+        </div>
+
+        <p>
+          © 2026 GlowRush. Корейская косметика.
+        </p>
+</footer>
 
 
       {selectedProduct && (
@@ -1019,8 +1136,6 @@ const deliveryOptions = [
 }
 
 export default App;
-
-
 
 
 

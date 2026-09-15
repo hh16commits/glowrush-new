@@ -1,0 +1,371 @@
+﻿import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import Icon from "../components/Icon";
+
+const CATEGORIES = [
+  "Все",
+  "Очищение",
+  "Тонеры",
+  "Эссенции",
+  "Сыворотки",
+  "Кремы",
+  "SPF",
+  "Маски",
+];
+
+const formatPrice = (value) =>
+  new Intl.NumberFormat("ru-RU").format(Number(value || 0));
+
+function pickTranslation(translations = []) {
+  return (
+    translations.find((item) => item.locale === "RU") ||
+    translations[0] ||
+    null
+  );
+}
+
+function ProductCard({ product, favorite, onFavorite, onAddToCart }) {
+  return (
+    <article className="catalog-product-card">
+      <div className="catalog-product-image-wrap">
+        <Link to={`/product/${product.slug}`} className="catalog-product-image">
+          {product.image ? (
+            <img src={product.image} alt={product.name} loading="lazy" />
+          ) : (
+            <div className="catalog-product-placeholder">
+              <span>GLOW</span>
+              <small>RUSH</small>
+            </div>
+          )}
+        </Link>
+
+        <button
+          type="button"
+          className={`catalog-favorite ${favorite ? "is-active" : ""}`}
+          onClick={() => onFavorite(product.id)}
+          aria-label={favorite ? "Убрать из избранного" : "В избранное"}
+        >
+          <Icon name="heart" size={19} />
+        </button>
+
+        {product.oldPrice > product.price && (
+          <span className="catalog-discount">
+            −{Math.round((1 - product.price / product.oldPrice) * 100)}%
+          </span>
+        )}
+      </div>
+
+      <div className="catalog-product-info">
+        <p className="catalog-product-brand">{product.brand}</p>
+
+        <Link
+          to={`/product/${product.slug}`}
+          className="catalog-product-name"
+        >
+          {product.name}
+        </Link>
+
+        <p className="catalog-product-description">
+          {product.description}
+        </p>
+
+        <div className="catalog-product-bottom">
+          <div>
+            <strong>{formatPrice(product.price)} сум</strong>
+
+            {product.oldPrice > product.price && (
+              <span className="catalog-old-price">
+                {formatPrice(product.oldPrice)} сум
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            className="catalog-add-button"
+            onClick={() => onAddToCart(product)}
+          >
+            В корзину
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default function CatalogPage() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [category, setCategory] = useState("Все");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("glowrush-favorites")) || [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadProducts() {
+      setLoading(true);
+      setError("");
+
+      const { data, error: queryError } = await supabase
+        .from("Product")
+        .select(`
+          id,
+          sku,
+          slug,
+          price,
+          oldPrice,
+          rating,
+          reviewCount,
+          stockStatus,
+          isActive,
+          isNew,
+          isBestseller,
+          createdAt,
+          brand:Brand (
+            slug,
+            translations:BrandTranslation (
+              locale,
+              name
+            )
+          ),
+          category:Category (
+            slug,
+            translations:CategoryTranslation (
+              locale,
+              name
+            )
+          ),
+          translations:ProductTranslation (
+            locale,
+            name,
+            description
+          ),
+          images:ProductImage (
+            url,
+            altText,
+            position,
+            isPrimary
+          )
+        `)
+        .eq("isActive", true)
+        .order("createdAt", { ascending: false });
+
+      if (!mounted) return;
+
+      if (queryError) {
+        console.error("Catalog load error:", queryError);
+        setError(queryError.message);
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+
+      const mapped = (data || []).map((product) => {
+        const brandTranslation = pickTranslation(
+          product.brand?.translations
+        );
+        const categoryTranslation = pickTranslation(
+          product.category?.translations
+        );
+        const productTranslation = pickTranslation(
+          product.translations
+        );
+
+        const primaryImage =
+          product.images?.find((image) => image.isPrimary) ||
+          [...(product.images || [])].sort(
+            (a, b) => (a.position || 0) - (b.position || 0)
+          )[0];
+
+        return {
+          ...product,
+          brand: brandTranslation?.name || product.brand?.slug || "",
+          category:
+            categoryTranslation?.name ||
+            product.category?.slug ||
+            "",
+          name: productTranslation?.name || product.slug,
+          description:
+            productTranslation?.description ||
+            "Средство для ежедневного ухода за кожей.",
+          image: primaryImage?.url || "",
+        };
+      });
+
+      setProducts(mapped);
+      setLoading(false);
+    }
+
+    loadProducts();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const toggleFavorite = (id) => {
+    setFavorites((current) => {
+      const next = current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id];
+
+      localStorage.setItem(
+        "glowrush-favorites",
+        JSON.stringify(next)
+      );
+
+      return next;
+    });
+  };
+
+  const addToCart = (product) => {
+    const current = JSON.parse(
+      localStorage.getItem("glowrush-cart") || "[]"
+    );
+
+    const existing = current.find((item) => item.id === product.id);
+
+    const next = existing
+      ? current.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      : [...current, { ...product, quantity: 1 }];
+
+    localStorage.setItem(
+      "glowrush-cart",
+      JSON.stringify(next)
+    );
+
+    window.dispatchEvent(new Event("glowrush:cart-updated"));
+  };
+
+  const filteredProducts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    const result = products.filter((product) => {
+      const matchesCategory =
+        category === "Все" || product.category === category;
+
+      const matchesSearch =
+        !query ||
+        product.name.toLowerCase().includes(query) ||
+        product.brand.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query);
+
+      return matchesCategory && matchesSearch;
+    });
+
+    return [...result].sort((a, b) => {
+      if (sort === "price-asc") return a.price - b.price;
+      if (sort === "price-desc") return b.price - a.price;
+      if (sort === "rating") return (b.rating || 0) - (a.rating || 0);
+      return (
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime()
+      );
+    });
+  }, [products, category, search, sort]);
+
+  return (
+    <main className="catalog-page">
+      <section className="catalog-hero">
+        <p className="eyebrow">GLOWRUSH COLLECTION</p>
+        <div className="catalog-heading-row">
+          <div>
+            <h1>Каталог</h1>
+            <p>
+              Корейский уход, который легко подобрать под свою кожу.
+            </p>
+          </div>
+
+          <span className="catalog-result-count">
+            {filteredProducts.length} товаров
+          </span>
+        </div>
+      </section>
+
+      <section className="catalog-toolbar">
+        <div className="catalog-search">
+          <Icon name="search" size={18} />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Поиск по товарам, брендам и категориям"
+          />
+        </div>
+
+        <select
+          value={sort}
+          onChange={(event) => setSort(event.target.value)}
+          aria-label="Сортировка"
+        >
+          <option value="newest">Сначала новые</option>
+          <option value="price-asc">Цена: по возрастанию</option>
+          <option value="price-desc">Цена: по убыванию</option>
+          <option value="rating">По рейтингу</option>
+        </select>
+      </section>
+
+      <section className="catalog-layout">
+        <aside className="catalog-sidebar">
+          <p className="catalog-filter-title">Категория</p>
+
+          <div className="catalog-category-list">
+            {CATEGORIES.map((item) => (
+              <button
+                type="button"
+                key={item}
+                className={category === item ? "is-active" : ""}
+                onClick={() => setCategory(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <div className="catalog-grid">
+          {loading ? (
+            <div className="catalog-state">
+              <h2>Загрузка каталога…</h2>
+            </div>
+          ) : error ? (
+            <div className="catalog-state catalog-error">
+              <h2>Не удалось загрузить каталог</h2>
+              <p>{error}</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="catalog-state">
+              <h2>Ничего не найдено</h2>
+              <p>Попробуй изменить поиск или категорию.</p>
+            </div>
+          ) : (
+            filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                favorite={favorites.includes(product.id)}
+                onFavorite={toggleFavorite}
+                onAddToCart={addToCart}
+              />
+            ))
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}
+

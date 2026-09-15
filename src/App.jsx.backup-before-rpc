@@ -6,8 +6,6 @@ import CartDrawer from "./components/CartDrawer";
 import FavoritesDrawer from "./components/FavoritesDrawer";
 import ProfilePanel from "./components/ProfilePanel";
 import Icon from "./components/Icon";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -25,13 +23,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
@@ -305,41 +297,91 @@ const deliveryOptions = [
       return;
     }
 
-    if (!user) {
-      alert("Сначала войдите в аккаунт.");
-      setAuthOpen(true);
-      return;
-    }
+    const orderId = crypto.randomUUID();
+    const orderNumber = `GR-${new Date().getTime().toString().slice(-8)}`;
+    const now = new Date().toISOString();
+
+    const order = {
+      id: orderId,
+      number: orderNumber,
+      createdAt: new Date().toISOString(),
+      items: cart,
+      subtotal: cartTotal,
+      deliveryFee,
+      total: orderTotal,
+      customer: checkoutForm,
+      delivery: selectedDelivery,
+    };
 
     try {
-      const { data, error } = await supabase.rpc("create_order", {
-        p_items: cart.map((item) => ({
-          productId: item.id,
-          quantity: item.quantity,
-        })),
-        p_name: checkoutForm.name.trim(),
-        p_phone: checkoutForm.phone.trim(),
-        p_city: checkoutForm.city.trim(),
-        p_comment: checkoutForm.comment.trim() || null,
-        p_delivery_method: selectedDelivery.id,
-      });
+      const { error: orderError } = await supabase
+        .from("Order")
+        .insert({
+          id: orderId,
+          orderNumber,
+          userId: user.id,
+          guestName: checkoutForm.name.trim(),
+          guestPhone: checkoutForm.phone.trim(),
+          status: "PENDING",
+          currency: "UZS",
+          subtotal: cartTotal,
+          discountAmount: 0,
+          deliveryFee,
+          giftWrapFee: 0,
+          totalAmount: orderTotal,
+          localeAtOrder: "RU",
+          createdAt: now,
+          updatedAt: now,
+          notes: [
+            checkoutForm.city?.trim(),
+            checkoutForm.comment?.trim(),
+          ]
+            .filter(Boolean)
+            .join(" — ") || null,
+        });
 
-      if (error) throw error;
+      if (orderError) throw orderError;
 
-      const order = {
-        id: data.orderId,
-        number: data.orderNumber,
-        createdAt: new Date().toISOString(),
-        items: cart,
-        subtotal: data.subtotal,
-        deliveryFee: data.deliveryFee,
-        total: data.total,
-        customer: checkoutForm,
-        delivery: {
-          ...selectedDelivery,
-          price: data.deliveryFee,
-        },
-      };
+      const orderItems = cart.map((item) => ({
+        id: crypto.randomUUID(),
+        orderId,
+        productId: item.id,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        totalPrice: item.price * item.quantity,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("OrderItem")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      const { error: deliveryError } = await supabase
+        .from("Delivery")
+        .insert({
+          id: crypto.randomUUID(),
+          orderId,
+          provider: "MANUAL",
+          status: "READY_FOR_DELIVERY",
+          fee: deliveryFee,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+      if (deliveryError) throw deliveryError;
+
+      const { error: historyError } = await supabase
+        .from("OrderStatusHistory")
+        .insert({
+          id: crypto.randomUUID(),
+          orderId,
+          fromStatus: null,
+          toStatus: "PENDING",
+          note: "Новый заказ создан в магазине",
+        });
+
+      if (historyError) throw historyError;
 
       setOrders((current) => [order, ...current]);
       setConfirmedOrder(order);
@@ -347,18 +389,9 @@ const deliveryOptions = [
       setCart([]);
     } catch (error) {
       console.error("Supabase order creation error:", error);
-
-      const message = error?.message || "Неизвестная ошибка";
-
-      if (
-        message.includes("Недостаточно товара") ||
-        message.includes("Товар недоступен") ||
-        message.includes("Товар не найден")
-      ) {
-        alert("К сожалению, один из товаров сейчас недоступен.");
-      } else {
-        alert(`Не удалось оформить заказ.\n\n${message}`);
-      }
+      alert(
+        `Не удалось оформить заказ.\n\n${error.message || "Неизвестная ошибка"}`
+      );
     }
   };
   const addToCart = (product) => {
@@ -421,25 +454,140 @@ const deliveryOptions = [
 
   return (
     <div className="glowrush">
-      <Header
-        user={user}
-        isAdmin={isAdmin}
-        onAdminOpen={() => setAdminOpen(true)}
-        onProfileOpen={() => setProfileOpen(true)}
-        onAuthOpen={() => setAuthOpen(true)}
-        searchOpen={searchOpen}
-        search={search}
-        onSearchChange={(value) => setSearch(value)}
-        onSearchClose={() => {
-          setSearch("");
-          setSearchOpen(false);
-        }}
-        onSearchToggle={() => setSearchOpen((value) => !value)}
-        favorites={favorites}
-        cartCount={cartCount}
-        onFavoritesOpen={() => setFavoritesOpen(true)}
-        onCartOpen={() => setCartOpen(true)}
-      />
+
+      <header className="site-header">
+        <div className="header-inner">
+
+          <button
+            type="button"
+            className="brand-logo"
+            onClick={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
+          >
+            Glow<span>Rush</span>
+          </button>
+
+          <nav className="main-nav">
+            <a
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              Главная
+            </a>
+
+            <a
+              href="#catalog"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToCatalog();
+              }}
+            >
+              Каталог
+            </a>
+
+            <a href="#new">Новинки</a>
+            <a href="#care">Уход</a>
+          </nav>
+
+          <div className="header-actions">
+
+            {user ? (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => {
+                  if (isAdmin) {
+                    setAdminOpen(true);
+                  } else {
+                    setProfileOpen(true);
+                  }
+                }}
+                aria-label="Открыть профиль"
+              >
+                {user?.user_metadata?.name || user?.user_metadata?.preferred_username || user?.email?.split("@")[0] || "Профиль"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="icon-button auth-header-button"
+                onClick={() => setAuthOpen(true)}
+                aria-label="Войти"
+              >
+                Войти
+              </button>
+            )}
+
+
+            {searchOpen && (
+              <div className="search-field">
+                <input
+                  autoFocus
+                  type="search"
+                  placeholder="Поиск косметики..."
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+
+                <button
+                  type="button"
+                  aria-label="Закрыть поиск"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchOpen(false);
+                  }}
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Поиск"
+              onClick={() => setSearchOpen((value) => !value)}
+            >
+              ⌕
+            </button>
+
+            <button
+              type="button"
+              className="icon-button favorites-button"
+              aria-label="Избранное"
+              onClick={() => setFavoritesOpen(true)}
+            >
+              <Icon name="heart" size={20} />
+
+              {favorites.length > 0 && (
+                <span className="favorites-count">
+                  {favorites.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="cart-button"
+              aria-label="Корзина"
+              onClick={() => setCartOpen(true)}
+            >
+              <Icon name="cart" size={20} />
+
+              {cartCount > 0 && (
+                <span className="cart-count">{cartCount}</span>
+              )}
+            </button>
+
+          </div>
+        </div>
+      </header>
 
       <AuthModal
         open={authOpen}
@@ -677,7 +825,17 @@ const deliveryOptions = [
         </section>
 
       </main>
-      <Footer />
+
+      <footer className="site-footer">
+
+        <div className="footer-logo">
+          Glow<span>Rush</span>
+        </div>
+
+        <p>
+          © 2026 GlowRush. Корейская косметика.
+        </p>
+</footer>
 
 
       {selectedProduct && (
@@ -1019,9 +1177,6 @@ const deliveryOptions = [
 }
 
 export default App;
-
-
-
 
 
 

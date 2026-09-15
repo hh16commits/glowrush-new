@@ -25,13 +25,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
@@ -1019,7 +1013,6 @@ const deliveryOptions = [
 }
 
 export default App;
-
 
 
 
