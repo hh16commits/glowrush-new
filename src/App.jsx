@@ -370,6 +370,11 @@ const deliveryOptions = [
       }
     }
   };
+  useEffect(() => {
+    localStorage.setItem("glowrush-cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("glowrush:cart-updated"));
+  }, [cart]);
+
   const addToCart = (product) => {
     setCart((current) => {
       const existing = current.find((item) => item.id === product.id);
