@@ -1,4 +1,5 @@
-﻿import Icon from "../components/Icon";
+﻿import { Link, useNavigate } from "react-router-dom";
+import Icon from "../components/Icon";
 
 const homeCategories = [
   { name: "Очищение", subtitle: "CLEANSE", number: "01" },
@@ -127,6 +128,7 @@ function HomePage({
   addToCart,
   setSelectedProduct,
 }) {
+  const navigate = useNavigate();
   const popularProducts = filteredProducts.slice(0, 4);
 
   const newProducts = products
@@ -186,7 +188,7 @@ function HomePage({
               type="button"
               className="home-v4-primary"
               onClick={() => {
-                window.location.href = "/catalog";
+                navigate("/catalog");
               }}
             >
               Смотреть уход
@@ -310,9 +312,9 @@ function HomePage({
             <h2>Соберите свою routine</h2>
           </div>
 
-          <a href="/catalog">
+          <Link to="/catalog">
             Смотреть каталог →
-          </a>
+          </Link>
         </div>
 
         <div className="home-v4-category-grid">
@@ -337,9 +339,9 @@ function HomePage({
                   Маски: "masks",
                 };
                 const categorySlug = categorySlugMap[category.name];
-                window.location.href = categorySlug
+                navigate(categorySlug
                   ? `/catalog?category=${categorySlug}`
-                  : "/catalog";
+                  : "/catalog");
               }}
             >
               <div className="home-v4-category-top">
@@ -375,9 +377,9 @@ function HomePage({
             <h2>Популярное</h2>
           </div>
 
-          <a href="/catalog">
+          <Link to="/catalog">
             Смотреть всё →
-          </a>
+          </Link>
         </div>
 
         <div className="home-v4-products-grid">
@@ -407,9 +409,9 @@ function HomePage({
               <h2>Новинки</h2>
             </div>
 
-            <a href="/new">
+            <Link to="/new">
               Все новинки →
-            </a>
+            </Link>
           </div>
 
           <div className="home-v4-products-grid">
@@ -453,13 +455,13 @@ function HomePage({
             получает именно то, что ей нужно.
           </p>
 
-          <a
-            href="/care"
+          <Link
+            to="/care"
             className="home-v4-primary"
           >
             Смотреть уход
             <span>→</span>
-          </a>
+          </Link>
         </div>
 
         <div className="home-v4-routine-steps">
@@ -490,9 +492,9 @@ function HomePage({
             <h2>Корея, которой мы доверяем</h2>
           </div>
 
-          <a href="/brands">
+          <Link to="/brands">
             Все бренды →
-          </a>
+          </Link>
         </div>
 
         <div className="home-v4-brand-list">
@@ -515,4 +517,3 @@ function HomePage({
 }
 
 export default HomePage;
-

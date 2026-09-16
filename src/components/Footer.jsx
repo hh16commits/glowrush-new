@@ -32,15 +32,15 @@ export default function Footer() {
             <Link to="/delivery">Доставка</Link>
             <Link to="/account">Профиль</Link>
             <Link to="/guide">Glow Guide</Link>
-            <a href="/catalog">Помощь с выбором</a>
+            <Link to="/catalog">Помощь с выбором</Link>
           </div>
 
           <div className="site-footer-column">
             <span className="site-footer-title">ИНФОРМАЦИЯ</span>
-            <a href="/delivery">Оплата и доставка</a>
-            <a href="/delivery">Возврат</a>
-            <a href="/guide">FAQ</a>
-            <a href="/account">Контакты</a>
+            <Link to="/delivery">Оплата и доставка</Link>
+            <Link to="/delivery">Возврат</Link>
+            <Link to="/guide">FAQ</Link>
+            <Link to="/account">Контакты</Link>
           </div>
 
           <div className="site-footer-column">
