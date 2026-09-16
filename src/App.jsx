@@ -34,7 +34,13 @@ function App() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("glowrush-favorites")) || [];
+    } catch {
+      return [];
+    }
+  });
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -407,6 +413,11 @@ const deliveryOptions = [
   const removeFromCart = (id) => {
     setCart((current) => current.filter((item) => item.id !== id));
   };
+
+  useEffect(() => {
+    localStorage.setItem("glowrush-favorites", JSON.stringify(favorites));
+    window.dispatchEvent(new Event("glowrush:favorites-updated"));
+  }, [favorites]);
 
   const toggleFavorite = (id) => {
     setFavorites((current) =>
@@ -804,70 +815,4 @@ const deliveryOptions = [
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
