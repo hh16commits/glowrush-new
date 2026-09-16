@@ -83,6 +83,9 @@ function App() {
           slug,
           price,
           oldPrice,
+          rating,
+          reviewCount,
+          isBestseller,
           stockStatus,
           isActive,
           isNew,
@@ -157,6 +160,9 @@ function App() {
             "",
           price: product.price,
           oldPrice: product.oldPrice,
+          rating: product.rating,
+          reviewCount: product.reviewCount,
+          isBestseller: product.isBestseller,
           image: primaryImage?.url || "",
           description:
             productTranslation?.description ||
