@@ -8,6 +8,7 @@ import ProfilePanel from "./components/ProfilePanel";
 import Icon from "./components/Icon";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import HomePage from "./pages/HomePage";
 import "./styles/glowrush.css";
 
 const categories = [
@@ -78,6 +79,7 @@ function App() {
           oldPrice,
           stockStatus,
           isActive,
+          isNew,
           brand:Brand (
             slug,
             translations:BrandTranslation (
@@ -154,6 +156,7 @@ function App() {
             productTranslation?.description ||
             "Средство для ежедневного ухода за кожей.",
           stockStatus: product.stockStatus,
+          isNew: product.isNew,
         };
       });
 
@@ -445,238 +448,20 @@ const deliveryOptions = [
         open={authOpen}
         onClose={() => setAuthOpen(false)}
       />
-      <main>
-
-        <section className="hero">
-          <div className="hero-content">
-
-            <p className="eyebrow">KOREAN BEAUTY</p>
-
-            <h1>
-              Твоя кожа.
-              <br />
-              Твоё <span>сияние.</span>
-            </h1>
-
-            <p className="hero-description">
-              Корейская косметика для ежедневного ухода,
-              здоровой кожи и естественного сияния.
-            </p>
-
-            <button
-              type="button"
-              className="primary-button"
-              onClick={scrollToCatalog}
-            >
-              Смотреть каталог
-            </button>
-
-          </div>
-
-          <div className="hero-visual">
-            <div className="hero-orb">
-              <span>GLOW</span>
-              <strong>RUSH</strong>
-            </div>
-          </div>
-        </section>
-
-        <section className="benefits">
-
-          <div>
-            <span>01</span>
-            <strong>Оригинальная косметика</strong>
-            <p>Только проверенные продукты.</p>
-          </div>
-
-          <div>
-            <span>02</span>
-            <strong>Корейский уход</strong>
-            <p>Средства для ежедневной рутины.</p>
-          </div>
-
-          <div>
-            <span>03</span>
-            <strong>Быстрая доставка</strong>
-            <p>Доставляем заказы по Узбекистану.</p>
-          </div>
-
-          <div>
-            <span>04</span>
-            <strong>Безопасная покупка</strong>
-            <p>Ваши данные защищены.</p>
-          </div>
-
-        </section>
-
-        <section className="category-section">
-
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">SHOP BY CATEGORY</p>
-              <h2>Категории</h2>
-            </div>
-          </div>
-
-          <div className="category-list">
-
-            {categories.map((category) => (
-              <button
-                type="button"
-                key={category}
-                className={
-                  selectedCategory === category
-                    ? "category active"
-                    : "category"
-                }
-                onClick={() => {
-                  setSelectedCategory(category);
-                  scrollToCatalog();
-                }}
-              >
-                {category}
-              </button>
-            ))}
-
-          </div>
-
-        </section>
-
-        <section className="catalog-section" id="catalog">
-
-          <div className="section-heading">
-
-            <div>
-              <p className="eyebrow">GLOWRUSH COLLECTION</p>
-              <h2>Популярное</h2>
-            </div>
-
-            <span className="product-count">
-              {filteredProducts.length} товара
-            </span>
-
-          </div>
-
-          {productsLoading ? (
-            <div className="empty-state">
-              <h3>Загрузка каталога...</h3>
-              <p>Получаем товары из Supabase.</p>
-            </div>
-          ) : productsError ? (
-            <div className="empty-state">
-              <h3>Не удалось загрузить каталог</h3>
-              <p>{productsError}</p>
-            </div>
-          ) : filteredProducts.length > 0 ? (
-
-            <div className="products-grid">
-
-              {filteredProducts.map((product) => {
-                const favorite = favorites.includes(product.id);
-
-                return (
-                  <article
-                    className="product-card"
-                    key={product.id}
-                    onClick={() => setSelectedProduct(product)}
-                  >
-
-                    <div className="product-image">
-
-                      <img
-                        className="product-photo"
-                        src={product.image}
-                        alt={product.name}
-                      />
-
-                      <button
-                        type="button"
-                        className={
-                          favorite
-                            ? "favorite active"
-                            : "favorite"
-                        }
-                        aria-label="Добавить в избранное"
-                        onClick={(event) => {
-  event.preventDefault();
-  event.stopPropagation();
-  toggleFavorite(product.id);
-}}
-                      >
-                        {favorite ? <Icon name="heart" size={18} strokeWidth={2.2} /> : <Icon name="heart" size={18} /> }
-                      </button>
-
-                    </div>
-
-                    <div className="product-info">
-
-                      <p className="product-brand">
-                        {product.brand}
-                      </p>
-
-                      <h3>{product.name}</h3>
-
-                      <p className="product-category">
-                        {product.category}
-                      </p>
-
-                      <div className="product-footer">
-
-                        <strong>
-                          {product.price.toLocaleString("ru-RU")} сум
-                        </strong>
-
-                        <button
-                          type="button"
-                          className="add-button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            addToCart(product);
-                          }}
-                        >
-                          <Icon name="plus" size={18} />
-                        </button>
-
-                      </div>
-
-                    </div>
-
-                  </article>
-                );
-              })}
-
-            </div>
-
-          ) : (
-
-            <div className="empty-result">
-              <h3>Ничего не нашли</h3>
-              <p>
-                Попробуйте изменить поиск или категорию.
-              </p>
-            </div>
-
-          )}
-
-        </section>
-
-        <section className="simple-section" id="new">
-          <p className="eyebrow">JUST ARRIVED</p>
-          <h2>Новинки</h2>
-          <p>
-            Скоро здесь появятся новые продукты GlowRush.
-          </p>
-        </section>
-
-        <section className="simple-section" id="care">
-          <p className="eyebrow">DAILY SKINCARE</p>
-          <h2>Уход</h2>
-          <p>
-            Подборка средств для ежедневного ухода.
-          </p>
-        </section>
-
-      </main>
+      <HomePage
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        search={search}
+        products={products}
+        productsLoading={productsLoading}
+        productsError={productsError}
+        filteredProducts={filteredProducts}
+        favorites={favorites}
+        toggleFavorite={toggleFavorite}
+        addToCart={addToCart}
+        setSelectedProduct={setSelectedProduct}
+        scrollToCatalog={scrollToCatalog}
+      />
       <Footer />
 
 
@@ -1019,6 +804,11 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
+
 
 
 
