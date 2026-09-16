@@ -375,6 +375,35 @@ const deliveryOptions = [
     window.dispatchEvent(new Event("glowrush:cart-updated"));
   }, [cart]);
 
+  useEffect(() => {
+    const handleCartUpdated = () => {
+      try {
+        const nextCart =
+          JSON.parse(localStorage.getItem("glowrush-cart")) || [];
+
+        setCart((currentCart) => {
+          if (JSON.stringify(currentCart) === JSON.stringify(nextCart)) {
+            return currentCart;
+          }
+
+          return nextCart;
+        });
+      } catch {
+        setCart((currentCart) =>
+          currentCart.length === 0 ? currentCart : []
+        );
+      }
+    };
+
+    window.addEventListener("glowrush:cart-updated", handleCartUpdated);
+
+    return () => {
+      window.removeEventListener(
+        "glowrush:cart-updated",
+        handleCartUpdated
+      );
+    };
+  }, []);
   const addToCart = (product) => {
     setCart((current) => {
       const existing = current.find((item) => item.id === product.id);
