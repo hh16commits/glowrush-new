@@ -26,11 +26,13 @@ export default function Header({
         </Link>
 
         <nav className="main-nav">
-          <Link to="/">Главная</Link>
-          <Link to="/catalog">Каталог</Link>
-          <Link to="/new">Новинки</Link>
-          <Link to="/care">Уход</Link>
-        </nav>
+  <Link to="/catalog">Каталог</Link>
+  <Link to="/brands">Бренды</Link>
+  <Link to="/new">Новинки</Link>
+  <Link to="/care">Уход</Link>
+  <Link to="/sale">Sale</Link>
+  <Link to="/guide">Glow Guide</Link>
+</nav>
 
         <div className="header-actions">
 
