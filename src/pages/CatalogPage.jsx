@@ -689,8 +689,3 @@ const [products, setProducts] = useState([]);
   );
 }
 
-
-
-
-
-

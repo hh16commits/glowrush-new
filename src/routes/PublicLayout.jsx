@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import Footer from "../components/Footer";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import Icon from "../components/Icon";
@@ -130,45 +131,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="site-footer premium-footer">
-        <div className="footer-inner">
-          <div className="footer-brand-block">
-            <div className="footer-logo">
-              Glow<span>Rush</span>
-            </div>
-
-            <p>
-              Корейская косметика для твоего glow.
-            </p>
-          </div>
-
-          <div className="footer-column">
-            <strong>Магазин</strong>
-            <Link to="/catalog">Каталог</Link>
-            <Link to="/brands">Бренды</Link>
-            <Link to="/new">Новинки</Link>
-            <Link to="/sale">Акции</Link>
-          </div>
-
-          <div className="footer-column">
-            <strong>Помощь</strong>
-            <Link to="/delivery">Доставка</Link>
-            <Link to="/account">Профиль</Link>
-            <Link to="/guide">Glow Guide</Link>
-          </div>
-
-          <div className="footer-column">
-            <strong>Связаться</strong>
-            <span>Telegram</span>
-            <span>Instagram</span>
-            <span>+998 XX XXX XX XX</span>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          © 2026 GlowRush. Корейская косметика.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
