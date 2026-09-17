@@ -1,7 +1,11 @@
 ﻿import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import Icon from "../components/Icon";
+import {
+  setCart,
+  getStockLabel,
+  canAddToCart,
+} from "../lib/shop";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("ru-RU").format(Number(value || 0));
@@ -16,11 +20,13 @@ function pickTranslation(translations = []) {
 
 export default function ProductPage() {
   const { slug } = useParams();
+  const { onAddToCart: addToCartFromApp } = useOutletContext();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [added, setAdded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -122,6 +128,14 @@ export default function ProductPage() {
         images,
       });
 
+      const primaryIndex = images.findIndex(
+        (image) => image.isPrimary
+      );
+
+      setSelectedImageIndex(
+        primaryIndex >= 0 ? primaryIndex : 0
+      );
+
       setLoading(false);
     }
 
@@ -133,60 +147,19 @@ export default function ProductPage() {
   }, [slug]);
 
   const addToCart = () => {
-    if (!product) return;
-
-    let current = [];
-
-    try {
-      current =
-        JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-    } catch {
-      current = [];
+    if (!canAddToCart(product)) {
+      return;
     }
 
-    const existing = current.find(
-      (item) => item.id === product.id
-    );
-
     const cartProduct = {
-      id: product.id,
-      sku: product.sku,
-      slug: product.slug,
-      name: product.name,
-      brand: product.brand,
-      category: product.category,
-      price: product.price,
-      oldPrice: product.oldPrice,
-      image: product.images?.[0]?.url || "",
-      description: product.description,
-      stockStatus: product.stockStatus,
+      ...product,
+      image:
+        product.images?.find((image) => image.isPrimary)?.url ||
+        product.images?.[0]?.url ||
+        "",
     };
 
-    const next = existing
-      ? current.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-            : item
-        )
-      : [
-          ...current,
-          {
-            ...cartProduct,
-            quantity: 1,
-          },
-        ];
-
-    localStorage.setItem(
-      "glowrush-cart",
-      JSON.stringify(next)
-    );
-
-    window.dispatchEvent(
-      new Event("glowrush:cart-updated")
-    );
+    addToCartFromApp(cartProduct);
 
     setAdded(true);
 
@@ -219,9 +192,13 @@ export default function ProductPage() {
     );
   }
 
-  const mainImage =
-    product.images?.find((image) => image.isPrimary) ||
-    product.images?.[0];
+  const productImages = product.images || [];
+
+  const activeImage =
+    productImages[selectedImageIndex] ||
+    productImages.find((image) => image.isPrimary) ||
+    productImages[0] ||
+    null;
 
   return (
     <main className="product-page">
@@ -235,15 +212,48 @@ export default function ProductPage() {
 
       <section className="product-main">
         <div className="product-gallery">
-          {mainImage?.url ? (
-            <img
-              src={mainImage.url}
-              alt={mainImage.altText || product.name}
-            />
-          ) : (
-            <div className="product-gallery-placeholder">
-              <span>GLOW</span>
-              <small>RUSH</small>
+          <div className="product-gallery-main">
+            {activeImage?.url ? (
+              <img
+                src={activeImage.url}
+                alt={activeImage.altText || product.name}
+              />
+            ) : (
+              <div className="product-gallery-placeholder">
+                <span>GLOW</span>
+                <small>RUSH</small>
+              </div>
+            )}
+          </div>
+
+          {productImages.length > 1 && (
+            <div
+              className="product-gallery-thumbnails"
+              aria-label="Фотографии товара"
+            >
+              {productImages.map((image, index) => (
+                <button
+                  key={image.url + "-" + index}
+                  type="button"
+                  className={
+                    index === selectedImageIndex
+                      ? "product-gallery-thumbnail is-active"
+                      : "product-gallery-thumbnail"
+                  }
+                  onClick={() => setSelectedImageIndex(index)}
+                  aria-label={"Показать фото " + (index + 1)}
+                  aria-pressed={index === selectedImageIndex}
+                >
+                  <img
+                    src={image.url}
+                    alt={
+                      image.altText ||
+                      product.name + " — фото " + (index + 1)
+                    }
+                    loading="lazy"
+                  />
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -295,7 +305,7 @@ export default function ProductPage() {
             <div>
               <strong>Наличие</strong>
               <span>
-                {product.stockStatus || "Уточняется"}
+                {getStockLabel(product.stockStatus)}
               </span>
             </div>
 
@@ -322,3 +332,7 @@ export default function ProductPage() {
     </main>
   );
 }
+
+
+
+

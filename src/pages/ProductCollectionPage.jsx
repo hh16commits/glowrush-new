@@ -1,6 +1,11 @@
 ﻿import { useEffect, useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { supabase } from "../lib/supabase";
+import {
+  getStockLabel,
+  canAddToCart,
+} from "../lib/shop";
 
 function pickTranslation(translations = []) {
   return (
@@ -16,6 +21,7 @@ export default function ProductCollectionPage({
   description,
   filterProducts,
 }) {
+  const { onAddToCart: addToCartFromApp } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -140,57 +146,11 @@ export default function ProductCollectionPage({
   );
 
   const addToCart = (product) => {
-    let current = [];
-
-    try {
-      current =
-        JSON.parse(
-          localStorage.getItem("glowrush-cart")
-        ) || [];
-    } catch {
-      current = [];
+    if (!canAddToCart(product)) {
+      return;
     }
 
-    const existing = current.find(
-      (item) => item.id === product.id
-    );
-
-    const next = existing
-      ? current.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                quantity:
-                  Number(item.quantity || 0) + 1,
-              }
-            : item
-        )
-      : [
-          ...current,
-          {
-            id: product.id,
-            sku: product.sku,
-            slug: product.slug,
-            name: product.name,
-            brand: product.brand,
-            category: product.category,
-            price: product.price,
-            oldPrice: product.oldPrice,
-            image: product.image,
-            description: product.description,
-            stockStatus: product.stockStatus,
-            quantity: 1,
-          },
-        ];
-
-    localStorage.setItem(
-      "glowrush-cart",
-      JSON.stringify(next)
-    );
-
-    window.dispatchEvent(
-      new Event("glowrush:cart-updated")
-    );
+    addToCartFromApp(product);
   };
 
   return (
@@ -240,3 +200,9 @@ export default function ProductCollectionPage({
     </main>
   );
 }
+
+
+
+
+
+

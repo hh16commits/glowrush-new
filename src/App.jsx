@@ -1,6 +1,18 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { supabase } from "./lib/supabase";
+import {
+  CART_UPDATED_EVENT,
+  FAVORITES_UPDATED_EVENT,
+  addProductToCart,
+  getCart,
+  getFavorites,
+  removeProductFromCart,
+  setCart,
+  setFavorites,
+  updateCartQuantity,
+  toggleProductFavorite,
+} from "./lib/shop";
 import AdminPanel from "./admin/AdminPanel";
 import AuthModal from "./AuthModal";
 import CartDrawer from "./components/CartDrawer";
@@ -12,37 +24,14 @@ import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
 import "./styles/glowrush.css";
 
-const categories = [
-  "Все",
-  "Очищение",
-  "Тонеры",
-  "Эссенции",
-  "Сыворотки",
-  "Кремы",
-  "SPF",
-  "Маски",
-]
-
 function App() {
   const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCartState] = useState(() => getCart());
   const [cartOpen, setCartOpen] = useState(false);
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("glowrush-favorites")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [favorites, setFavoritesState] = useState(() => getFavorites());
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
@@ -323,7 +312,7 @@ const deliveryOptions = [
     }
 
     if (!user) {
-      alert("Сначала войдите в аккаунт.");
+      alert("������� ������� � �������.");
       setAuthOpen(true);
       return;
     }
@@ -361,114 +350,104 @@ const deliveryOptions = [
       setOrders((current) => [order, ...current]);
       setConfirmedOrder(order);
       setCheckoutStatus("success");
-      setCart([]);
+      commitCart([]);
     } catch (error) {
       console.error("Supabase order creation error:", error);
 
-      const message = error?.message || "Неизвестная ошибка";
+      const message =
+        typeof error?.message === "string" && error.message.trim()
+          ? error.message.trim()
+          : "Не удалось оформить заказ.";
 
-      if (
-        message.includes("Недостаточно товара") ||
+      const isInventoryError =
+        message.includes("Недостаточно товара на складе") ||
         message.includes("Товар недоступен") ||
-        message.includes("Товар не найден")
-      ) {
-        alert("К сожалению, один из товаров сейчас недоступен.");
+        message.includes("Товар не найден");
+
+      if (isInventoryError) {
+        alert(
+          "К сожалению, один из товаров в корзине сейчас недоступен или его количества недостаточно на складе. Корзина сохранена."
+        );
       } else {
         alert(`Не удалось оформить заказ.\n\n${message}`);
       }
     }
   };
   useEffect(() => {
-    localStorage.setItem("glowrush-cart", JSON.stringify(cart));
-    window.dispatchEvent(new Event("glowrush:cart-updated"));
-  }, [cart]);
-
-  useEffect(() => {
     const handleCartUpdated = () => {
-      try {
-        const nextCart =
-          JSON.parse(localStorage.getItem("glowrush-cart")) || [];
-
-        setCart((currentCart) => {
-          if (JSON.stringify(currentCart) === JSON.stringify(nextCart)) {
-            return currentCart;
-          }
-
-          return nextCart;
-        });
-      } catch {
-        setCart((currentCart) =>
-          currentCart.length === 0 ? currentCart : []
-        );
-      }
+      setCartState(getCart());
     };
 
-    window.addEventListener("glowrush:cart-updated", handleCartUpdated);
+    const handleFavoritesUpdated = () => {
+      setFavoritesState(getFavorites());
+    };
+
+    window.addEventListener(CART_UPDATED_EVENT, handleCartUpdated);
+    window.addEventListener(
+      FAVORITES_UPDATED_EVENT,
+      handleFavoritesUpdated
+    );
 
     return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, handleCartUpdated);
       window.removeEventListener(
-        "glowrush:cart-updated",
-        handleCartUpdated
+        FAVORITES_UPDATED_EVENT,
+        handleFavoritesUpdated
       );
     };
   }, []);
+  const commitCart = (nextCart) => {
+    setCartState(nextCart);
+    setCart(nextCart);
+  };
+
   const addToCart = (product) => {
-    setCart((current) => {
-      const existing = current.find((item) => item.id === product.id);
+    if (!product || product.stockStatus === "OUT_OF_STOCK") {
+      return;
+    }
 
-      if (existing) {
-        return current.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-
-      return [...current, { ...product, quantity: 1 }];
-    });
-
+    commitCart(addProductToCart(product));
     setCartOpen(true);
   };
 
   const decreaseQuantity = (id) => {
-    setCart((current) =>
-      current
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+    const item = getCart().find((cartItem) => cartItem.id === id);
+
+    if (!item) return;
+
+    commitCart(
+      updateCartQuantity(
+        id,
+        Number(item.quantity || 0) - 1
+      )
     );
   };
 
   const increaseQuantity = (id) => {
-    setCart((current) =>
-      current.map((item) =>
-        item.id === id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
+    const item = getCart().find((cartItem) => cartItem.id === id);
+
+    if (!item || item.stockStatus === "OUT_OF_STOCK") {
+      return;
+    }
+
+    commitCart(
+      updateCartQuantity(
+        id,
+        Number(item.quantity || 0) + 1
       )
     );
   };
 
   const removeFromCart = (id) => {
-    setCart((current) => current.filter((item) => item.id !== id));
+    commitCart(removeProductFromCart(id));
   };
-
-  useEffect(() => {
-    localStorage.setItem("glowrush-favorites", JSON.stringify(favorites));
-    window.dispatchEvent(new Event("glowrush:favorites-updated"));
-  }, [favorites]);
 
   const toggleFavorite = (id) => {
-    setFavorites((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
-  };
+    const next = toggleProductFavorite(id);
 
+    setFavoritesState(next);
+    setFavorites(next);
+  };
   const scrollToCatalog = () => {
     document.getElementById("catalog")?.scrollIntoView({
       behavior: "smooth",
@@ -517,7 +496,25 @@ const deliveryOptions = [
           scrollToCatalog={scrollToCatalog}
         />
       ) : (
-        <Outlet />
+        <Outlet
+  context={{
+    user,
+    favorites,
+    cartCount,
+    onFavorite: toggleFavorite,
+    onAddToCart: addToCart,
+    setFavoritesOpen,
+    setCartOpen,
+    setAuthOpen,
+    onLogout: async () => {
+      await supabase.auth.signOut();
+      setUser(null);
+      setIsAdmin(false);
+      setProfileOpen(false);
+      setAuthOpen(false);
+    },
+  }}
+/>
       )}
       <Footer />
 
@@ -616,7 +613,6 @@ const deliveryOptions = [
         cartOpen={cartOpen}
         setCartOpen={setCartOpen}
         cart={cart}
-        setCart={setCart}
         cartTotal={cartTotal}
         removeFromCart={removeFromCart}
         increaseQuantity={increaseQuantity}
@@ -861,4 +857,15 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
 
