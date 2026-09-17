@@ -1,6 +1,5 @@
-﻿import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import PublicLayout from "./PublicLayout";
 import CatalogPage from "../pages/CatalogPage";
 import BrandsPage from "../pages/BrandsPage";
 import ProductPage from "../pages/ProductPage";
@@ -15,44 +14,45 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-  },
-  {
-    element: <PublicLayout />,
     children: [
       {
-        path: "/catalog",
+        index: true,
+        element: null,
+      },
+      {
+        path: "catalog",
         element: <CatalogPage />,
       },
       {
-        path: "/brands",
+        path: "brands",
         element: <BrandsPage />,
       },
       {
-        path: "/product/:slug",
+        path: "product/:slug",
         element: <ProductPage />,
       },
       {
-        path: "/new",
+        path: "new",
         element: <NewArrivalsPage />,
       },
       {
-        path: "/care",
+        path: "care",
         element: <CarePage />,
       },
       {
-        path: "/sale",
+        path: "sale",
         element: <SalePage />,
       },
       {
-        path: "/guide",
+        path: "guide",
         element: <GuidePage />,
       },
       {
-        path: "/account",
+        path: "account",
         element: <AccountPage />,
       },
       {
-        path: "/delivery",
+        path: "delivery",
         element: <DeliveryPage />,
       },
     ],

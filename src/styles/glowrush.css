@@ -1430,6 +1430,7 @@ input:focus-visible {
 .cart-drawer {
   width: min(440px, 100%);
   height: 100vh;
+  height: 100dvh;
 
   display: flex;
   flex-direction: column;
@@ -1490,6 +1491,7 @@ input:focus-visible {
 
 .cart-items {
   flex: 1;
+  min-height: 0;
 
   overflow-y: auto;
 

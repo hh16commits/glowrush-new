@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 
 export default function CartDrawer({
   cartOpen,
@@ -16,10 +16,7 @@ export default function CartDrawer({
   const closeCart = () => setCartOpen(false);
 
   return (
-    <div
-      className="cart-overlay"
-      onClick={closeCart}
-    >
+    <div className="cart-overlay" onClick={closeCart}>
       <aside
         className="cart-drawer"
         onClick={(event) => event.stopPropagation()}
@@ -55,18 +52,32 @@ export default function CartDrawer({
           <>
             <div className="cart-items">
               {cart.map((item) => (
-                <div
-                  className="cart-item"
-                  key={item.id}
-                >
-                  <div>
+                <div className="cart-item" key={item.id}>
+                  <div className="cart-item-image">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                      />
+                    ) : (
+                      <span>GLOWRUSH</span>
+                    )}
+                  </div>
+
+                  <div className="cart-item-info">
+                    {item.brand && (
+                      <div className="product-brand">
+                        {item.brand}
+                      </div>
+                    )}
+
                     <h3>{item.name}</h3>
 
                     <strong>
                       {item.price.toLocaleString("ru-RU")} сум
                     </strong>
 
-                    <div>
+                    <div className="quantity-control">
                       <button
                         type="button"
                         onClick={() => decreaseQuantity(item.id)}
@@ -89,6 +100,7 @@ export default function CartDrawer({
 
                   <button
                     type="button"
+                    className="remove-cart-item"
                     onClick={() => removeFromCart(item.id)}
                     aria-label={`Удалить ${item.name}`}
                   >
@@ -99,13 +111,14 @@ export default function CartDrawer({
             </div>
 
             <div className="cart-footer">
-              <strong>
-                {cartTotal.toLocaleString("ru-RU")} сум
-              </strong>
+              <div className="cart-total">
+                <span>Итого</span>
+                <strong>{cartTotal.toLocaleString("ru-RU")} сум</strong>
+              </div>
 
               <button
                 type="button"
-                className="primary-button"
+                className="primary-button checkout-button"
                 onClick={openCheckout}
               >
                 Оформить заказ

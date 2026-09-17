@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { supabase } from "./lib/supabase";
 import AdminPanel from "./admin/AdminPanel";
 import AuthModal from "./AuthModal";
@@ -23,6 +24,7 @@ const categories = [
 ]
 
 function App() {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -499,20 +501,24 @@ const deliveryOptions = [
         open={authOpen}
         onClose={() => setAuthOpen(false)}
       />
-      <HomePage
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        search={search}
-        products={products}
-        productsLoading={productsLoading}
-        productsError={productsError}
-        filteredProducts={filteredProducts}
-        favorites={favorites}
-        toggleFavorite={toggleFavorite}
-        addToCart={addToCart}
-        setSelectedProduct={setSelectedProduct}
-        scrollToCatalog={scrollToCatalog}
-      />
+      {location.pathname === "/" ? (
+        <HomePage
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          search={search}
+          products={products}
+          productsLoading={productsLoading}
+          productsError={productsError}
+          filteredProducts={filteredProducts}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          addToCart={addToCart}
+          setSelectedProduct={setSelectedProduct}
+          scrollToCatalog={scrollToCatalog}
+        />
+      ) : (
+        <Outlet />
+      )}
       <Footer />
 
 
