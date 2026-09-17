@@ -66,6 +66,12 @@ function HomeProductCard({
           </span>
         )}
 
+        {product.isBestseller && (
+          <span className="home-v4-hit-badge">
+            ХИТ
+          </span>
+        )}
+
         <button
           type="button"
           className={
@@ -94,6 +100,13 @@ function HomeProductCard({
         </span>
 
         <h3>{product.name}</h3>
+
+        <div className="home-v4-product-rating">
+          ★ {product.rating || "—"}
+          <span>
+            ({product.reviewCount || 0})
+          </span>
+        </div>
 
         <div className="home-v4-product-bottom">
           <strong>
@@ -517,3 +530,5 @@ function HomePage({
 }
 
 export default HomePage;
+
+

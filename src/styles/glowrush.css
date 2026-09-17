@@ -9896,3 +9896,32 @@ input:focus-visible {
     margin-top: 42px;
   }
 }
+
+.home-v4-hit-badge {
+  position: absolute;
+  left: 12px;
+  top: 44px;
+  z-index: 2;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #29242a;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .08em;
+}
+
+.home-v4-product-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px;
+  color: #4d434a;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.home-v4-product-rating span {
+  color: #a1969d;
+}
