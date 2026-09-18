@@ -53,6 +53,7 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("AUTH USER:", session?.user);
       setUser(session?.user ?? null);
     });
 
@@ -312,7 +313,7 @@ const deliveryOptions = [
     }
 
     if (!user) {
-      alert("������� ������� � �������.");
+      alert("??????? ??????? ? ???????.");
       setAuthOpen(true);
       return;
     }
@@ -631,8 +632,8 @@ const deliveryOptions = [
         Icon={Icon}
       />
   <ProfilePanel
-    profileOpen={profileOpen}
-    setProfileOpen={setProfileOpen}
+    open={profileOpen}
+    onClose={() => setProfileOpen(false)}
     user={user}
     favorites={favorites}
     cartCount={cartCount}
@@ -651,7 +652,7 @@ const deliveryOptions = [
         className="admin-back"
         onClick={() => setAdminOpen(false)}
       >
-        ← Вернуться в магазин
+        Вернуться в магазин
       </button>
 
       {adminRoleLoading ? (
@@ -857,6 +858,9 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
 
 
 
