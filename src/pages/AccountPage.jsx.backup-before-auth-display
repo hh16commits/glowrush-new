@@ -1,4 +1,4 @@
-import { Link, useOutletContext } from "react-router-dom";
+﻿import { Link, useOutletContext } from "react-router-dom";
 
 export default function AccountPage() {
   const {
@@ -64,7 +64,7 @@ export default function AccountPage() {
 
           <div>
             <h1>{displayName}</h1>
-            <p>{getAuthMethodLabel(user)}</p>
+            <p>{user.email || "Email не указан"}</p>
           </div>
         </div>
       </section>
@@ -114,8 +114,8 @@ export default function AccountPage() {
           <p className="eyebrow">ДАННЫЕ АККАУНТА</p>
 
           <div className="account-info-row">
-            <span>Способ входа</span>
-            <strong>{getAuthMethodLabel(user)}</strong>
+            <span>Email</span>
+            <strong>{user.email || "Не указан"}</strong>
           </div>
 
           <div className="account-info-row">

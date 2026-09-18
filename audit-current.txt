@@ -1,0 +1,213 @@
+=== INVENTORY REFERENCES ===
+src/App.jsx:13:  updateCartQuantity,
+src/App.jsx:257:    (total, product) => total + product.quantity,
+src/App.jsx:262:    (total, product) => total + product.price * product.quantity,
+src/App.jsx:324:          quantity: item.quantity,
+src/App.jsx:362:      const isInventoryError =
+src/App.jsx:367:      if (isInventoryError) {
+src/App.jsx:413:  const decreaseQuantity = (id) => {
+src/App.jsx:419:      updateCartQuantity(
+src/App.jsx:421:        Number(item.quantity || 0) - 1
+src/App.jsx:426:  const increaseQuantity = (id) => {
+src/App.jsx:434:      updateCartQuantity(
+src/App.jsx:436:        Number(item.quantity || 0) + 1
+src/App.jsx:618:        increaseQuantity={increaseQuantity}
+src/App.jsx:619:        decreaseQuantity={decreaseQuantity}
+src/admin/AdminPanel.jsx:43:              quantity,
+src/admin/AdminPanel.jsx:121:              quantity: item.quantity || 1,
+src/admin/AdminPanel.jsx:295:            `${item.name} x${item.quantity || 1}`
+src/admin/AdminPanel.jsx:632:                        sum + (item.quantity || 1),
+src/admin/AdminPanel.jsx:807:                      {item.quantity} шт.
+src/admin/AdminPanel.jsx:813:                      item.price * item.quantity
+src/components/CartDrawer.jsx:8:  decreaseQuantity,
+src/components/CartDrawer.jsx:9:  increaseQuantity,
+src/components/CartDrawer.jsx:81:                    <div className="quantity-control">
+src/components/CartDrawer.jsx:84:                        onClick={() => decreaseQuantity(item.id)}
+src/components/CartDrawer.jsx:90:                      <span>{item.quantity}</span>
+src/components/CartDrawer.jsx:94:                        onClick={() => increaseQuantity(item.id)}
+src/lib/shop.js:37:export function addProductToCart(product, quantity = 1) {
+src/lib/shop.js:42:  const safeQuantity = Math.max(1, Number(quantity) || 1);
+src/lib/shop.js:51:            quantity: Number(item.quantity || 0) + safeQuantity,
+src/lib/shop.js:61:      quantity: safeQuantity,
+src/lib/shop.js:70:export function updateCartQuantity(productId, quantity) {
+src/lib/shop.js:71:  if (quantity <= 0) {
+src/lib/shop.js:77:      ? { ...item, quantity: Number(quantity) }
+src/styles/glowrush.css:1571:.quantity-control {
+src/styles/glowrush.css:1585:.quantity-control button {
+src/styles/glowrush.css:1598:.quantity-control button:hover {
+src/styles/glowrush.css:1603:.quantity-control span {
+src/styles/glowrush.css:4244:.quantity-control button svg,
+
+=== PRODUCT STOCK FIELDS ===
+src/pages/CatalogPage.jsx:74:          stockStatus,
+src/pages/CatalogPage.jsx:245:          product.stockStatus !== "OUT_OF_STOCK") ||
+src/pages/CatalogPage.jsx:247:          product.stockStatus === "LOW_STOCK");
+src/pages/ProductCollectionPage.jsx:46:          stockStatus,
+src/pages/ProductPage.jsx:48:          stockStatus,
+src/pages/ProductPage.jsx:308:                {getStockLabel(product.stockStatus)}
+src/components/CartDrawer.jsx:8:  decreaseQuantity,
+src/components/CartDrawer.jsx:9:  increaseQuantity,
+src/components/CartDrawer.jsx:81:                    <div className="quantity-control">
+src/components/CartDrawer.jsx:84:                        onClick={() => decreaseQuantity(item.id)}
+src/components/CartDrawer.jsx:90:                      <span>{item.quantity}</span>
+src/components/CartDrawer.jsx:94:                        onClick={() => increaseQuantity(item.id)}
+src/components/CartDrawer.jsx:96:                        disabled={item.stockStatus === "OUT_OF_STOCK"}
+src/components/ProductCard.jsx:75:          {product.stockStatus === "LOW_STOCK" && (
+src/components/ProductCard.jsx:106:          {getStockLabel(product.stockStatus)}
+src/lib/shop.js:37:export function addProductToCart(product, quantity = 1) {
+src/lib/shop.js:38:  if (!product || product.stockStatus === "OUT_OF_STOCK") {
+src/lib/shop.js:42:  const safeQuantity = Math.max(1, Number(quantity) || 1);
+src/lib/shop.js:51:            quantity: Number(item.quantity || 0) + safeQuantity,
+src/lib/shop.js:61:      quantity: safeQuantity,
+src/lib/shop.js:70:export function updateCartQuantity(productId, quantity) {
+src/lib/shop.js:71:  if (quantity <= 0) {
+src/lib/shop.js:77:      ? { ...item, quantity: Number(quantity) }
+src/lib/shop.js:90:export function getStockLabel(stockStatus) {
+src/lib/shop.js:91:  switch (stockStatus) {
+src/lib/shop.js:104:  return Boolean(product) && product.stockStatus !== "OUT_OF_STOCK";
+
+=== PRODUCT PAGE IMPORT ===
+﻿import { useEffect, useState } from "react";
+import { Link, useOutletContext, useParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import {
+  setCart,
+  getStockLabel,
+  canAddToCart,
+} from "../lib/shop";
+
+const formatPrice = (value) =>
+  new Intl.NumberFormat("ru-RU").format(Number(value || 0));
+
+function pickTranslation(translations = []) {
+  return (
+    translations.find((item) => item.locale === "RU") ||
+    translations[0] ||
+    null
+  );
+}
+
+export default function ProductPage() {
+  const { slug } = useParams();
+  const { onAddToCart: addToCartFromApp } = useOutletContext();
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [added, setAdded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadProduct() {
+      setLoading(true);
+
+=== BROKEN ENCODING ===
+src/App.jsx:315:      alert("������� ������� � �������.");
+
+=== LINT ===
+
+> glowrush-new@0.0.0 lint
+> oxlint
+
+
+  ! eslint(no-unused-vars): Identifier 'createClient' is imported but never used.
+   ,-[supabase/functions/telegram-send-code/index.ts:2:10]
+ 1 | ﻿import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+ 2 | import { createClient } from "npm:@supabase/supabase-js@2";
+   :          ^^^^^^|^^^^^
+   :                `-- 'createClient' is imported here
+ 3 | 
+   `----
+  help: Consider removing this import.
+
+  ! react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+    ,-[src/AuthModal.jsx:20:5]
+ 16 | 
+ 17 |   useEffect(() => {
+    :   ^^^^|^^^^
+    :       `-- This is the containing effect
+ 18 |     if (!open) return;
+ 19 | 
+ 20 |     setError("");
+    :     ^^^^|^^^
+    :         `-- Avoid calling setState() directly within an effect
+ 21 |     setEmail("");
+    `----
+  help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.
+  note: React Compiler skipped optimizing this component or hook. Additional guidance: https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
+
+  ! eslint(no-unused-vars): Identifier 'setCart' is imported but never used.
+   ,-[src/pages/ProductPage.jsx:5:3]
+ 4 | import {
+ 5 |   setCart,
+   :   ^^^|^^^
+   :      `-- 'setCart' is imported here
+ 6 |   getStockLabel,
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'getStockLabel' is imported but never used.
+   ,-[src/pages/ProductCollectionPage.jsx:6:3]
+ 5 | import {
+ 6 |   getStockLabel,
+   :   ^^^^^^|^^^^^^
+   :         `-- 'getStockLabel' is imported here
+ 7 |   canAddToCart,
+   `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Variable 'formatPrice' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/pages/CatalogPage.jsx:28:7]
+ 27 | 
+ 28 | const formatPrice = (value) =>
+    :       ^^^^^|^^^^^
+    :            `-- 'formatPrice' is declared here
+ 29 |   new Intl.NumberFormat("ru-RU").format(
+    `----
+  help: Consider removing this declaration.
+
+  ! react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+     ,-[src/pages/CatalogPage.jsx:190:9]
+ 182 |   // Синхронизация URL-фильтров с UI
+ 183 |   useEffect(() => {
+     :   ^^^^|^^^^
+     :       `-- This is the containing effect
+ 184 |     if (brandFromUrl) {
+ 185 |       const matchedBrand = products.find(
+ 186 |         (product) => product.brandSlug === brandFromUrl
+ 187 |       );
+ 188 | 
+ 189 |       if (matchedBrand?.brand) {
+ 190 |         setBrand(matchedBrand.brand);
+     :         ^^^^|^^^
+     :             `-- Avoid calling setState() directly within an effect
+ 191 |       }
+     `----
+  help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.
+  note: React Compiler skipped optimizing this component or hook. Additional guidance: https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
+
+Found 6 warnings and 0 errors.
+Finished in 106ms on 28 files with 104 rules using 8 threads.
+
+=== BUILD ===
+
+> glowrush-new@0.0.0 build
+> vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 91 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:   0.29 kB
+dist/assets/index-Cbvnvo8f.css  120.90 kB │ gzip:  22.23 kB
+dist/assets/index-Ddgx0Pem.js   587.23 kB │ gzip: 165.66 kB
+
+✓ built in 737ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
