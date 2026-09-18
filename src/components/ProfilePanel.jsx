@@ -1,6 +1,5 @@
-import { supabase } from "../lib/supabase";
+﻿import { supabase } from "../lib/supabase";
 import Icon from "./Icon";
-
 const getAuthMethodLabel = (user) => {
   const provider = String(
     user?.app_metadata?.provider || ""
@@ -12,7 +11,7 @@ const getAuthMethodLabel = (user) => {
 
   if (provider.includes("telegram")) {
     return username
-      ? `Telegram · @${username}`
+      ? `Telegram В· @${username}`
       : "Telegram";
   }
 
@@ -20,10 +19,10 @@ const getAuthMethodLabel = (user) => {
     return user.email;
   }
 
-  return "Способ входа не указан";
+  return "РЎРїРѕСЃРѕР± РІС…РѕРґР° РЅРµ СѓРєР°Р·Р°РЅ";
 };
 
-function ProfilePanel({
+export default function ProfilePanel({
   open,
   onClose,
   user,
@@ -43,14 +42,14 @@ function ProfilePanel({
       <section className="profile-panel">
         <div className="profile-panel-header">
           <p className="eyebrow">
-            ЛИЧНЫЙ КАБИНЕТ
+            Р›РР§РќР«Р™ РљРђР‘РРќР•Рў
           </p>
 
           <h2>
             {user?.user_metadata?.name ||
               user?.user_metadata?.preferred_username ||
               user?.email?.split("@")[0] ||
-              "Пользователь"}
+              "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"}
           </h2>
 
           <button
@@ -83,7 +82,7 @@ function ProfilePanel({
                 {user?.user_metadata?.name ||
                   user?.user_metadata?.preferred_username ||
                   user?.email?.split("@")[0] ||
-                  "Пользователь"}
+                  "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"}
               </strong>
 
               <p>
@@ -109,16 +108,16 @@ function ProfilePanel({
 
               <div>
                 <strong>
-                  Избранное
+                  РР·Р±СЂР°РЅРЅРѕРµ
                 </strong>
 
                 <small>
-                  {favorites.length} сохраненных товаров
+                  {favorites.length} СЃРѕС…СЂР°РЅРµРЅРЅС‹С… С‚РѕРІР°СЂРѕРІ
                 </small>
               </div>
 
               <b>
-                →
+                в†’
               </b>
             </button>
 
@@ -137,16 +136,16 @@ function ProfilePanel({
 
               <div>
                 <strong>
-                  Корзина
+                  РљРѕСЂР·РёРЅР°
                 </strong>
 
                 <small>
-                  {cartCount} товаров
+                  {cartCount} С‚РѕРІР°СЂРѕРІ
                 </small>
               </div>
 
               <b>
-                →
+                в†’
               </b>
             </button>
 
@@ -157,12 +156,12 @@ function ProfilePanel({
           <div className="profile-account-info">
 
             <p className="eyebrow">
-              АККАУНТ
+              РђРљРљРђРЈРќРў
             </p>
 
             <div>
               <span>
-                Способ входа
+                РЎРїРѕСЃРѕР± РІС…РѕРґР°
               </span>
 
               <strong>
@@ -193,7 +192,7 @@ function ProfilePanel({
               }
             }}
           >
-            Выйти из аккаунта
+            Р’С‹Р№С‚Рё РёР· Р°РєРєР°СѓРЅС‚Р°
           </button>
 
 
@@ -204,4 +203,5 @@ function ProfilePanel({
   );
 }
 
-export default ProfilePanel;
+
+

@@ -25,11 +25,6 @@ const CATEGORIES = [
   "Маски",
 ];
 
-const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(
-    Number(value || 0)
-  );
-
 const pickTranslation = (translations = []) =>
   translations.find((item) => item.locale === "RU") ||
   translations[0] ||
@@ -474,6 +469,7 @@ export default function CatalogPage() {
     </main>
   );
 }
+
 
 
 

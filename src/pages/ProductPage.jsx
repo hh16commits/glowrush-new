@@ -2,7 +2,6 @@
 import { Link, useOutletContext, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import {
-  setCart,
   getStockLabel,
   canAddToCart,
 } from "../lib/shop";
@@ -332,6 +331,7 @@ export default function ProductPage() {
     </main>
   );
 }
+
 
 
 

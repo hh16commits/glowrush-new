@@ -3,7 +3,6 @@ import { useOutletContext } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { supabase } from "../lib/supabase";
 import {
-  getStockLabel,
   canAddToCart,
 } from "../lib/shop";
 
@@ -200,6 +199,7 @@ export default function ProductCollectionPage({
     </main>
   );
 }
+
 
 
 
