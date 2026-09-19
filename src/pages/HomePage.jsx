@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+﻿import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
+import { sortBestsellers, sortNewProducts } from "../lib/productSort";
 
 const homeCategories = [
   { name: "Очищение", subtitle: "CLEANSE", number: "01" },
@@ -142,11 +143,13 @@ function HomePage({
   setSelectedProduct,
 }) {
   const navigate = useNavigate();
-  const popularProducts = filteredProducts.slice(0, 4);
+  const popularProducts = sortBestsellers(
+    filteredProducts.filter((product) => product.isBestseller)
+  ).slice(0, 4);
 
-  const newProducts = products
-    .filter((product) => product.isNew)
-    .slice(0, 4);
+  const newProducts = sortNewProducts(
+    products.filter((product) => product.isNew)
+  ).slice(0, 4);
 
   const heroProduct =
     products.find(
@@ -390,7 +393,7 @@ function HomePage({
             <h2>Популярное</h2>
           </div>
 
-          <Link to="/catalog">
+          <Link to="/bestsellers">
             Смотреть всё →
           </Link>
         </div>
@@ -530,5 +533,3 @@ function HomePage({
 }
 
 export default HomePage;
-
-

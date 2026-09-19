@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { supabase } from "../lib/supabase";
-import {
-  canAddToCart,
-} from "../lib/shop";
+import { canAddToCart } from "../lib/shop";
+import { sortBestsellers, sortNewProducts } from "../lib/productSort";
 
 function pickTranslation(translations = []) {
   return (
@@ -139,10 +138,19 @@ export default function ProductCollectionPage({
     };
   }, []);
 
-  const visibleProducts = useMemo(
-    () => products.filter(filterProducts),
-    [products, filterProducts]
-  );
+  const visibleProducts = useMemo(() => {
+    const filtered = products.filter(filterProducts);
+
+    if (title === "Бестселлеры") {
+      return sortBestsellers(filtered);
+    }
+
+    if (title === "Новинки") {
+      return sortNewProducts(filtered);
+    }
+
+    return filtered;
+  }, [products, filterProducts, title]);
 
   const addToCart = (product) => {
     if (!canAddToCart(product)) {
@@ -199,10 +207,3 @@ export default function ProductCollectionPage({
     </main>
   );
 }
-
-
-
-
-
-
-

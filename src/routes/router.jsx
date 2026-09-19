@@ -8,6 +8,7 @@ import GuidePage from "../pages/GuidePage";
 import AccountPage from "../pages/AccountPage";
 import DeliveryPage from "../pages/DeliveryPage";
 import NewArrivalsPage from "../pages/NewArrivalsPage";
+import BestsellersPage from "../pages/BestsellersPage";
 import CarePage from "../pages/CarePage";
 
 export const router = createBrowserRouter([
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
       {
         path: "new",
         element: <NewArrivalsPage />,
+      },
+      {
+        path: "bestsellers",
+        element: <BestsellersPage />,
       },
       {
         path: "care",
