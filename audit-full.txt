@@ -1,0 +1,1282 @@
+========================================
+       GLOWRUSH FULL AUDIT
+========================================
+
+=== PROJECT ===
+/data/data/com.termux/files/home/glowrush-new
+--- package.json ---
+{
+  "name": "glowrush-new",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "vite": "^8.2.2"
+  }
+}
+
+=== SOURCE TREE ===
+src/App.jsx
+src/App.jsx.backup-before-cart-sync
+src/App.jsx.backup-before-header-footer
+src/App.jsx.backup-before-rpc
+src/AuthModal.jsx
+src/admin/AdminPanel.jsx
+src/assets/hero.png
+src/assets/react.svg
+src/assets/vite.svg
+src/components/CartDrawer.jsx
+src/components/FavoritesDrawer.jsx
+src/components/Footer.jsx
+src/components/Header.jsx
+src/components/Icon.jsx
+src/components/ProductCard.jsx
+src/components/ProfilePanel.jsx
+src/index.css
+src/lib/shop.js
+src/lib/supabase.js
+src/main.jsx
+src/pages/AccountPage.jsx
+src/pages/BrandsPage.jsx
+src/pages/CarePage.jsx
+src/pages/CatalogPage.jsx
+src/pages/CatalogPage.jsx.backup-before-brand-filter-20260915-164612
+src/pages/CatalogPage.jsx.backup-before-filter-select-sync-20260915-170007
+src/pages/CatalogPage.jsx.backup-before-premium
+src/pages/CatalogPage.jsx.backup-before-url-filter-final-20260915-165656
+src/pages/CatalogPage.jsx.backup-before-url-filters-20260915-165611
+src/pages/DeliveryPage.jsx
+src/pages/GuidePage.jsx
+src/pages/GuidePage.jsx.backup-before-guide-20260915-164612
+src/pages/HomePage.jsx
+src/pages/NewArrivalsPage.jsx
+src/pages/ProductCollectionPage.jsx
+src/pages/ProductPage.jsx
+src/pages/SalePage.jsx
+src/routes/Layout.jsx
+src/routes/router.jsx
+src/routes/router.jsx.backup-before-content-pages
+src/routes/router.jsx.backup-before-public-layout
+src/styles/glowrush.css
+src/styles/glowrush.css.backup-before-catalog-ui
+src/styles/glowrush.css.backup-before-premium-catalog
+
+=== ROUTES ===
+src/App.jsx:2:import { Outlet, useLocation } from "react-router-dom";
+src/App.jsx:499:        <Outlet
+src/components/Footer.jsx:1:import { Link } from "react-router-dom";
+src/components/Header.jsx:1:﻿import { Link } from "react-router-dom";
+src/components/ProductCard.jsx:1:﻿import { Link } from "react-router-dom";
+src/main.jsx:3:import { RouterProvider } from "react-router-dom";
+src/main.jsx:4:import { router } from "./routes/router";
+src/main.jsx:10:    <RouterProvider router={router} />
+src/pages/AccountPage.jsx:1:﻿import { Link, useOutletContext } from "react-router-dom";
+src/pages/AccountPage.jsx:12:  } = useOutletContext();
+src/pages/BrandsPage.jsx:2:import { Link } from "react-router-dom";
+src/pages/CatalogPage.jsx:2:import { useOutletContext, useSearchParams } from "react-router-dom";
+src/pages/CatalogPage.jsx:43:  } = useOutletContext();
+src/pages/DeliveryPage.jsx:1:﻿import { Link } from "react-router-dom";
+src/pages/GuidePage.jsx:1:﻿import { Link } from "react-router-dom";
+src/pages/HomePage.jsx:1:﻿import { Link, useNavigate } from "react-router-dom";
+src/pages/ProductCollectionPage.jsx:2:import { useOutletContext } from "react-router-dom";
+src/pages/ProductCollectionPage.jsx:24:  const { onAddToCart: addToCartFromApp } = useOutletContext();
+src/pages/ProductPage.jsx:2:import { Link, useOutletContext, useParams } from "react-router-dom";
+src/pages/ProductPage.jsx:23:  const { onAddToCart: addToCartFromApp } = useOutletContext();
+src/routes/Layout.jsx:1:﻿import { Outlet } from "react-router-dom";
+src/routes/Layout.jsx:6:      <Outlet />
+src/routes/router.jsx:1:import { createBrowserRouter } from "react-router-dom";
+src/routes/router.jsx:13:export const router = createBrowserRouter([
+src/routes/router.jsx:15:    path: "/",
+src/routes/router.jsx:23:        path: "catalog",
+src/routes/router.jsx:27:        path: "brands",
+src/routes/router.jsx:31:        path: "product/:slug",
+src/routes/router.jsx:35:        path: "new",
+src/routes/router.jsx:39:        path: "care",
+src/routes/router.jsx:43:        path: "sale",
+src/routes/router.jsx:47:        path: "guide",
+src/routes/router.jsx:51:        path: "account",
+src/routes/router.jsx:55:        path: "delivery",
+
+=== LAYOUT / APP ===
+src/App.jsx:18:import CartDrawer from "./components/CartDrawer";
+src/App.jsx:19:import FavoritesDrawer from "./components/FavoritesDrawer";
+src/App.jsx:22:import Header from "./components/Header";
+src/App.jsx:24:import HomePage from "./pages/HomePage";
+src/App.jsx:459:      <Header
+src/App.jsx:484:        <HomePage
+src/App.jsx:612:      <CartDrawer
+src/App.jsx:623:      <FavoritesDrawer
+src/AuthModal.jsx:257:        <header className="auth-card-header">
+src/AuthModal.jsx:280:        </header>
+src/admin/AdminPanel.jsx:279:    const headers = [
+src/admin/AdminPanel.jsx:316:    const csv = [headers, ...rows]
+src/admin/AdminPanel.jsx:450:      <div className="admin-header">
+src/admin/AdminPanel.jsx:457:        <div className="admin-header-actions">
+src/admin/AdminPanel.jsx:463:          <div className="admin-header-buttons">
+src/components/CartDrawer.jsx:3:export default function CartDrawer({
+src/components/CartDrawer.jsx:24:        <div className="cart-header">
+src/components/FavoritesDrawer.jsx:1:﻿export default function FavoritesDrawer({
+src/components/FavoritesDrawer.jsx:22:            <div className="favorites-header">
+src/components/Header.jsx:4:export default function Header({
+src/components/Header.jsx:21:    <header className="site-header">
+src/components/Header.jsx:22:      <div className="header-inner">
+src/components/Header.jsx:37:        <div className="header-actions">
+src/components/Header.jsx:42:              className="icon-button auth-header-button"
+src/components/Header.jsx:60:              className="icon-button auth-header-button"
+src/components/Header.jsx:129:    </header>
+src/components/ProfilePanel.jsx:26:        <div className="profile-panel-header">
+src/pages/HomePage.jsx:134:function HomePage({
+src/pages/HomePage.jsx:532:export default HomePage;
+
+=== CART ===
+src/App.jsx:7:  addProductToCart,
+src/App.jsx:8:  getCart,
+src/App.jsx:10:  removeProductFromCart,
+src/App.jsx:11:  setCart,
+src/App.jsx:13:  updateCartQuantity,
+src/App.jsx:18:import CartDrawer from "./components/CartDrawer";
+src/App.jsx:32:  const [cart, setCartState] = useState(() => getCart());
+src/App.jsx:33:  const [cartOpen, setCartOpen] = useState(false);
+src/App.jsx:184:      return JSON.parse(localStorage.getItem("glowrush-orders")) || [];
+src/App.jsx:191:    localStorage.setItem("glowrush-orders", JSON.stringify(orders));
+src/App.jsx:256:  const cartCount = cart.reduce(
+src/App.jsx:301:    setCartOpen(false);
+src/App.jsx:378:      setCartState(getCart());
+src/App.jsx:400:    setCartState(nextCart);
+src/App.jsx:401:    setCart(nextCart);
+src/App.jsx:404:  const addToCart = (product) => {
+src/App.jsx:409:    commitCart(addProductToCart(product));
+src/App.jsx:410:    setCartOpen(true);
+src/App.jsx:414:    const item = getCart().find((cartItem) => cartItem.id === id);
+src/App.jsx:419:      updateCartQuantity(
+src/App.jsx:427:    const item = getCart().find((cartItem) => cartItem.id === id);
+src/App.jsx:434:      updateCartQuantity(
+src/App.jsx:442:    commitCart(removeProductFromCart(id));
+src/App.jsx:474:        cartCount={cartCount}
+src/App.jsx:476:        onCartOpen={() => setCartOpen(true)}
+src/App.jsx:494:          addToCart={addToCart}
+src/App.jsx:503:    cartCount,
+src/App.jsx:505:    onAddToCart: addToCart,
+src/App.jsx:507:    setCartOpen,
+src/App.jsx:590:                    addToCart(selectedProduct);
+src/App.jsx:612:      <CartDrawer
+src/App.jsx:614:        setCartOpen={setCartOpen}
+src/App.jsx:628:        addToCart={addToCart}
+src/App.jsx:638:    cartCount={cartCount}
+src/App.jsx:640:    setCartOpen={setCartOpen}
+src/components/CartDrawer.jsx:3:export default function CartDrawer({
+src/components/CartDrawer.jsx:5:  setCartOpen,
+src/components/CartDrawer.jsx:16:  const closeCart = () => setCartOpen(false);
+src/components/FavoritesDrawer.jsx:6:  addToCart,
+src/components/FavoritesDrawer.jsx:96:                            addToCart(product);
+src/components/Header.jsx:16:  cartCount,
+src/components/Header.jsx:120:            {cartCount > 0 && (
+src/components/Header.jsx:122:                {cartCount}
+src/components/ProductCard.jsx:3:import { canAddToCart, getStockLabel } from "../lib/shop";
+src/components/ProductCard.jsx:14:  onAddToCart,
+src/components/ProductCard.jsx:102:          onClick={() => onAddToCart(product)}
+src/components/ProductCard.jsx:103:          disabled={!canAddToCart(product)}
+src/components/ProductCard.jsx:104:          aria-disabled={!canAddToCart(product)}
+src/components/ProfilePanel.jsx:6:  cartCount,
+src/components/ProfilePanel.jsx:8:  setCartOpen,
+src/components/ProfilePanel.jsx:96:                setCartOpen(true);
+src/components/ProfilePanel.jsx:105:                  {cartCount} товаров
+src/lib/shop.js:1:﻿const CART_KEY = "glowrush-cart";
+src/lib/shop.js:9:    const value = JSON.parse(localStorage.getItem(key));
+src/lib/shop.js:17:  localStorage.setItem(key, JSON.stringify(value));
+src/lib/shop.js:21:export function getCart() {
+src/lib/shop.js:25:export function setCart(cart) {
+src/lib/shop.js:37:export function addProductToCart(product, quantity = 1) {
+src/lib/shop.js:39:    return getCart();
+src/lib/shop.js:43:  const cart = getCart();
+src/lib/shop.js:66:export function removeProductFromCart(productId) {
+src/lib/shop.js:67:  return getCart().filter((item) => item.id !== productId);
+src/lib/shop.js:70:export function updateCartQuantity(productId, quantity) {
+src/lib/shop.js:72:    return removeProductFromCart(productId);
+src/lib/shop.js:75:  return getCart().map((item) =>
+src/lib/shop.js:103:export function canAddToCart(product) {
+src/pages/AccountPage.jsx:7:    cartCount,
+src/pages/AccountPage.jsx:9:    setCartOpen,
+src/pages/AccountPage.jsx:89:          onClick={() => setCartOpen(true)}
+src/pages/AccountPage.jsx:94:            {cartCount}{" "}
+src/pages/AccountPage.jsx:95:            {cartCount === 1 ? "товар" : "товаров"}
+src/pages/CatalogPage.jsx:42:    onAddToCart: addToCartFromApp,
+src/pages/CatalogPage.jsx:469:              onAddToCart={addToCartFromApp}
+src/pages/HomePage.jsx:141:  addToCart,
+src/pages/HomePage.jsx:406:              onAdd={addToCart}
+src/pages/HomePage.jsx:438:                onAdd={addToCart}
+src/pages/ProductCollectionPage.jsx:7:  canAddToCart,
+src/pages/ProductCollectionPage.jsx:24:  const { onAddToCart: addToCartFromApp } = useOutletContext();
+src/pages/ProductCollectionPage.jsx:148:  const addToCart = (product) => {
+src/pages/ProductCollectionPage.jsx:149:    if (!canAddToCart(product)) {
+src/pages/ProductCollectionPage.jsx:153:    addToCartFromApp(product);
+src/pages/ProductCollectionPage.jsx:195:              onAddToCart={addToCart}
+src/pages/ProductPage.jsx:5:  setCart,
+src/pages/ProductPage.jsx:7:  canAddToCart,
+src/pages/ProductPage.jsx:23:  const { onAddToCart: addToCartFromApp } = useOutletContext();
+src/pages/ProductPage.jsx:149:  const addToCart = () => {
+src/pages/ProductPage.jsx:150:    if (!canAddToCart(product)) {
+src/pages/ProductPage.jsx:162:    addToCartFromApp(cartProduct);
+src/pages/ProductPage.jsx:299:            onClick={addToCart}
+
+=== FAVORITES ===
+src/App.jsx:6:  FAVORITES_UPDATED_EVENT,
+src/App.jsx:9:  getFavorites,
+src/App.jsx:12:  setFavorites,
+src/App.jsx:14:  toggleProductFavorite,
+src/App.jsx:19:import FavoritesDrawer from "./components/FavoritesDrawer";
+src/App.jsx:34:  const [favorites, setFavoritesState] = useState(() => getFavorites());
+src/App.jsx:35:  const [favoritesOpen, setFavoritesOpen] = useState(false);
+src/App.jsx:381:    const handleFavoritesUpdated = () => {
+src/App.jsx:382:      setFavoritesState(getFavorites());
+src/App.jsx:387:      FAVORITES_UPDATED_EVENT,
+src/App.jsx:388:      handleFavoritesUpdated
+src/App.jsx:394:        FAVORITES_UPDATED_EVENT,
+src/App.jsx:395:        handleFavoritesUpdated
+src/App.jsx:446:    const next = toggleProductFavorite(id);
+src/App.jsx:448:    setFavoritesState(next);
+src/App.jsx:449:    setFavorites(next);
+src/App.jsx:473:        favorites={favorites}
+src/App.jsx:475:        onFavoritesOpen={() => setFavoritesOpen(true)}
+src/App.jsx:492:          favorites={favorites}
+src/App.jsx:502:    favorites,
+src/App.jsx:506:    setFavoritesOpen,
+src/App.jsx:550:                  favorites.includes(selectedProduct.id)
+src/App.jsx:558:                {favorites.includes(selectedProduct.id) ? <Icon name="heart" size={20} strokeWidth={2.2} /> : <Icon name="heart" size={20} /> }
+src/App.jsx:623:      <FavoritesDrawer
+src/App.jsx:624:        favoritesOpen={favoritesOpen}
+src/App.jsx:625:        setFavoritesOpen={setFavoritesOpen}
+src/App.jsx:626:        favorites={favorites}
+src/App.jsx:637:    favorites={favorites}
+src/App.jsx:639:    setFavoritesOpen={setFavoritesOpen}
+src/components/FavoritesDrawer.jsx:1:﻿export default function FavoritesDrawer({
+src/components/FavoritesDrawer.jsx:2:  favoritesOpen,
+src/components/FavoritesDrawer.jsx:3:  setFavoritesOpen,
+src/components/FavoritesDrawer.jsx:4:  favorites,
+src/components/FavoritesDrawer.jsx:11:  if (!favoritesOpen) return null;
+src/components/FavoritesDrawer.jsx:15:          className="favorites-overlay"
+src/components/FavoritesDrawer.jsx:16:          onClick={() => setFavoritesOpen(false)}
+src/components/FavoritesDrawer.jsx:19:            className="favorites-drawer"
+src/components/FavoritesDrawer.jsx:22:            <div className="favorites-header">
+src/components/FavoritesDrawer.jsx:24:                <p className="eyebrow">YOUR FAVORITES</p>
+src/components/FavoritesDrawer.jsx:30:                className="favorites-close"
+src/components/FavoritesDrawer.jsx:32:                onClick={() => setFavoritesOpen(false)}
+src/components/FavoritesDrawer.jsx:38:            {favorites.length === 0 ? (
+src/components/FavoritesDrawer.jsx:39:              <div className="favorites-empty">
+src/components/FavoritesDrawer.jsx:40:                <div className="favorites-empty-icon">
+src/components/FavoritesDrawer.jsx:54:                    setFavoritesOpen(false)
+src/components/FavoritesDrawer.jsx:62:              <div className="favorites-items">
+src/components/FavoritesDrawer.jsx:64:                  .filter((product) => favorites.includes(product.id))
+src/components/Header.jsx:15:  favorites,
+src/components/Header.jsx:17:  onFavoritesOpen,
+src/components/Header.jsx:99:            className="icon-button favorites-button"
+src/components/Header.jsx:101:            onClick={onFavoritesOpen}
+src/components/Header.jsx:105:            {favorites.length > 0 && (
+src/components/Header.jsx:106:              <span className="favorites-count">
+src/components/Header.jsx:107:                {favorites.length}
+src/components/ProfilePanel.jsx:5:  favorites,
+src/components/ProfilePanel.jsx:7:  setFavoritesOpen,
+src/components/ProfilePanel.jsx:77:                setFavoritesOpen(true);
+src/components/ProfilePanel.jsx:86:                  {favorites.length} сохраненных товаров
+src/lib/shop.js:2:const FAVORITES_KEY = "glowrush-favorites";
+src/lib/shop.js:5:export const FAVORITES_UPDATED_EVENT = "glowrush:favorites-updated";
+src/lib/shop.js:29:export function getFavorites() {
+src/lib/shop.js:30:  return readArray(FAVORITES_KEY);
+src/lib/shop.js:33:export function setFavorites(favorites) {
+src/lib/shop.js:34:  writeArray(FAVORITES_KEY, favorites, FAVORITES_UPDATED_EVENT);
+src/lib/shop.js:82:export function toggleProductFavorite(productId) {
+src/lib/shop.js:83:  const favorites = getFavorites();
+src/lib/shop.js:85:  return favorites.includes(productId)
+src/lib/shop.js:86:    ? favorites.filter((id) => id !== productId)
+src/lib/shop.js:87:    : [...favorites, productId];
+src/lib/shop.js:107:export { CART_KEY, FAVORITES_KEY };
+src/pages/AccountPage.jsx:6:    favorites,
+src/pages/AccountPage.jsx:8:    setFavoritesOpen,
+src/pages/AccountPage.jsx:76:          onClick={() => setFavoritesOpen(true)}
+src/pages/AccountPage.jsx:81:            {favorites.length}{" "}
+src/pages/AccountPage.jsx:82:            {favorites.length === 1 ? "товар" : "товаров"}
+src/pages/CatalogPage.jsx:40:    favorites,
+src/pages/CatalogPage.jsx:467:              favorite={favorites.includes(product.id)}
+src/pages/HomePage.jsx:139:  favorites,
+src/pages/HomePage.jsx:403:              favorite={favorites.includes(product.id)}
+src/pages/HomePage.jsx:435:                favorite={favorites.includes(product.id)}
+
+=== INVENTORY / STOCK ===
+src/App.jsx:13:  updateCartQuantity,
+src/App.jsx:80:          stockStatus,
+src/App.jsx:161:          stockStatus: product.stockStatus,
+src/App.jsx:257:    (total, product) => total + product.quantity,
+src/App.jsx:262:    (total, product) => total + product.price * product.quantity,
+src/App.jsx:324:          quantity: item.quantity,
+src/App.jsx:362:      const isInventoryError =
+src/App.jsx:367:      if (isInventoryError) {
+src/App.jsx:405:    if (!product || product.stockStatus === "OUT_OF_STOCK") {
+src/App.jsx:413:  const decreaseQuantity = (id) => {
+src/App.jsx:419:      updateCartQuantity(
+src/App.jsx:421:        Number(item.quantity || 0) - 1
+src/App.jsx:426:  const increaseQuantity = (id) => {
+src/App.jsx:429:    if (!item || item.stockStatus === "OUT_OF_STOCK") {
+src/App.jsx:434:      updateCartQuantity(
+src/App.jsx:436:        Number(item.quantity || 0) + 1
+src/App.jsx:618:        increaseQuantity={increaseQuantity}
+src/App.jsx:619:        decreaseQuantity={decreaseQuantity}
+src/admin/AdminPanel.jsx:43:              quantity,
+src/admin/AdminPanel.jsx:121:              quantity: item.quantity || 1,
+src/admin/AdminPanel.jsx:295:            `${item.name} x${item.quantity || 1}`
+src/admin/AdminPanel.jsx:632:                        sum + (item.quantity || 1),
+src/admin/AdminPanel.jsx:807:                      {item.quantity} шт.
+src/admin/AdminPanel.jsx:813:                      item.price * item.quantity
+src/components/CartDrawer.jsx:8:  decreaseQuantity,
+src/components/CartDrawer.jsx:9:  increaseQuantity,
+src/components/CartDrawer.jsx:81:                    <div className="quantity-control">
+src/components/CartDrawer.jsx:84:                        onClick={() => decreaseQuantity(item.id)}
+src/components/CartDrawer.jsx:90:                      <span>{item.quantity}</span>
+src/components/CartDrawer.jsx:94:                        onClick={() => increaseQuantity(item.id)}
+src/components/CartDrawer.jsx:96:                        disabled={item.stockStatus === "OUT_OF_STOCK"}
+src/components/ProductCard.jsx:75:          {product.stockStatus === "LOW_STOCK" && (
+src/components/ProductCard.jsx:106:          {getStockLabel(product.stockStatus)}
+src/lib/shop.js:37:export function addProductToCart(product, quantity = 1) {
+src/lib/shop.js:38:  if (!product || product.stockStatus === "OUT_OF_STOCK") {
+src/lib/shop.js:42:  const safeQuantity = Math.max(1, Number(quantity) || 1);
+src/lib/shop.js:51:            quantity: Number(item.quantity || 0) + safeQuantity,
+src/lib/shop.js:61:      quantity: safeQuantity,
+src/lib/shop.js:70:export function updateCartQuantity(productId, quantity) {
+src/lib/shop.js:71:  if (quantity <= 0) {
+src/lib/shop.js:77:      ? { ...item, quantity: Number(quantity) }
+src/lib/shop.js:90:export function getStockLabel(stockStatus) {
+src/lib/shop.js:91:  switch (stockStatus) {
+src/lib/shop.js:92:    case "IN_STOCK":
+src/lib/shop.js:94:    case "LOW_STOCK":
+src/lib/shop.js:96:    case "OUT_OF_STOCK":
+src/lib/shop.js:104:  return Boolean(product) && product.stockStatus !== "OUT_OF_STOCK";
+src/pages/CatalogPage.jsx:74:          stockStatus,
+src/pages/CatalogPage.jsx:245:          product.stockStatus !== "OUT_OF_STOCK") ||
+src/pages/CatalogPage.jsx:247:          product.stockStatus === "LOW_STOCK");
+src/pages/ProductCollectionPage.jsx:46:          stockStatus,
+src/pages/ProductPage.jsx:48:          stockStatus,
+src/pages/ProductPage.jsx:308:                {getStockLabel(product.stockStatus)}
+
+=== SUPABASE ===
+src/App.jsx:3:import { supabase } from "./lib/supabase";
+src/App.jsx:47:    supabase.auth.getSession().then(({ data }) => {
+src/App.jsx:55:    } = supabase.auth.onAuthStateChange((_event, session) => {
+src/App.jsx:69:      const { data, error } = await supabase
+src/App.jsx:70:        .from("Product")
+src/App.jsx:113:        console.error("Supabase products error:", error);
+src/App.jsx:212:      const { data, error } = await supabase
+src/App.jsx:213:        .from("User")
+src/App.jsx:321:      const { data, error } = await supabase.rpc("create_order", {
+src/App.jsx:355:      console.error("Supabase order creation error:", error);
+src/App.jsx:510:      await supabase.auth.signOut();
+src/App.jsx:641:    supabase={supabase}
+src/App.jsx:672:            await supabase.auth.signOut();
+src/AuthModal.jsx:2:import { supabase } from "./lib/supabase";
+src/AuthModal.jsx:59:    const { error: authError } = await supabase.auth.signInWithOAuth({
+src/AuthModal.jsx:84:    const { error: authError } = await supabase.auth.signInWithOtp({
+src/AuthModal.jsx:216:    const { error: authError } = await supabase.auth.verifyOtp({
+src/admin/AdminPanel.jsx:2:import { supabase } from "../lib/supabase";
+src/admin/AdminPanel.jsx:26:        const { data, error } = await supabase
+src/admin/AdminPanel.jsx:27:          .from("Order")
+src/admin/AdminPanel.jsx:219:    const { error: updateError } = await supabase
+src/admin/AdminPanel.jsx:220:      .from("Order")
+src/admin/AdminPanel.jsx:233:    const { error: historyError } = await supabase
+src/admin/AdminPanel.jsx:234:      .from("OrderStatusHistory")
+src/admin/AdminPanel.jsx:586:          <p>Получаем заказы из Supabase.</p>
+src/components/ProfilePanel.jsx:9:  supabase,
+src/components/ProfilePanel.jsx:125:              await supabase.auth.signOut();
+src/lib/supabase.js:1:﻿import { createClient } from "@supabase/supabase-js";
+src/lib/supabase.js:3:const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+src/lib/supabase.js:4:const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+src/lib/supabase.js:6:if (!supabaseUrl || !supabaseAnonKey) {
+src/lib/supabase.js:7:  throw new Error("Supabase environment variables are missing");
+src/lib/supabase.js:10:export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+src/pages/BrandsPage.jsx:3:import { supabase } from "../lib/supabase";
+src/pages/BrandsPage.jsx:26:      const { data, error: queryError } = await supabase
+src/pages/BrandsPage.jsx:27:        .from("Brand")
+src/pages/CatalogPage.jsx:3:import { supabase } from "../lib/supabase";
+src/pages/CatalogPage.jsx:64:      const { data, error: queryError } = await supabase
+src/pages/CatalogPage.jsx:65:        .from("Product")
+src/pages/CatalogPage.jsx:214:      ...Array.from(
+src/pages/HomePage.jsx:160:  const brandNames = Array.from(
+src/pages/ProductCollectionPage.jsx:4:import { supabase } from "../lib/supabase";
+src/pages/ProductCollectionPage.jsx:36:      const { data, error: queryError } = await supabase
+src/pages/ProductCollectionPage.jsx:37:        .from("Product")
+src/pages/ProductPage.jsx:3:import { supabase } from "../lib/supabase";
+src/pages/ProductPage.jsx:38:      const { data, error: queryError } = await supabase
+src/pages/ProductPage.jsx:39:        .from("Product")
+
+=== AUTH ===
+src/App.jsx:39:  const [user, setUser] = useState(null);
+src/App.jsx:47:    supabase.auth.getSession().then(({ data }) => {
+src/App.jsx:49:        setUser(data.session?.user ?? null);
+src/App.jsx:55:    } = supabase.auth.onAuthStateChange((_event, session) => {
+src/App.jsx:56:      setUser(session?.user ?? null);
+src/App.jsx:202:      if (!user) {
+src/App.jsx:213:        .from("User")
+src/App.jsx:215:        .eq("id", user.id)
+src/App.jsx:238:  }, [user]);
+src/App.jsx:296:    if (!user) {
+src/App.jsx:314:    if (!user) {
+src/App.jsx:460:        user={user}
+src/App.jsx:501:    user,
+src/App.jsx:510:      await supabase.auth.signOut();
+src/App.jsx:511:      setUser(null);
+src/App.jsx:636:    user={user}
+src/App.jsx:642:    setUser={setUser}
+src/App.jsx:672:            await supabase.auth.signOut();
+src/AuthModal.jsx:1:﻿import { useEffect, useRef, useState } from "react";
+src/AuthModal.jsx:15:  const otpRefs = useRef([]);
+src/AuthModal.jsx:59:    const { error: authError } = await supabase.auth.signInWithOAuth({
+src/AuthModal.jsx:84:    const { error: authError } = await supabase.auth.signInWithOtp({
+src/AuthModal.jsx:216:    const { error: authError } = await supabase.auth.verifyOtp({
+src/components/Header.jsx:5:  user,
+src/components/Header.jsx:39:          {user ? (
+src/components/Header.jsx:52:              {user?.user_metadata?.name ||
+src/components/Header.jsx:53:                user?.user_metadata?.preferred_username ||
+src/components/Header.jsx:54:                user?.email?.split("@")[0] ||
+src/components/Icon.jsx:67:    case "user":
+src/components/ProfilePanel.jsx:4:  user,
+src/components/ProfilePanel.jsx:10:  setUser,
+src/components/ProfilePanel.jsx:30:              {user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:31:                user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:32:                user?.email?.split("@")[0] ||
+src/components/ProfilePanel.jsx:48:          <div className="profile-user-card">
+src/components/ProfilePanel.jsx:51:                user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:52:                user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:53:                user?.email ||
+src/components/ProfilePanel.jsx:62:                {user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:63:                  user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:64:                  user?.email?.split("@")[0] ||
+src/components/ProfilePanel.jsx:68:              <p>{user?.email || "Telegram аккаунт"}</p>
+src/components/ProfilePanel.jsx:117:              <strong>{user?.email || "Не указан"}</strong>
+src/components/ProfilePanel.jsx:125:              await supabase.auth.signOut();
+src/components/ProfilePanel.jsx:126:              setUser(null);
+src/pages/AccountPage.jsx:5:    user,
+src/pages/AccountPage.jsx:15:    user?.user_metadata?.name ||
+src/pages/AccountPage.jsx:16:    user?.user_metadata?.preferred_username ||
+src/pages/AccountPage.jsx:17:    user?.email?.split("@")[0] ||
+src/pages/AccountPage.jsx:22:  if (!user) {
+src/pages/AccountPage.jsx:62:        <div className="account-user">
+src/pages/AccountPage.jsx:67:            <p>{user.email || "Email не указан"}</p>
+src/pages/AccountPage.jsx:118:            <strong>{user.email || "Не указан"}</strong>
+
+=== PRODUCT DATA ===
+src/App.jsx:29:  const [selectedCategory, setSelectedCategory] = useState("Все");
+src/App.jsx:75:          price,
+src/App.jsx:76:          oldPrice,
+src/App.jsx:77:          rating,
+src/App.jsx:78:          reviewCount,
+src/App.jsx:83:          brand:Brand (
+src/App.jsx:85:            translations:BrandTranslation (
+src/App.jsx:90:          category:Category (
+src/App.jsx:92:            translations:CategoryTranslation (
+src/App.jsx:97:          translations:ProductTranslation (
+src/App.jsx:102:          images:ProductImage (
+src/App.jsx:121:        const brandTranslation =
+src/App.jsx:122:          product.brand?.translations?.find(
+src/App.jsx:124:          ) || product.brand?.translations?.[0];
+src/App.jsx:126:        const categoryTranslation =
+src/App.jsx:127:          product.category?.translations?.find(
+src/App.jsx:129:          ) || product.category?.translations?.[0];
+src/App.jsx:131:        const productTranslation =
+src/App.jsx:137:          product.images?.find((image) => image.isPrimary) ||
+src/App.jsx:138:          [...(product.images || [])].sort(
+src/App.jsx:146:          brand: brandTranslation?.name || product.brand?.slug || "",
+src/App.jsx:147:          name: productTranslation?.name || product.slug,
+src/App.jsx:148:          category:
+src/App.jsx:149:            categoryTranslation?.name ||
+src/App.jsx:150:            product.category?.slug ||
+src/App.jsx:152:          price: product.price,
+src/App.jsx:153:          oldPrice: product.oldPrice,
+src/App.jsx:154:          rating: product.rating,
+src/App.jsx:155:          reviewCount: product.reviewCount,
+src/App.jsx:159:            productTranslation?.description ||
+src/App.jsx:241:    const categoryMatch =
+src/App.jsx:242:      selectedCategory === "Все" ||
+src/App.jsx:243:      product.category === selectedCategory;
+src/App.jsx:250:      product.brand.toLowerCase().includes(query) ||
+src/App.jsx:251:      product.category.toLowerCase().includes(query);
+src/App.jsx:253:    return categoryMatch && searchMatch;
+src/App.jsx:262:    (total, product) => total + product.price * product.quantity,
+src/App.jsx:278:      price: cartTotal >= 300000 ? 0 : 20000,
+src/App.jsx:284:      price: 0,
+src/App.jsx:292:  const deliveryFee = selectedDelivery.price;
+src/App.jsx:346:          price: data.deliveryFee,
+src/App.jsx:485:          selectedCategory={selectedCategory}
+src/App.jsx:486:          setSelectedCategory={setSelectedCategory}
+src/App.jsx:564:              <p className="product-brand">
+src/App.jsx:565:                {selectedProduct.brand}
+src/App.jsx:570:              <p className="product-modal-category">
+src/App.jsx:571:                {selectedProduct.category}
+src/App.jsx:574:              <div className="product-modal-price">
+src/App.jsx:575:                {selectedProduct.price.toLocaleString("ru-RU")} сум
+src/App.jsx:766:                        {option.price === 0
+src/App.jsx:768:                          : `${option.price.toLocaleString("ru-RU")} сум`}
+src/AuthModal.jsx:258:          <div className="auth-card-brand">
+src/admin/AdminPanel.jsx:44:              unitPrice,
+src/admin/AdminPanel.jsx:45:              totalPrice,
+src/admin/AdminPanel.jsx:49:                brand:Brand (
+src/admin/AdminPanel.jsx:50:                  translations:BrandTranslation (
+src/admin/AdminPanel.jsx:55:                translations:ProductTranslation (
+src/admin/AdminPanel.jsx:59:                images:ProductImage (
+src/admin/AdminPanel.jsx:106:              item.product?.images?.find(
+src/admin/AdminPanel.jsx:109:              item.product?.images?.[0];
+src/admin/AdminPanel.jsx:114:              brand:
+src/admin/AdminPanel.jsx:115:                item.product?.brand?.translations?.find(
+src/admin/AdminPanel.jsx:118:                item.product?.brand?.translations?.[0]?.name ||
+src/admin/AdminPanel.jsx:122:              price: item.unitPrice || 0,
+src/admin/AdminPanel.jsx:167:  const formatPrice = (price) =>
+src/admin/AdminPanel.jsx:168:    `${Number(price || 0).toLocaleString("ru-RU")} сум`;
+src/admin/AdminPanel.jsx:487:          <strong>{formatPrice(totalRevenue)}</strong>
+src/admin/AdminPanel.jsx:492:          <strong>{formatPrice(completedRevenue)}</strong>
+src/admin/AdminPanel.jsx:497:          <strong>{formatPrice(deliveryRevenue)}</strong>
+src/admin/AdminPanel.jsx:502:          <strong>{formatPrice(newRevenue)}</strong>
+src/admin/AdminPanel.jsx:514:          <strong>{formatPrice(todayRevenue)}</strong>
+src/admin/AdminPanel.jsx:661:                  {formatPrice(order.total)}
+src/admin/AdminPanel.jsx:804:                    <span>{item.brand}</span>
+src/admin/AdminPanel.jsx:812:                    {formatPrice(
+src/admin/AdminPanel.jsx:813:                      item.price * item.quantity
+src/admin/AdminPanel.jsx:824:                {formatPrice(
+src/components/CartDrawer.jsx:69:                    {item.brand && (
+src/components/CartDrawer.jsx:70:                      <div className="product-brand">
+src/components/CartDrawer.jsx:71:                        {item.brand}
+src/components/CartDrawer.jsx:78:                      {Number(item.price || 0).toLocaleString("ru-RU")} сум
+src/components/FavoritesDrawer.jsx:76:                          <span>{product.brand}</span>
+src/components/FavoritesDrawer.jsx:81:                        <p className="product-brand">
+src/components/FavoritesDrawer.jsx:82:                          {product.brand}
+src/components/FavoritesDrawer.jsx:88:                          {product.price.toLocaleString("ru-RU")} сум
+src/components/Footer.jsx:8:          <div className="site-footer-brand">
+src/components/Footer.jsx:25:            <Link to="/brands">Бренды</Link>
+src/components/Header.jsx:24:        <Link to="/" className="brand-logo" aria-label="GlowRush">
+src/components/Header.jsx:30:  <Link to="/brands">Бренды</Link>
+src/components/ProductCard.jsx:5:const formatPrice = (value) =>
+src/components/ProductCard.jsx:17:    product.oldPrice > product.price
+src/components/ProductCard.jsx:19:          (1 - product.price / product.oldPrice) * 100
+src/components/ProductCard.jsx:111:        <p className="premium-product-brand">
+src/components/ProductCard.jsx:112:          {product.brand}
+src/components/ProductCard.jsx:127:          <div className="product-rating-line">
+src/components/ProductCard.jsx:128:            ★ {product.rating || "—"}
+src/components/ProductCard.jsx:131:              ({product.reviewCount || 0})
+src/components/ProductCard.jsx:135:          <div className="premium-product-prices">
+src/components/ProductCard.jsx:137:              {formatPrice(product.price)} сум
+src/components/ProductCard.jsx:140:            {product.oldPrice > product.price && (
+src/components/ProductCard.jsx:142:                {formatPrice(product.oldPrice)} сум
+src/pages/BrandsPage.jsx:13:export default function BrandsPage() {
+src/pages/BrandsPage.jsx:14:  const [brands, setBrands] = useState([]);
+src/pages/BrandsPage.jsx:22:    async function loadBrands() {
+src/pages/BrandsPage.jsx:27:        .from("Brand")
+src/pages/BrandsPage.jsx:31:          translations:BrandTranslation (
+src/pages/BrandsPage.jsx:42:        console.error("Brands load error:", queryError);
+src/pages/BrandsPage.jsx:44:        setBrands([]);
+src/pages/BrandsPage.jsx:46:        setBrands(
+src/pages/BrandsPage.jsx:47:          (data || []).map((brand) => {
+src/pages/BrandsPage.jsx:49:              brand.translations
+src/pages/BrandsPage.jsx:53:              ...brand,
+src/pages/BrandsPage.jsx:56:                brand.slug ||
+src/pages/BrandsPage.jsx:57:                "Brand",
+src/pages/BrandsPage.jsx:66:    loadBrands();
+src/pages/BrandsPage.jsx:73:  const visibleBrands = useMemo(() => {
+src/pages/BrandsPage.jsx:76:    return brands.filter(
+src/pages/BrandsPage.jsx:77:      (brand) =>
+src/pages/BrandsPage.jsx:79:        brand.name.toLowerCase().includes(query) ||
+src/pages/BrandsPage.jsx:80:        brand.slug.toLowerCase().includes(query)
+src/pages/BrandsPage.jsx:82:  }, [brands, search]);
+src/pages/BrandsPage.jsx:85:    <main className="brands-page">
+src/pages/BrandsPage.jsx:86:      <section className="brands-hero">
+src/pages/BrandsPage.jsx:96:        <div className="brands-search">
+src/pages/BrandsPage.jsx:118:      ) : visibleBrands.length === 0 ? (
+src/pages/BrandsPage.jsx:123:        <section className="brands-grid">
+src/pages/BrandsPage.jsx:124:          {visibleBrands.map((brand) => (
+src/pages/BrandsPage.jsx:126:              key={brand.id}
+src/pages/BrandsPage.jsx:127:              to={`/catalog?brand=${encodeURIComponent(
+src/pages/BrandsPage.jsx:128:                brand.slug
+src/pages/BrandsPage.jsx:130:              className="brand-tile"
+src/pages/BrandsPage.jsx:132:              <span>{brand.name}</span>
+src/pages/BrandsPage.jsx:133:              <small>{brand.slug}</small>
+src/pages/CarePage.jsx:17:      CARE_CATEGORIES.includes(product.category),
+src/pages/CatalogPage.jsx:6:const CATEGORY_SLUG_MAP = {
+src/pages/CatalogPage.jsx:28:const formatPrice = (value) =>
+src/pages/CatalogPage.jsx:45:  const brandFromUrl = (searchParams.get("brand") || "").toLowerCase();
+src/pages/CatalogPage.jsx:46:  const categoryFromUrl = (searchParams.get("category") || "").toLowerCase();
+src/pages/CatalogPage.jsx:50:  const [category, setCategory] = useState("Все");
+src/pages/CatalogPage.jsx:51:  const [brand, setBrand] = useState("Все бренды");
+src/pages/CatalogPage.jsx:70:          price,
+src/pages/CatalogPage.jsx:71:          oldPrice,
+src/pages/CatalogPage.jsx:72:          rating,
+src/pages/CatalogPage.jsx:73:          reviewCount,
+src/pages/CatalogPage.jsx:79:          brand:Brand (
+src/pages/CatalogPage.jsx:81:            translations:BrandTranslation (
+src/pages/CatalogPage.jsx:86:          category:Category (
+src/pages/CatalogPage.jsx:88:            translations:CategoryTranslation (
+src/pages/CatalogPage.jsx:93:          translations:ProductTranslation (
+src/pages/CatalogPage.jsx:98:          images:ProductImage (
+src/pages/CatalogPage.jsx:122:        const brandTranslation = pickTranslation(
+src/pages/CatalogPage.jsx:123:          product.brand?.translations
+src/pages/CatalogPage.jsx:126:        const categoryTranslation = pickTranslation(
+src/pages/CatalogPage.jsx:127:          product.category?.translations
+src/pages/CatalogPage.jsx:130:        const productTranslation = pickTranslation(
+src/pages/CatalogPage.jsx:134:        const images = [...(product.images || [])].sort(
+src/pages/CatalogPage.jsx:140:          images.find((image) => image.isPrimary) ||
+src/pages/CatalogPage.jsx:141:          images[0];
+src/pages/CatalogPage.jsx:143:        const secondImage = images.find(
+src/pages/CatalogPage.jsx:150:          brand:
+src/pages/CatalogPage.jsx:151:            brandTranslation?.name ||
+src/pages/CatalogPage.jsx:152:            product.brand?.slug ||
+src/pages/CatalogPage.jsx:154:          brandSlug: String(product.brand?.slug || "").toLowerCase(),
+src/pages/CatalogPage.jsx:155:          category:
+src/pages/CatalogPage.jsx:156:            categoryTranslation?.name ||
+src/pages/CatalogPage.jsx:157:            product.category?.slug ||
+src/pages/CatalogPage.jsx:159:          categorySlug: String(product.category?.slug || "").toLowerCase(),
+src/pages/CatalogPage.jsx:161:            productTranslation?.name ||
+src/pages/CatalogPage.jsx:164:            productTranslation?.description ||
+src/pages/CatalogPage.jsx:184:    if (brandFromUrl) {
+src/pages/CatalogPage.jsx:185:      const matchedBrand = products.find(
+src/pages/CatalogPage.jsx:186:        (product) => product.brandSlug === brandFromUrl
+src/pages/CatalogPage.jsx:189:      if (matchedBrand?.brand) {
+src/pages/CatalogPage.jsx:190:        setBrand(matchedBrand.brand);
+src/pages/CatalogPage.jsx:193:      setBrand("Все бренды");
+src/pages/CatalogPage.jsx:196:    if (categoryFromUrl) {
+src/pages/CatalogPage.jsx:197:      const matchedCategory =
+src/pages/CatalogPage.jsx:198:        CATEGORY_SLUG_MAP[categoryFromUrl];
+src/pages/CatalogPage.jsx:200:      if (matchedCategory) {
+src/pages/CatalogPage.jsx:201:        setCategory(matchedCategory);
+src/pages/CatalogPage.jsx:204:      setCategory("Все");
+src/pages/CatalogPage.jsx:207:    brandFromUrl,
+src/pages/CatalogPage.jsx:208:    categoryFromUrl,
+src/pages/CatalogPage.jsx:211:  const brands = useMemo(
+src/pages/CatalogPage.jsx:217:            .map((product) => product.brand)
+src/pages/CatalogPage.jsx:230:      const categoryMatch =
+src/pages/CatalogPage.jsx:231:        (category === "Все" ||
+src/pages/CatalogPage.jsx:232:          product.category === category) &&
+src/pages/CatalogPage.jsx:233:        (!categoryFromUrl ||
+src/pages/CatalogPage.jsx:234:          product.categorySlug === categoryFromUrl);
+src/pages/CatalogPage.jsx:236:      const brandMatch =
+src/pages/CatalogPage.jsx:237:        (brand === "Все бренды" ||
+src/pages/CatalogPage.jsx:238:          product.brand === brand) &&
+src/pages/CatalogPage.jsx:239:        (!brandFromUrl ||
+src/pages/CatalogPage.jsx:240:          product.brandSlug === brandFromUrl);
+src/pages/CatalogPage.jsx:251:        product.oldPrice > product.price;
+src/pages/CatalogPage.jsx:256:        product.brand.toLowerCase().includes(query) ||
+src/pages/CatalogPage.jsx:257:        product.category.toLowerCase().includes(query);
+src/pages/CatalogPage.jsx:260:        categoryMatch &&
+src/pages/CatalogPage.jsx:261:        brandMatch &&
+src/pages/CatalogPage.jsx:269:      if (sort === "price-asc") {
+src/pages/CatalogPage.jsx:270:        return a.price - b.price;
+src/pages/CatalogPage.jsx:273:      if (sort === "price-desc") {
+src/pages/CatalogPage.jsx:274:        return b.price - a.price;
+src/pages/CatalogPage.jsx:277:      if (sort === "rating") {
+src/pages/CatalogPage.jsx:279:          (b.rating || 0) -
+src/pages/CatalogPage.jsx:280:          (a.rating || 0)
+src/pages/CatalogPage.jsx:291:    category,
+src/pages/CatalogPage.jsx:292:    brand,
+src/pages/CatalogPage.jsx:293:    brandFromUrl,
+src/pages/CatalogPage.jsx:294:    categoryFromUrl,
+src/pages/CatalogPage.jsx:351:            <option value="rating">
+src/pages/CatalogPage.jsx:354:            <option value="price-asc">
+src/pages/CatalogPage.jsx:357:            <option value="price-desc">
+src/pages/CatalogPage.jsx:370:              category === item ? "is-active" : ""
+src/pages/CatalogPage.jsx:372:            onClick={() => setCategory(item)}
+src/pages/CatalogPage.jsx:381:          value={brand}
+src/pages/CatalogPage.jsx:383:            setBrand(event.target.value)
+src/pages/CatalogPage.jsx:387:          {brands.map((item) => (
+src/pages/CatalogPage.jsx:424:        {(category !== "Все" ||
+src/pages/CatalogPage.jsx:425:          brand !== "Все бренды" ||
+src/pages/CatalogPage.jsx:433:              setCategory("Все");
+src/pages/CatalogPage.jsx:434:              setBrand("Все бренды");
+src/pages/DeliveryPage.jsx:7:    price: "20 000 сум",
+src/pages/DeliveryPage.jsx:13:    price: "Бесплатно",
+src/pages/DeliveryPage.jsx:54:                  <strong>{method.price}</strong>
+src/pages/GuidePage.jsx:9:      { label: "Жирная кожа", to: "/catalog?category=serums" },
+src/pages/GuidePage.jsx:10:      { label: "Сухая кожа", to: "/catalog?category=creams" },
+src/pages/GuidePage.jsx:11:      { label: "Чувствительная кожа", to: "/catalog?category=cleansing" },
+src/pages/GuidePage.jsx:19:      { label: "Очищение", to: "/catalog?category=cleansing" },
+src/pages/GuidePage.jsx:20:      { label: "Тонеры", to: "/catalog?category=toners" },
+src/pages/GuidePage.jsx:21:      { label: "Кремы", to: "/catalog?category=creams" },
+src/pages/GuidePage.jsx:22:      { label: "SPF", to: "/catalog?category=spf" },
+src/pages/GuidePage.jsx:30:      { label: "Сыворотки", to: "/catalog?category=serums" },
+src/pages/GuidePage.jsx:31:      { label: "Эссенции", to: "/catalog?category=essences" },
+src/pages/GuidePage.jsx:32:      { label: "Ампулы", to: "/catalog?category=ampoules" },
+src/pages/HomePage.jsx:98:        <span className="home-v4-product-brand">
+src/pages/HomePage.jsx:99:          {product.brand}
+src/pages/HomePage.jsx:104:        <div className="home-v4-product-rating">
+src/pages/HomePage.jsx:105:          ★ {product.rating || "—"}
+src/pages/HomePage.jsx:107:            ({product.reviewCount || 0})
+src/pages/HomePage.jsx:113:            {product.price.toLocaleString("ru-RU")} сум
+src/pages/HomePage.jsx:135:  selectedCategory,
+src/pages/HomePage.jsx:136:  setSelectedCategory,
+src/pages/HomePage.jsx:154:        product.brand?.toLowerCase() ===
+src/pages/HomePage.jsx:160:  const brandNames = Array.from(
+src/pages/HomePage.jsx:163:        .map((product) => product.brand)
+src/pages/HomePage.jsx:231:                    .map((product) => product.brand)
+src/pages/HomePage.jsx:265:                  <span>{heroProduct.brand}</span>
+src/pages/HomePage.jsx:333:        <div className="home-v4-category-grid">
+src/pages/HomePage.jsx:334:          {homeCategories.map((category, index) => (
+src/pages/HomePage.jsx:337:              key={category.number}
+src/pages/HomePage.jsx:339:                selectedCategory === category.name
+src/pages/HomePage.jsx:340:                  ? "home-v4-category is-active"
+src/pages/HomePage.jsx:341:                  : "home-v4-category"
+src/pages/HomePage.jsx:344:                setSelectedCategory(category.name);
+src/pages/HomePage.jsx:345:                const categorySlugMap = {
+src/pages/HomePage.jsx:354:                const categorySlug = categorySlugMap[category.name];
+src/pages/HomePage.jsx:355:                navigate(categorySlug
+src/pages/HomePage.jsx:356:                  ? `/catalog?category=${categorySlug}`
+src/pages/HomePage.jsx:360:              <div className="home-v4-category-top">
+src/pages/HomePage.jsx:361:                <span>{category.subtitle}</span>
+src/pages/HomePage.jsx:362:                <strong>{category.number}</strong>
+src/pages/HomePage.jsx:365:              <div className="home-v4-category-bottom">
+src/pages/HomePage.jsx:366:                <span>{category.name}</span>
+src/pages/HomePage.jsx:371:                className="home-v4-category-index"
+src/pages/HomePage.jsx:499:      <section className="home-v4-section home-v4-brands">
+src/pages/HomePage.jsx:503:              CURATED BRANDS
+src/pages/HomePage.jsx:508:          <Link to="/brands">
+src/pages/HomePage.jsx:513:        <div className="home-v4-brand-list">
+src/pages/HomePage.jsx:514:          {brandNames.map((brand, index) => (
+src/pages/HomePage.jsx:516:              className="home-v4-brand"
+src/pages/HomePage.jsx:517:              key={brand}
+src/pages/HomePage.jsx:522:              <strong>{brand}</strong>
+src/pages/ProductCollectionPage.jsx:42:          price,
+src/pages/ProductCollectionPage.jsx:43:          oldPrice,
+src/pages/ProductCollectionPage.jsx:44:          rating,
+src/pages/ProductCollectionPage.jsx:45:          reviewCount,
+src/pages/ProductCollectionPage.jsx:51:          brand:Brand (
+src/pages/ProductCollectionPage.jsx:53:            translations:BrandTranslation (
+src/pages/ProductCollectionPage.jsx:58:          category:Category (
+src/pages/ProductCollectionPage.jsx:60:            translations:CategoryTranslation (
+src/pages/ProductCollectionPage.jsx:65:          translations:ProductTranslation (
+src/pages/ProductCollectionPage.jsx:70:          images:ProductImage (
+src/pages/ProductCollectionPage.jsx:91:        const brandTranslation = pickTranslation(
+src/pages/ProductCollectionPage.jsx:92:          product.brand?.translations
+src/pages/ProductCollectionPage.jsx:95:        const categoryTranslation = pickTranslation(
+src/pages/ProductCollectionPage.jsx:96:          product.category?.translations
+src/pages/ProductCollectionPage.jsx:99:        const productTranslation = pickTranslation(
+src/pages/ProductCollectionPage.jsx:103:        const images = [...(product.images || [])].sort(
+src/pages/ProductCollectionPage.jsx:109:          images.find((image) => image.isPrimary) ||
+src/pages/ProductCollectionPage.jsx:110:          images[0];
+src/pages/ProductCollectionPage.jsx:114:          brand:
+src/pages/ProductCollectionPage.jsx:115:            brandTranslation?.name ||
+src/pages/ProductCollectionPage.jsx:116:            product.brand?.slug ||
+src/pages/ProductCollectionPage.jsx:118:          category:
+src/pages/ProductCollectionPage.jsx:119:            categoryTranslation?.name ||
+src/pages/ProductCollectionPage.jsx:120:            product.category?.slug ||
+src/pages/ProductCollectionPage.jsx:123:            productTranslation?.name ||
+src/pages/ProductCollectionPage.jsx:126:            productTranslation?.description ||
+src/pages/ProductPage.jsx:10:const formatPrice = (value) =>
+src/pages/ProductPage.jsx:44:          price,
+src/pages/ProductPage.jsx:45:          oldPrice,
+src/pages/ProductPage.jsx:46:          rating,
+src/pages/ProductPage.jsx:47:          reviewCount,
+src/pages/ProductPage.jsx:54:          brand:Brand (
+src/pages/ProductPage.jsx:56:            translations:BrandTranslation (
+src/pages/ProductPage.jsx:61:          category:Category (
+src/pages/ProductPage.jsx:63:            translations:CategoryTranslation (
+src/pages/ProductPage.jsx:68:          translations:ProductTranslation (
+src/pages/ProductPage.jsx:73:          images:ProductImage (
+src/pages/ProductPage.jsx:101:      const productTranslation = pickTranslation(
+src/pages/ProductPage.jsx:105:      const brandTranslation = pickTranslation(
+src/pages/ProductPage.jsx:106:        data.brand?.translations
+src/pages/ProductPage.jsx:109:      const categoryTranslation = pickTranslation(
+src/pages/ProductPage.jsx:110:        data.category?.translations
+src/pages/ProductPage.jsx:113:      const images = [...(data.images || [])].sort(
+src/pages/ProductPage.jsx:119:        name: productTranslation?.name || data.slug,
+src/pages/ProductPage.jsx:121:          productTranslation?.description ||
+src/pages/ProductPage.jsx:123:        brand: brandTranslation?.name || data.brand?.slug || "",
+src/pages/ProductPage.jsx:124:        category:
+src/pages/ProductPage.jsx:125:          categoryTranslation?.name ||
+src/pages/ProductPage.jsx:126:          data.category?.slug ||
+src/pages/ProductPage.jsx:128:        images,
+src/pages/ProductPage.jsx:131:      const primaryIndex = images.findIndex(
+src/pages/ProductPage.jsx:157:        product.images?.find((image) => image.isPrimary)?.url ||
+src/pages/ProductPage.jsx:158:        product.images?.[0]?.url ||
+src/pages/ProductPage.jsx:195:  const productImages = product.images || [];
+src/pages/ProductPage.jsx:198:    productImages[selectedImageIndex] ||
+src/pages/ProductPage.jsx:199:    productImages.find((image) => image.isPrimary) ||
+src/pages/ProductPage.jsx:200:    productImages[0] ||
+src/pages/ProductPage.jsx:229:          {productImages.length > 1 && (
+src/pages/ProductPage.jsx:234:              {productImages.map((image, index) => (
+src/pages/ProductPage.jsx:262:          <p className="eyebrow">{product.brand}</p>
+src/pages/ProductPage.jsx:266:          <p className="product-category">
+src/pages/ProductPage.jsx:267:            {product.category}
+src/pages/ProductPage.jsx:270:          {product.rating ? (
+src/pages/ProductPage.jsx:271:            <div className="product-rating">
+src/pages/ProductPage.jsx:272:              ★ {product.rating}
+src/pages/ProductPage.jsx:275:                · {product.reviewCount || 0} отзывов
+src/pages/ProductPage.jsx:280:          <div className="product-price">
+src/pages/ProductPage.jsx:282:              {formatPrice(product.price)} сум
+src/pages/ProductPage.jsx:285:            {product.oldPrice > product.price && (
+src/pages/ProductPage.jsx:287:                {formatPrice(product.oldPrice)} сум
+src/pages/SalePage.jsx:7:      Number(product.oldPrice || 0) >
+src/pages/SalePage.jsx:8:      Number(product.price || 0),
+src/routes/router.jsx:4:import BrandsPage from "../pages/BrandsPage";
+src/routes/router.jsx:27:        path: "brands",
+src/routes/router.jsx:28:        element: <BrandsPage />,
+
+=== CHECKOUT ===
+src/App.jsx:172:  const [checkoutOpen, setCheckoutOpen] = useState(false);
+src/App.jsx:173:  const [checkoutStatus, setCheckoutStatus] = useState("form");
+src/App.jsx:174:  const [checkoutForm, setCheckoutForm] = useState({
+src/App.jsx:176:    phone: "",
+src/App.jsx:177:    city: "Ташкент",
+src/App.jsx:267:  "Ташкент",
+src/App.jsx:273:const deliveryOptions = [
+src/App.jsx:275:      id: "courier",
+src/App.jsx:277:      description: "Доставка до двери по городу",
+src/App.jsx:281:      id: "pickup",
+src/App.jsx:288:  const [selectedDelivery, setSelectedDelivery] = useState(
+src/App.jsx:289:    deliveryOptions[0]
+src/App.jsx:292:  const deliveryFee = selectedDelivery.price;
+src/App.jsx:293:  const orderTotal = cartTotal + deliveryFee;
+src/App.jsx:295:  const openCheckout = () => {
+src/App.jsx:302:    setCheckoutStatus("form");
+src/App.jsx:303:    setCheckoutOpen(true);
+src/App.jsx:306:  const confirmCheckout = async (event) => {
+src/App.jsx:321:      const { data, error } = await supabase.rpc("create_order", {
+src/App.jsx:326:        p_name: checkoutForm.name.trim(),
+src/App.jsx:327:        p_phone: checkoutForm.phone.trim(),
+src/App.jsx:328:        p_city: checkoutForm.city.trim(),
+src/App.jsx:329:        p_comment: checkoutForm.comment.trim() || null,
+src/App.jsx:330:        p_delivery_method: selectedDelivery.id,
+src/App.jsx:341:        deliveryFee: data.deliveryFee,
+src/App.jsx:343:        customer: checkoutForm,
+src/App.jsx:344:        delivery: {
+src/App.jsx:345:          ...selectedDelivery,
+src/App.jsx:346:          price: data.deliveryFee,
+src/App.jsx:352:      setCheckoutStatus("success");
+src/App.jsx:620:        openCheckout={openCheckout}
+src/App.jsx:680:  {checkoutOpen && (
+src/App.jsx:681:    <div className="checkout-overlay">
+src/App.jsx:682:      <div className="checkout-modal">
+src/App.jsx:685:          className="checkout-close"
+src/App.jsx:686:          onClick={() => setCheckoutOpen(false)}
+src/App.jsx:691:        {checkoutStatus === "form" ? (
+src/App.jsx:693:            <p className="eyebrow">GLOWRUSH CHECKOUT</p>
+src/App.jsx:696:            <form onSubmit={confirmCheckout} className="checkout-form">
+src/App.jsx:702:                  value={checkoutForm.name}
+src/App.jsx:704:                    setCheckoutForm((current) => ({
+src/App.jsx:718:                  value={checkoutForm.phone}
+src/App.jsx:720:                    setCheckoutForm((current) => ({
+src/App.jsx:722:                      phone: event.target.value,
+src/App.jsx:730:                Город
+src/App.jsx:732:                  value={checkoutForm.city}
+src/App.jsx:734:                    setCheckoutForm((current) => ({
+src/App.jsx:748:              <div className="checkout-delivery">
+src/App.jsx:751:                <div className="checkout-delivery-options">
+src/App.jsx:752:                  {deliveryOptions.map((option) => (
+src/App.jsx:756:                      className={`checkout-delivery-option ${
+src/App.jsx:757:                        selectedDelivery.id === option.id
+src/App.jsx:758:                          ? "checkout-delivery-option-active"
+src/App.jsx:761:                      onClick={() => setSelectedDelivery(option)}
+src/App.jsx:778:                  value={checkoutForm.comment}
+src/App.jsx:780:                    setCheckoutForm((current) => ({
+src/App.jsx:790:              <div className="checkout-summary">
+src/App.jsx:801:                    {deliveryFee === 0
+src/App.jsx:803:                      : `${deliveryFee.toLocaleString("ru-RU")} сум`}
+src/App.jsx:807:                <div className="checkout-summary-total">
+src/App.jsx:816:                Подтвердить заказ
+src/App.jsx:821:          <div className="checkout-success">
+src/App.jsx:822:            <div className="checkout-success-icon">
+src/App.jsx:844:                setCheckoutOpen(false);
+src/admin/AdminPanel.jsx:8:  { id: "delivery", label: "Доставляется" },
+src/admin/AdminPanel.jsx:32:            guestPhone,
+src/admin/AdminPanel.jsx:35:            deliveryFee,
+src/admin/AdminPanel.jsx:65:            delivery:Delivery (
+src/admin/AdminPanel.jsx:81:          deliveryFee: order.deliveryFee || 0,
+src/admin/AdminPanel.jsx:84:            phone: order.guestPhone || "",
+src/admin/AdminPanel.jsx:88:          delivery: {
+src/admin/AdminPanel.jsx:90:              order.delivery?.[0]?.provider === "MANUAL"
+src/admin/AdminPanel.jsx:178:    READY_FOR_DELIVERY: "delivery",
+src/admin/AdminPanel.jsx:179:    COURIER_ASSIGNED: "delivery",
+src/admin/AdminPanel.jsx:180:    IN_TRANSIT: "delivery",
+src/admin/AdminPanel.jsx:191:    delivery: "IN_TRANSIT",
+src/admin/AdminPanel.jsx:284:      "Город",
+src/admin/AdminPanel.jsx:307:        order.customer?.phone || "",
+src/admin/AdminPanel.jsx:309:        order.delivery?.name || "",
+src/admin/AdminPanel.jsx:374:  const deliveryRevenue = orders
+src/admin/AdminPanel.jsx:376:      (order) => getStatus(order.id) === "delivery"
+src/admin/AdminPanel.jsx:422:      const phone =
+src/admin/AdminPanel.jsx:423:        order.customer?.phone?.toLowerCase() || "";
+src/admin/AdminPanel.jsx:431:        phone.includes(normalizedSearch) ||
+src/admin/AdminPanel.jsx:497:          <strong>{formatPrice(deliveryRevenue)}</strong>
+src/admin/AdminPanel.jsx:624:                  {order.customer?.phone ||
+src/admin/AdminPanel.jsx:665:                  {order.delivery?.name ||
+src/admin/AdminPanel.jsx:748:                  {selectedOrder.customer?.phone}
+src/admin/AdminPanel.jsx:751:                {selectedOrder.customer?.phone && (
+src/admin/AdminPanel.jsx:754:                      href={`tel:${selectedOrder.customer.phone}`}
+src/admin/AdminPanel.jsx:761:                      href={`https://wa.me/${selectedOrder.customer.phone.replace(
+src/admin/AdminPanel.jsx:776:                <span>Город</span>
+src/admin/AdminPanel.jsx:785:                  {selectedOrder.delivery?.name}
+src/components/CartDrawer.jsx:11:  openCheckout,
+src/components/CartDrawer.jsx:125:                className="primary-button checkout-button"
+src/components/CartDrawer.jsx:126:                onClick={openCheckout}
+src/components/Footer.jsx:32:            <Link to="/delivery">Доставка</Link>
+src/components/Footer.jsx:40:            <Link to="/delivery">Оплата и доставка</Link>
+src/components/Footer.jsx:41:            <Link to="/delivery">Возврат</Link>
+src/pages/AccountPage.jsx:48:          <Link to="/delivery" className="account-link-card">
+src/pages/AccountPage.jsx:105:        <Link to="/delivery" className="account-card">
+src/pages/DeliveryPage.jsx:3:const deliveryMethods = [
+src/pages/DeliveryPage.jsx:6:    description: "Доставка до двери по городу.",
+src/pages/DeliveryPage.jsx:19:  "Ташкент",
+src/pages/DeliveryPage.jsx:26:export default function DeliveryPage() {
+src/pages/DeliveryPage.jsx:28:    <main className="page-shell delivery-page">
+src/pages/DeliveryPage.jsx:29:      <section className="delivery-hero">
+src/pages/DeliveryPage.jsx:38:      <section className="delivery-section">
+src/pages/DeliveryPage.jsx:39:        <div className="delivery-section-heading">
+src/pages/DeliveryPage.jsx:44:        <div className="delivery-methods">
+src/pages/DeliveryPage.jsx:45:          {deliveryMethods.map((method) => (
+src/pages/DeliveryPage.jsx:46:            <article className="delivery-method-card" key={method.title}>
+src/pages/DeliveryPage.jsx:47:              <div className="delivery-method-icon">→</div>
+src/pages/DeliveryPage.jsx:53:                <div className="delivery-method-meta">
+src/pages/DeliveryPage.jsx:63:      <section className="delivery-section">
+src/pages/DeliveryPage.jsx:64:        <div className="delivery-section-heading">
+src/pages/DeliveryPage.jsx:65:          <p className="eyebrow">ГОРОДА</p>
+src/pages/DeliveryPage.jsx:69:        <div className="delivery-cities">
+src/pages/DeliveryPage.jsx:71:            <div className="delivery-city" key={city}>
+src/pages/DeliveryPage.jsx:79:      <section className="delivery-section delivery-payment">
+src/pages/DeliveryPage.jsx:80:        <div className="delivery-section-heading">
+src/pages/DeliveryPage.jsx:85:        <div className="delivery-info-card">
+src/pages/DeliveryPage.jsx:94:      <section className="delivery-note">
+src/pages/HomePage.jsx:289:            <span>DELIVERY IN UZBEKISTAN</span>
+src/pages/HomePage.jsx:306:          <strong>DELIVERY</strong>
+src/routes/router.jsx:9:import DeliveryPage from "../pages/DeliveryPage";
+src/routes/router.jsx:55:        path: "delivery",
+src/routes/router.jsx:56:        element: <DeliveryPage />,
+
+=== ACCOUNT / DELIVERY ===
+src/App.jsx:277:      description: "Доставка до двери по городу",
+src/App.jsx:310:      alert("Корзина пуста.");
+src/App.jsx:369:          "К сожалению, один из товаров в корзине сейчас недоступен или его количества недостаточно на складе. Корзина сохранена."
+src/App.jsx:799:                  <span>Доставка</span>
+src/AuthModal.jsx:297:                чтобы оформлять заказы и сохранять избранное.
+src/admin/AdminPanel.jsx:92:                : "Доставка",
+src/admin/AdminPanel.jsx:285:      "Доставка",
+src/admin/AdminPanel.jsx:666:                    "Доставка"}
+src/admin/AdminPanel.jsx:783:                <span>Доставка</span>
+src/components/CartDrawer.jsx:25:          <h2>Корзина</h2>
+src/components/CartDrawer.jsx:38:            <h3>Корзина пока пуста</h3>
+src/components/FavoritesDrawer.jsx:25:                <h2>Избранное</h2>
+src/components/FavoritesDrawer.jsx:31:                aria-label="Закрыть избранное"
+src/components/FavoritesDrawer.jsx:44:                <h3>Избранное пока пусто</h3>
+src/components/Footer.jsx:32:            <Link to="/delivery">Доставка</Link>
+src/components/Footer.jsx:33:            <Link to="/account">Профиль</Link>
+src/components/Footer.jsx:40:            <Link to="/delivery">Оплата и доставка</Link>
+src/components/Footer.jsx:41:            <Link to="/delivery">Возврат</Link>
+src/components/Footer.jsx:43:            <Link to="/account">Контакты</Link>
+src/components/Header.jsx:50:              aria-label="Открыть профиль"
+src/components/Header.jsx:55:                "Профиль"}
+src/components/Header.jsx:100:            aria-label="Избранное"
+src/components/Header.jsx:115:            aria-label="Корзина"
+src/components/ProductCard.jsx:92:                : "Добавить в избранное"
+src/components/ProfilePanel.jsx:41:            aria-label="Закрыть профиль"
+src/components/ProfilePanel.jsx:84:                <strong>Избранное</strong>
+src/components/ProfilePanel.jsx:103:                <strong>Корзина</strong>
+src/pages/AccountPage.jsx:3:export default function AccountPage() {
+src/pages/AccountPage.jsx:48:          <Link to="/delivery" className="account-link-card">
+src/pages/AccountPage.jsx:49:            <strong>Доставка и оплата</strong>
+src/pages/AccountPage.jsx:79:          <strong>Избранное</strong>
+src/pages/AccountPage.jsx:92:          <strong>Корзина</strong>
+src/pages/AccountPage.jsx:105:        <Link to="/delivery" className="account-card">
+src/pages/AccountPage.jsx:107:          <strong>Доставка</strong>
+src/pages/DeliveryPage.jsx:5:    title: "Курьерская доставка",
+src/pages/DeliveryPage.jsx:6:    description: "Доставка до двери по городу.",
+src/pages/DeliveryPage.jsx:26:export default function DeliveryPage() {
+src/pages/DeliveryPage.jsx:31:        <h1>Доставка и оплата</h1>
+src/pages/DeliveryPage.jsx:66:          <h2>Доставка доступна в</h2>
+src/pages/DeliveryPage.jsx:98:          а при заказе от 300 000 сум доставка бесплатна.
+src/pages/HomePage.jsx:82:          aria-label="Добавить в избранное"
+src/pages/HomePage.jsx:240:              <span>доставка</span>
+src/pages/HomePage.jsx:307:          <span>Доставка по Узбекистану</span>
+src/routes/router.jsx:8:import AccountPage from "../pages/AccountPage";
+src/routes/router.jsx:9:import DeliveryPage from "../pages/DeliveryPage";
+src/routes/router.jsx:52:        element: <AccountPage />,
+src/routes/router.jsx:56:        element: <DeliveryPage />,
+
+=== PRODUCT CARDS ===
+src/components/ProductCard.jsx
+src/pages/CatalogPage.jsx
+src/pages/HomePage.jsx
+src/pages/ProductCollectionPage.jsx
+
+=== DUPLICATED CART ===
+src/App.jsx:378:      setCartState(getCart());
+src/App.jsx:400:    setCartState(nextCart);
+src/App.jsx:401:    setCart(nextCart);
+src/App.jsx:409:    commitCart(addProductToCart(product));
+src/lib/shop.js:25:export function setCart(cart) {
+src/lib/shop.js:37:export function addProductToCart(product, quantity = 1) {
+
+=== DUPLICATED FAVORITES ===
+src/App.jsx:446:    const next = toggleProductFavorite(id);
+src/App.jsx:449:    setFavorites(next);
+src/lib/shop.js:33:export function setFavorites(favorites) {
+src/lib/shop.js:82:export function toggleProductFavorite(productId) {
+
+=== IMAGE GALLERY ===
+src/App.jsx:102:          images:ProductImage (
+src/App.jsx:137:          product.images?.find((image) => image.isPrimary) ||
+src/admin/AdminPanel.jsx:59:                images:ProductImage (
+src/admin/AdminPanel.jsx:106:              item.product?.images?.find(
+src/admin/AdminPanel.jsx:109:              item.product?.images?.[0];
+src/pages/CatalogPage.jsx:98:          images:ProductImage (
+src/pages/ProductCollectionPage.jsx:70:          images:ProductImage (
+src/pages/ProductPage.jsx:73:          images:ProductImage (
+src/pages/ProductPage.jsx:157:        product.images?.find((image) => image.isPrimary)?.url ||
+src/pages/ProductPage.jsx:158:        product.images?.[0]?.url ||
+src/pages/ProductPage.jsx:195:  const productImages = product.images || [];
+src/pages/ProductPage.jsx:198:    productImages[selectedImageIndex] ||
+src/pages/ProductPage.jsx:199:    productImages.find((image) => image.isPrimary) ||
+src/pages/ProductPage.jsx:200:    productImages[0] ||
+src/pages/ProductPage.jsx:214:        <div className="product-gallery">
+src/pages/ProductPage.jsx:215:          <div className="product-gallery-main">
+src/pages/ProductPage.jsx:222:              <div className="product-gallery-placeholder">
+src/pages/ProductPage.jsx:229:          {productImages.length > 1 && (
+src/pages/ProductPage.jsx:231:              className="product-gallery-thumbnails"
+src/pages/ProductPage.jsx:234:              {productImages.map((image, index) => (
+src/pages/ProductPage.jsx:240:                      ? "product-gallery-thumbnail is-active"
+src/pages/ProductPage.jsx:241:                      : "product-gallery-thumbnail"
+
+=== CATEGORY MAP ===
+src/pages/CarePage.jsx:10:  "SPF",
+src/pages/CatalogPage.jsx:6:const CATEGORY_SLUG_MAP = {
+src/pages/CatalogPage.jsx:7:  cleansing: "Очищение",
+src/pages/CatalogPage.jsx:8:  toners: "Тонеры",
+src/pages/CatalogPage.jsx:9:  essences: "Эссенции",
+src/pages/CatalogPage.jsx:10:  ampoules: "Ампулы",
+src/pages/CatalogPage.jsx:11:  serums: "Сыворотки",
+src/pages/CatalogPage.jsx:12:  creams: "Кремы",
+src/pages/CatalogPage.jsx:13:  spf: "SPF",
+src/pages/CatalogPage.jsx:14:  masks: "Маски",
+src/pages/CatalogPage.jsx:24:  "SPF",
+src/pages/CatalogPage.jsx:198:        CATEGORY_SLUG_MAP[categoryFromUrl];
+src/pages/CatalogPage.jsx:317:            от очищения до SPF.
+src/pages/GuidePage.jsx:9:      { label: "Жирная кожа", to: "/catalog?category=serums" },
+src/pages/GuidePage.jsx:10:      { label: "Сухая кожа", to: "/catalog?category=creams" },
+src/pages/GuidePage.jsx:11:      { label: "Чувствительная кожа", to: "/catalog?category=cleansing" },
+src/pages/GuidePage.jsx:17:    text: "Не обязательно использовать десять средств. Начни с очищения, увлажнения и SPF, затем добавляй активы.",
+src/pages/GuidePage.jsx:19:      { label: "Очищение", to: "/catalog?category=cleansing" },
+src/pages/GuidePage.jsx:20:      { label: "Тонеры", to: "/catalog?category=toners" },
+src/pages/GuidePage.jsx:21:      { label: "Кремы", to: "/catalog?category=creams" },
+src/pages/GuidePage.jsx:22:      { label: "SPF", to: "/catalog?category=spf" },
+src/pages/GuidePage.jsx:30:      { label: "Сыворотки", to: "/catalog?category=serums" },
+src/pages/GuidePage.jsx:31:      { label: "Эссенции", to: "/catalog?category=essences" },
+src/pages/GuidePage.jsx:32:      { label: "Ампулы", to: "/catalog?category=ampoules" },
+src/pages/GuidePage.jsx:50:  "SPF нужен каждый день.",
+src/pages/GuidePage.jsx:108:            Утром — очищение, увлажнение и SPF. Вечером —
+src/pages/GuidePage.jsx:118:            ["04", "Protect", "SPF"],
+src/pages/HomePage.jsx:10:  { name: "SPF", subtitle: "PROTECT", number: "06" },
+src/pages/HomePage.jsx:11:  { name: "Маски", subtitle: "MASKS", number: "07" },
+src/pages/HomePage.jsx:18:    text: "Удалите макияж, SPF и загрязнения.",
+src/pages/HomePage.jsx:32:    title: "Крем + SPF",
+src/pages/HomePage.jsx:196:            до SPF.
+src/pages/HomePage.jsx:346:                  Очищение: "cleansing",
+src/pages/HomePage.jsx:347:                  Тонеры: "toners",
+src/pages/HomePage.jsx:348:                  Эссенции: "essences",
+src/pages/HomePage.jsx:349:                  Сыворотки: "serums",
+src/pages/HomePage.jsx:350:                  Кремы: "creams",
+src/pages/HomePage.jsx:351:                  SPF: "spf",
+src/pages/HomePage.jsx:352:                  Маски: "masks",
+
+=== HARDCODED UI ===
+src/admin/AdminPanel.jsx:92:                : "Доставка",
+src/admin/AdminPanel.jsx:285:      "Доставка",
+src/admin/AdminPanel.jsx:666:                    "Доставка"}
+src/components/Header.jsx:55:                "Профиль"}
+src/components/Header.jsx:100:            aria-label="Избранное"
+src/components/Header.jsx:115:            aria-label="Корзина"
+src/lib/shop.js:93:      return "В наличии";
+src/lib/shop.js:95:      return "Осталось мало";
+src/lib/shop.js:97:      return "Нет в наличии";
+src/pages/CatalogPage.jsx:244:        (availability === "В наличии" &&
+src/pages/CatalogPage.jsx:402:          <option value="В наличии">
+src/pages/GuidePage.jsx:40:      { label: "Новинки", to: "/new" },
+src/pages/NewArrivalsPage.jsx:13:      title="Новинки"
+src/pages/SalePage.jsx:15:      title="Акции"
+
+=== ADMIN ===
+src/App.jsx:16:import AdminPanel from "./admin/AdminPanel";
+src/App.jsx:194:  const [adminOpen, setAdminOpen] = useState(false);
+src/App.jsx:195:  const [isAdmin, setIsAdmin] = useState(false);
+src/App.jsx:196:  const [adminRoleLoading, setAdminRoleLoading] = useState(true);
+src/App.jsx:201:    const checkAdminRole = async () => {
+src/App.jsx:204:          setIsAdmin(false);
+src/App.jsx:205:          setAdminRoleLoading(false);
+src/App.jsx:210:      setAdminRoleLoading(true);
+src/App.jsx:214:        .select("role,status")
+src/App.jsx:221:        console.error("Admin role check error:", error);
+src/App.jsx:222:        setIsAdmin(false);
+src/App.jsx:224:        setIsAdmin(
+src/App.jsx:226:            (data?.role === "OWNER" || data?.role === "ADMIN")
+src/App.jsx:230:      setAdminRoleLoading(false);
+src/App.jsx:233:    checkAdminRole();
+src/App.jsx:461:        isAdmin={isAdmin}
+src/App.jsx:462:        onAdminOpen={() => setAdminOpen(true)}
+src/App.jsx:512:      setIsAdmin(false);
+src/App.jsx:643:    setIsAdmin={setIsAdmin}
+src/App.jsx:647:  {adminOpen && (
+src/App.jsx:648:    <div className="admin-screen">
+src/App.jsx:651:        className="admin-back"
+src/App.jsx:652:        onClick={() => setAdminOpen(false)}
+src/App.jsx:657:      {adminRoleLoading ? (
+src/App.jsx:658:        <div className="admin-login">
+src/App.jsx:659:          <div className="admin-login-card">
+src/App.jsx:660:            <div className="admin-login-logo">GR</div>
+src/App.jsx:661:            <p className="eyebrow">GLOWRUSH ADMIN</p>
+src/App.jsx:663:            <p className="admin-login-text">
+src/App.jsx:668:      ) : isAdmin ? (
+src/App.jsx:669:        <AdminPanel
+src/App.jsx:673:            setIsAdmin(false);
+src/App.jsx:674:            setAdminOpen(false);
+src/admin/AdminPanel.jsx:13:function AdminPanel({ onLogout }) {
+src/admin/AdminPanel.jsx:170:  const dbStatusToAdminStatus = {
+src/admin/AdminPanel.jsx:187:  const adminStatusToDbStatus = {
+src/admin/AdminPanel.jsx:198:    return dbStatusToAdminStatus[order?.dbStatus] || "new";
+src/admin/AdminPanel.jsx:207:    const dbStatus = adminStatusToDbStatus[status];
+src/admin/AdminPanel.jsx:449:    <section className="admin-panel">
+src/admin/AdminPanel.jsx:450:      <div className="admin-header">
+src/admin/AdminPanel.jsx:452:          <p className="eyebrow">GLOWRUSH ADMIN</p>
+src/admin/AdminPanel.jsx:457:        <div className="admin-header-actions">
+src/admin/AdminPanel.jsx:458:          <div className="admin-stat">
+src/admin/AdminPanel.jsx:463:          <div className="admin-header-buttons">
+src/admin/AdminPanel.jsx:466:              className="admin-export"
+src/admin/AdminPanel.jsx:475:              className="admin-logout"
+src/admin/AdminPanel.jsx:484:      <div className="admin-revenue-cards">
+src/admin/AdminPanel.jsx:485:        <div className="admin-revenue-card admin-revenue-main">
+src/admin/AdminPanel.jsx:490:        <div className="admin-revenue-card">
+src/admin/AdminPanel.jsx:495:        <div className="admin-revenue-card">
+src/admin/AdminPanel.jsx:500:        <div className="admin-revenue-card">
+src/admin/AdminPanel.jsx:506:      <div className="admin-today-card">
+src/admin/AdminPanel.jsx:518:      <div className="admin-status-cards">
+src/admin/AdminPanel.jsx:523:            className={`admin-status-card ${
+src/admin/AdminPanel.jsx:525:                ? "admin-status-card-active"
+src/admin/AdminPanel.jsx:542:      <div className="admin-filters">
+src/admin/AdminPanel.jsx:572:          className="admin-reset"
+src/admin/AdminPanel.jsx:583:        <div className="admin-empty">
+src/admin/AdminPanel.jsx:584:          <div className="admin-empty-icon">⏳</div>
+src/admin/AdminPanel.jsx:589:        <div className="admin-empty">
+src/admin/AdminPanel.jsx:590:          <div className="admin-empty-icon">⚠️</div>
+src/admin/AdminPanel.jsx:595:        <div className="admin-empty">
+src/admin/AdminPanel.jsx:596:          <div className="admin-empty-icon">🔎</div>
+src/admin/AdminPanel.jsx:603:        <div className="admin-orders">
+src/admin/AdminPanel.jsx:607:              className="admin-order"
+src/admin/AdminPanel.jsx:614:                <span className="admin-order-number">
+src/admin/AdminPanel.jsx:628:                <small className="admin-order-meta">
+src/admin/AdminPanel.jsx:651:                  className={`admin-status admin-status-${getStatus(
+src/admin/AdminPanel.jsx:659:              <div className="admin-order-right">
+src/admin/AdminPanel.jsx:676:          className="admin-order-overlay"
+src/admin/AdminPanel.jsx:682:            className="admin-order-modal"
+src/admin/AdminPanel.jsx:689:              className="admin-close"
+src/admin/AdminPanel.jsx:712:            <div className="admin-status-control">
+src/admin/AdminPanel.jsx:737:            <div className="admin-customer">
+src/admin/AdminPanel.jsx:752:                  <div className="admin-contact-actions">
+src/admin/AdminPanel.jsx:755:                      className="admin-contact-button"
+src/admin/AdminPanel.jsx:767:                      className="admin-contact-button"
+src/admin/AdminPanel.jsx:790:            <div className="admin-order-items">
+src/admin/AdminPanel.jsx:795:                  className="admin-order-item"
+src/admin/AdminPanel.jsx:820:            <div className="admin-total">
+src/admin/AdminPanel.jsx:831:              <div className="admin-comment">
+src/admin/AdminPanel.jsx:848:export default AdminPanel;
+src/components/Header.jsx:6:  isAdmin,
+src/components/Header.jsx:7:  onAdminOpen,
+src/components/Header.jsx:44:                if (isAdmin) {
+src/components/Header.jsx:45:                  onAdminOpen();
+src/components/Header.jsx:52:              {user?.user_metadata?.name ||
+src/components/Header.jsx:53:                user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:11:  setIsAdmin,
+src/components/ProfilePanel.jsx:30:              {user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:31:                user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:51:                user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:52:                user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:62:                {user?.user_metadata?.name ||
+src/components/ProfilePanel.jsx:63:                  user?.user_metadata?.preferred_username ||
+src/components/ProfilePanel.jsx:127:              setIsAdmin(false);
+src/pages/AccountPage.jsx:15:    user?.user_metadata?.name ||
+src/pages/AccountPage.jsx:16:    user?.user_metadata?.preferred_username ||
+
+=== DEBUG CODE ===
+src/App.jsx:113:        console.error("Supabase products error:", error);
+src/App.jsx:221:        console.error("Admin role check error:", error);
+src/App.jsx:310:      alert("Корзина пуста.");
+src/App.jsx:315:      alert("������� ������� � �������.");
+src/App.jsx:355:      console.error("Supabase order creation error:", error);
+src/App.jsx:368:        alert(
+src/App.jsx:372:        alert(`Не удалось оформить заказ.\n\n${message}`);
+src/AuthModal.jsx:67:      console.error("Telegram login error:", authError);
+src/AuthModal.jsx:91:      console.error("Email OTP send error:", authError);
+src/AuthModal.jsx:225:      console.error("Email OTP verify error:", authError);
+src/admin/AdminPanel.jsx:131:        console.error("Failed to load orders:", error);
+src/admin/AdminPanel.jsx:225:      console.error(
+src/admin/AdminPanel.jsx:229:      alert("Не удалось изменить статус заказа.");
+src/admin/AdminPanel.jsx:244:      console.error(
+src/admin/AdminPanel.jsx:249:      alert(
+src/pages/BrandsPage.jsx:42:        console.error("Brands load error:", queryError);
+src/pages/CatalogPage.jsx:111:        console.error(
+src/pages/ProductCollectionPage.jsx:83:        console.error("Collection load error:", queryError);
+src/pages/ProductPage.jsx:87:        console.error("Product load error:", queryError);
+
+=== CSS SIZE ===
+0 src/index.css
+174240 src/styles/glowrush.css
+
+=== BACKUP FILES ===
+src/App.jsx.backup-before-cart-sync
+src/App.jsx.backup-before-header-footer
+src/App.jsx.backup-before-rpc
+src/pages/CatalogPage.jsx.backup-before-brand-filter-20260915-164612
+src/pages/CatalogPage.jsx.backup-before-filter-select-sync-20260915-170007
+src/pages/CatalogPage.jsx.backup-before-premium
+src/pages/CatalogPage.jsx.backup-before-url-filter-final-20260915-165656
+src/pages/CatalogPage.jsx.backup-before-url-filters-20260915-165611
+src/pages/GuidePage.jsx.backup-before-guide-20260915-164612
+src/routes/router.jsx.backup-before-content-pages
+src/routes/router.jsx.backup-before-public-layout
+src/styles/glowrush.css.backup-before-catalog-ui
+src/styles/glowrush.css.backup-before-premium-catalog
+
+=== ENV FILES ===
+./.env.local
+
+=== GIT STATUS ===
+## fix/shop-core-2026-09-17...origin/fix/shop-core-2026-09-17
+?? audit-build.txt
+?? audit-full.txt
+?? audit-history.txt
+?? audit.sh
+
+=== BUILD ===
+
+> glowrush-new@0.0.0 build
+> vite build
+
+vite v8.2.2 building client environment for production...
+transforming...
+✓ 91 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.46 kB │ gzip:   0.29 kB
+dist/assets/index-Cbvnvo8f.css  120.90 kB │ gzip:  22.23 kB
+dist/assets/index-Ddgx0Pem.js   587.23 kB │ gzip: 165.66 kB
+
+✓ built in 1.36s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+========================================
+          AUDIT FINISHED
+========================================

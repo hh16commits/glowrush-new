@@ -1,4 +1,4 @@
-﻿export default function FavoritesDrawer({
+export default function FavoritesDrawer({
   favoritesOpen,
   setFavoritesOpen,
   favorites,
@@ -66,7 +66,15 @@
                     <div className="favorite-item" key={product.id}>
 
                       <div className="favorite-item-image">
-                        <span>{product.brand}</span>
+                        {product.image ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span>{product.brand}</span>
+                        )}
                       </div>
 
                       <div className="favorite-item-info">
@@ -113,6 +121,8 @@
         </div>
   );
 }
+
+
 
 
 

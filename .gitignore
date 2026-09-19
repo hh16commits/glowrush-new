@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .env
+
+# Backups and audit files
+*.backup*
+backup-*/
+audit-*.txt
+build-audit.txt

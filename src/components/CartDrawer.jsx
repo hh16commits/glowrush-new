@@ -58,6 +58,7 @@ export default function CartDrawer({
                       <img
                         src={item.image}
                         alt={item.name}
+                        loading="lazy"
                       />
                     ) : (
                       <span>GLOWRUSH</span>
@@ -74,7 +75,7 @@ export default function CartDrawer({
                     <h3>{item.name}</h3>
 
                     <strong>
-                      {item.price.toLocaleString("ru-RU")} сум
+                      {Number(item.price || 0).toLocaleString("ru-RU")} сум
                     </strong>
 
                     <div className="quantity-control">
@@ -83,7 +84,7 @@ export default function CartDrawer({
                         onClick={() => decreaseQuantity(item.id)}
                         aria-label="Уменьшить количество"
                       >
-                        -
+                        −
                       </button>
 
                       <span>{item.quantity}</span>
@@ -92,6 +93,7 @@ export default function CartDrawer({
                         type="button"
                         onClick={() => increaseQuantity(item.id)}
                         aria-label="Увеличить количество"
+                        disabled={item.stockStatus === "OUT_OF_STOCK"}
                       >
                         +
                       </button>
@@ -113,7 +115,9 @@ export default function CartDrawer({
             <div className="cart-footer">
               <div className="cart-total">
                 <span>Итого</span>
-                <strong>{cartTotal.toLocaleString("ru-RU")} сум</strong>
+                <strong>
+                  {Number(cartTotal || 0).toLocaleString("ru-RU")} сум
+                </strong>
               </div>
 
               <button

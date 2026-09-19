@@ -1,4 +1,6 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Icon from "./Icon";
+import { canAddToCart, getStockLabel } from "../lib/shop";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("ru-RU").format(
@@ -7,6 +9,8 @@ const formatPrice = (value) =>
 
 export default function ProductCard({
   product,
+  favorite = false,
+  onFavorite,
   onAddToCart,
 }) {
   const discount =
@@ -24,11 +28,23 @@ export default function ProductCard({
           className="premium-product-image"
         >
           {product.image ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              loading="lazy"
-            />
+            <>
+              <img
+                className="product-image-main"
+                src={product.image}
+                alt={product.name}
+                loading="lazy"
+              />
+
+              {product.secondImage && (
+                <img
+                  className="product-image-hover"
+                  src={product.secondImage}
+                  alt=""
+                  loading="lazy"
+                />
+              )}
+            </>
           ) : (
             <div className="premium-placeholder">
               <span>GLOW</span>
@@ -55,14 +71,39 @@ export default function ProductCard({
               −{discount}%
             </span>
           )}
+
+          {product.stockStatus === "LOW_STOCK" && (
+            <span className="product-badge badge-low">
+              Заканчивается
+            </span>
+          )}
         </div>
+
+        {onFavorite && (
+          <button
+            type="button"
+            className={`product-favorite-button ${
+              favorite ? "is-active" : ""
+            }`}
+            onClick={() => onFavorite(product.id)}
+            aria-label={
+              favorite
+                ? "Убрать из избранного"
+                : "Добавить в избранное"
+            }
+          >
+            <Icon name="heart" size={19} />
+          </button>
+        )}
 
         <button
           type="button"
           className="product-quick-add"
           onClick={() => onAddToCart(product)}
+          disabled={!canAddToCart(product)}
+          aria-disabled={!canAddToCart(product)}
         >
-          В корзину
+          {getStockLabel(product.stockStatus)}
         </button>
       </div>
 
@@ -107,3 +148,5 @@ export default function ProductCard({
     </article>
   );
 }
+
+

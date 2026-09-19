@@ -1,180 +1,45 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Link , useSearchParams} from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import Icon from "../components/Icon";
+import ProductCard from "../components/ProductCard";
 
 const CATEGORY_SLUG_MAP = {
   cleansing: "Очищение",
   toners: "Тонеры",
   essences: "Эссенции",
+  ampoules: "Ампулы",
   serums: "Сыворотки",
   creams: "Кремы",
   spf: "SPF",
   masks: "Маски",
 };
-    const CATEGORIES = [
+const CATEGORIES = [
   "Все",
   "Очищение",
   "Тонеры",
   "Эссенции",
+  "Ампулы",
   "Сыворотки",
   "Кремы",
   "SPF",
   "Маски",
 ];
 
-const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(
-    Number(value || 0)
-  );
-
 const pickTranslation = (translations = []) =>
   translations.find((item) => item.locale === "RU") ||
   translations[0] ||
   null;
 
-function ProductCard({
-  product,
-  favorite,
-  onFavorite,
-  onAddToCart,
-}) {
-  const discount =
-    product.oldPrice > product.price
-      ? Math.round(
-          (1 - product.price / product.oldPrice) * 100
-        )
-      : 0;
-
-  return (
-    <article className="premium-product-card">
-      <div className="premium-product-media">
-        <Link
-          to={`/product/${product.slug}`}
-          className="premium-product-image"
-        >
-          {product.image ? (
-            <>
-              <img
-                className="product-image-main"
-                src={product.image}
-                alt={product.name}
-                loading="lazy"
-              />
-
-              {product.secondImage && (
-                <img
-                  className="product-image-hover"
-                  src={product.secondImage}
-                  alt=""
-                  loading="lazy"
-                />
-              )}
-            </>
-          ) : (
-            <div className="premium-placeholder">
-              <span>GLOW</span>
-              <small>RUSH</small>
-            </div>
-          )}
-        </Link>
-
-        <div className="product-badge-stack">
-          {product.isBestseller && (
-            <span className="product-badge badge-hit">
-              ХИТ
-            </span>
-          )}
-
-          {product.isNew && (
-            <span className="product-badge badge-new">
-              NEW
-            </span>
-          )}
-
-          {discount > 0 && (
-            <span className="product-badge badge-sale">
-              −{discount}%
-            </span>
-          )}
-
-          {product.stockStatus === "LOW_STOCK" && (
-            <span className="product-badge badge-low">
-              Заканчивается
-            </span>
-          )}
-        </div>
-
-        <button
-          type="button"
-          className={`product-favorite-button ${
-            favorite ? "is-active" : ""
-          }`}
-          onClick={() => onFavorite(product.id)}
-          aria-label={
-            favorite
-              ? "Убрать из избранного"
-              : "Добавить в избранное"
-          }
-        >
-          <Icon name="heart" size={19} />
-        </button>
-
-        <button
-          type="button"
-          className="product-quick-add"
-          onClick={() => onAddToCart(product)}
-        >
-          В корзину
-        </button>
-      </div>
-
-      <div className="premium-product-copy">
-        <p className="premium-product-brand">
-          {product.brand}
-        </p>
-
-        <Link
-          to={`/product/${product.slug}`}
-          className="premium-product-name"
-        >
-          {product.name}
-        </Link>
-
-        <p className="premium-product-benefit">
-          {product.description}
-        </p>
-
-        <div className="premium-product-meta">
-          <div className="product-rating-line">
-            ★ {product.rating || "—"}
-            <span>
-              ({product.reviewCount || 0})
-            </span>
-          </div>
-
-          <div className="premium-product-prices">
-            <strong>
-              {formatPrice(product.price)} сум
-            </strong>
-
-            {product.oldPrice > product.price && (
-              <span>
-                {formatPrice(product.oldPrice)} сум
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function CatalogPage() {
+  const {
+    favorites,
+    onFavorite,
+    onAddToCart: addToCartFromApp,
+  } = useOutletContext();
   const [searchParams] = useSearchParams();
   const brandFromUrl = (searchParams.get("brand") || "").toLowerCase();
-    const categoryFromUrl = (searchParams.get("category") || "").toLowerCase();
-const [products, setProducts] = useState([]);
+  const categoryFromUrl = (searchParams.get("category") || "").toLowerCase();
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [category, setCategory] = useState("Все");
@@ -183,18 +48,6 @@ const [products, setProducts] = useState([]);
   const [discountOnly, setDiscountOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
-
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      return (
-        JSON.parse(
-          localStorage.getItem("glowrush-favorites")
-        ) || []
-      );
-    } catch {
-      return [];
-    }
-  });
 
   useEffect(() => {
     let mounted = true;
@@ -364,78 +217,6 @@ const [products, setProducts] = useState([]);
     [products]
   );
 
-  const toggleFavorite = (id) => {
-    setFavorites((current) => {
-      const next = current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id];
-
-      localStorage.setItem(
-        "glowrush-favorites",
-        JSON.stringify(next)
-      );
-
-      return next;
-    });
-  };
-
-  const addToCart = (product) => {
-    let current = [];
-
-    try {
-      current =
-        JSON.parse(
-          localStorage.getItem("glowrush-cart")
-        ) || [];
-    } catch {
-      current = [];
-    }
-
-    const existing = current.find(
-      (item) => item.id === product.id
-    );
-
-    const cartProduct = {
-      id: product.id,
-      sku: product.sku,
-      slug: product.slug,
-      name: product.name,
-      brand: product.brand,
-      category: product.category,
-      price: product.price,
-      oldPrice: product.oldPrice,
-      image: product.image,
-      description: product.description,
-      stockStatus: product.stockStatus,
-    };
-
-    const next = existing
-      ? current.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                quantity:
-                  Number(item.quantity || 0) + 1,
-              }
-            : item
-        )
-      : [
-          ...current,
-          {
-            ...cartProduct,
-            quantity: 1,
-          },
-        ];
-
-    localStorage.setItem(
-      "glowrush-cart",
-      JSON.stringify(next)
-    );
-
-    window.dispatchEvent(
-      new Event("glowrush:cart-updated")
-    );
-  };
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -679,8 +460,8 @@ const [products, setProducts] = useState([]);
               key={product.id}
               product={product}
               favorite={favorites.includes(product.id)}
-              onFavorite={toggleFavorite}
-              onAddToCart={addToCart}
+              onFavorite={onFavorite}
+              onAddToCart={addToCartFromApp}
             />
           ))}
         </section>
@@ -688,4 +469,14 @@ const [products, setProducts] = useState([]);
     </main>
   );
 }
+
+
+
+
+
+
+
+
+
+
 

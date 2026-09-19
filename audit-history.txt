@@ -1,0 +1,193 @@
+    1  cd ~/projects/glowrush-new
+    2  set -e
+    3  STAMP=$(date +%Y%m%d-%H%M%S)
+    4  BACKUP="../glowrush-backup-stage1-$STAMP"
+    5  mkdir -p "$BACKUP"
+    6  cp src/App.jsx "$BACKUP/App.jsx"
+    7  cp src/routes/PublicLayout.jsx "$BACKUP/PublicLayout.jsx"
+    8  python - <<'PY'
+    9  from pathlib import Path
+   10  p = Path("src/App.jsx")
+   11  s = p.read_text(encoding="utf-8-sig")
+   12  # 1. Корзина: загружаем сохранённую корзину при старте
+   13  old = '''  const [cart, setCart] = useState([]);
+   14    const [favorites, setFavorites] = useState([]);'''
+   15  new = '''  const [cart, setCart] = useState(() => {
+   16      try {
+   17        const saved = localStorage.getItem("glowrush-cart");
+   18        return saved ? JSON.parse(saved) : [];
+   19      } catch {
+   20        return [];
+   21      }
+   22    });
+   23    const [favorites, setFavorites] = useState(() => {
+   24      try {
+   25        const saved = localStorage.getItem("glowrush-favorites");
+   26        return saved ? JSON.parse(saved) : [];
+   27      } catch {
+   28        return [];
+   29      }
+   30    });'''
+   31  if old not in s:
+   32      raise SystemExit("ERROR: блок cart/favorites не найден")
+   33  s = s.replace(old, new, 1)
+   34  # 2. Сохраняем корзину и избранное после изменений
+   35  marker = '''  const toggleFavorite = (product) => {'''
+   36  insert = '''  useEffect(() => {
+   37      localStorage.setItem("glowrush-cart", JSON.stringify(cart));
+   38      window.dispatchEvent(new Event("glowrush:cart-updated"));
+   39    }, [cart]);
+   40    useEffect(() => {
+   41      localStorage.setItem("glowrush-favorites", JSON.stringify(favorites));
+   42      window.dispatchEvent(new Event("glowrush:favorites-updated"));
+   43    }, [favorites]);
+   44  '''
+   45  if marker not in s:
+   46      raise SystemExit("ERROR: toggleFavorite не найден")
+   47  s = s.replace(marker, insert + marker, 1)
+   48  p.write_text(s, encoding="utf-8")
+   49  print("OK: App.jsx patched")
+   50  PY
+   51  cd ~/projects/glowrush-new
+   52  set -e
+   53  STAMP=$(date +%Y%m%d-%H%M%S)
+   54  BACKUP="../glowrush-backup-stage1-$STAMP"
+   55  mkdir -p "$BACKUP"
+   56  cp src/App.jsx "$BACKUP/App.jsx"
+   57  cp src/routes/PublicLayout.jsx "$BACKUP/PublicLayout.jsx"
+   58  python - <<'PY'
+   59  from pathlib import Path
+   60  p = Path("src/App.jsx")
+   61  s = p.read_text(encoding="utf-8-sig")
+   62  # 1. Корзина: загружаем сохранённую корзину при старте
+   63  old = '''  const [cart, setCart] = useState([]);
+   64    const [favorites, setFavorites] = useState([]);'''
+   65  new = '''  const [cart, setCart] = useState(() => {
+   66      try {
+   67        const saved = localStorage.getItem("glowrush-cart");
+   68        return saved ? JSON.parse(saved) : [];
+   69      } catch {
+   70        return [];
+   71      }
+   72    });
+   73    const [favorites, setFavorites] = useState(() => {
+   74      try {
+   75        const saved = localStorage.getItem("glowrush-favorites");
+   76        return saved ? JSON.parse(saved) : [];
+   77      } catch {
+   78        return [];
+   79      }
+   80    });'''
+   81  if old not in s:
+   82      raise SystemExit("ERROR: блок cart/favorites не найден")
+   83  s = s.replace(old, new, 1)
+   84  # 2. Сохраняем корзину и избранное после изменений
+   85  marker = '''  const toggleFavorite = (product) => {'''
+   86  insert = '''  useEffect(() => {
+   87      localStorage.setItem("glowrush-cart", JSON.stringify(cart));
+   88      window.dispatchEvent(new Event("glowrush:cart-updated"));
+   89    }, [cart]);
+   90    useEffect(() => {
+   91      localStorage.setItem("glowrush-favorites", JSON.stringify(favorites));
+   92      window.dispatchEvent(new Event("glowrush:favorites-updated"));
+   93    }, [favorites]);
+   94  '''
+   95  if marker not in s:
+   96      raise SystemExit("ERROR: toggleFavorite не найден")
+   97  s = s.replace(marker, insert + marker, 1)
+   98  p.write_text(s, encoding="utf-8")
+   99  print("OK: App.jsx patched")
+  100  PY
+  101  cd ~/projects/glowrush-new
+  102  git remote -v
+  103  git config user.name "GlowRush"
+  104  clear
+  105  git config --global user.email
+  106  git config user.email "hh1676443@gmail.com"
+  107  git commit -m "Fix unified shop layout and cart drawer"
+  108  git push origin main
+  109  https://github.com/hh16commits/glowrush-new.git
+  110  gh auth status
+  111  pkg install -y gh
+  112  gh auth login
+  113  clear
+  114  gh auth login
+  115  clear
+  116  gh auth status
+  117  git push origin main
+  118  clear
+  119  exit
+  120  pkg update -y
+  121  pkg install git nodejs-lts -y
+  122  pkg update -y
+  123  pkg install git nodejs-lts -y
+  124  cd ~
+  125  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  126  cd glowrush-new
+  127  npm install
+  128  npm run dev
+  129  pkg update -y
+  130  pkg install git nodejs-lts -y
+  131  cd ~
+  132  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  133  cd glowrush-new
+  134  npm install
+  135  npm run dev
+  136  pkg update -y
+  137  pkg install git nodejs-lts -y
+  138  cd ~
+  139  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  140  cd glowrush-new
+  141  npm install
+  142  clear
+  143  pkg update -y
+  144  pkg install git nodejs-lts -y
+  145  cd ~
+  146  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  147  pkg update -y
+  148  pkg install git nodejs-lts -y
+  149  cd ~
+  150  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  151  cd glowrush-new
+  152  npm install
+  153  npm run dev
+  154  pkg update -y
+  155  pkg install git nodejs-lts -y
+  156  cd ~
+  157  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  158  cd glowrush-new
+  159  npm install
+  160  pkg update -y
+  161  pkg install git nodejs-lts -y
+  162  cd ~
+  163  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  164  cd glowrush-new
+  165  npm install
+  166  npm run dev
+  167  pkg update -y
+  168  pkg install git nodejs-lts -y
+  169  cd ~
+  170  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  171  cd glowrush-new
+  172  npm install
+  173  npm run dev
+  174  pkg update -y
+  175  pkg install git nodejs-lts -y
+  176  cd ~
+  177  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  178  cd glowrush-new
+  179  npm install
+  180  pkg update -y
+  181  pkg install git nodejs-lts -y
+  182  cd ~
+  183  git clone --branch fix/shop-core-2026-09-17 --single-branch https://github.com/hh16commits/glowrush-new.git
+  184  cd ~/glowrush-new
+  185  echo "=== ENV CHECK ==="
+  186  wc -c .env.local
+  187  grep '^VITE_SUPABASE_URL=' .env.local
+  188  grep '^VITE_SUPABASE_PUBLISHABLE_KEY=' .env.local | sed 's/=.*/=***SET***/'
+  189  echo "=== BUILD ==="
+  190  npm run build
+  191  wxit
+  192  exit
+  193  history > audit-history.txt

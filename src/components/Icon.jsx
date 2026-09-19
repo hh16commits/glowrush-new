@@ -1,4 +1,4 @@
-﻿function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {
+function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {
   const common = {
     width: size,
     height: size,
