@@ -1,4 +1,4 @@
-﻿import { useCallback } from "react";
+import { useCallback } from "react";
 import ProductCollectionPage from "./ProductCollectionPage";
 
 const CARE_CATEGORIES = [

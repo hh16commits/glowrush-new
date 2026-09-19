@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Icon from "./Icon";
 import { canAddToCart, getStockLabel } from "../lib/shop";
 

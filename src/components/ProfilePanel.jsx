@@ -1,4 +1,4 @@
-﻿import { supabase } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import Icon from "./Icon";
 const getAuthMethodLabel = (user) => {
   const provider = String(

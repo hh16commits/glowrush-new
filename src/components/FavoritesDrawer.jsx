@@ -1,4 +1,4 @@
-﻿export default function FavoritesDrawer({
+export default function FavoritesDrawer({
   favoritesOpen,
   setFavoritesOpen,
   favorites,

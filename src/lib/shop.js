@@ -1,4 +1,4 @@
-﻿const CART_KEY = "glowrush-cart";
+const CART_KEY = "glowrush-cart";
 const FAVORITES_KEY = "glowrush-favorites";
 
 export const CART_UPDATED_EVENT = "glowrush:cart-updated";
