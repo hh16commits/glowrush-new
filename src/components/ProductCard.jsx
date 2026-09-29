@@ -3,22 +3,145 @@ import Icon from "./Icon";
 import { canAddToCart, getStockLabel } from "../lib/shop";
 
 const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(
-    Number(value || 0)
-  );
+  new Intl.NumberFormat("ru-RU").format(Number(value || 0));
 
 export default function ProductCard({
   product,
   favorite = false,
   onFavorite,
   onAddToCart,
+  variant = "default",
+  onOpen,
+  isNew = false,
 }) {
   const discount =
     product.oldPrice > product.price
-      ? Math.round(
-          (1 - product.price / product.oldPrice) * 100
-        )
+      ? Math.round((1 - product.price / product.oldPrice) * 100)
       : 0;
+
+  const isHome = variant === "home";
+
+  if (isHome) {
+    return (
+      <article
+        className="home-v4-product-card"
+        onClick={() => onOpen?.(product)}
+      >
+        <div className="home-v4-product-media">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+            />
+          ) : (
+            <div className="home-v4-image-fallback">
+              GLOWRUSH
+            </div>
+          )}
+
+          {isNew && (
+            <span className="home-v4-new-badge">
+              NEW
+            </span>
+          )}
+
+          {product.isBestseller && (
+            <span className="home-v4-hit-badge">
+              ХИТ
+            </span>
+          )}
+
+          {onFavorite && (
+            <button
+              type="button"
+              className={
+                favorite
+                  ? "home-v4-favorite is-active"
+                  : "home-v4-favorite"
+              }
+              aria-label={
+                favorite
+                  ? "Убрать из избранного"
+                  : "Добавить в избранное"
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onFavorite(product.id);
+              }}
+            >
+              <Icon
+                name="heart"
+                size={18}
+                strokeWidth={favorite ? 2.2 : 1.7}
+              />
+            </button>
+          )}
+        </div>
+
+        <div className="home-v4-product-info">
+          <span className="home-v4-product-brand">
+            {product.brand}
+          </span>
+
+          <h3>{product.name}</h3>
+
+          <div className="home-v4-product-rating">
+            ★ {product.rating || "—"}
+            <span>
+              ({product.reviewCount || 0})
+            </span>
+          </div>
+
+          <div className="home-v4-product-bottom">
+            <div className="home-v4-price-block">
+              <strong>
+                {formatPrice(product.price)} сум
+              </strong>
+
+              {!canAddToCart(product) && (
+                <span
+                  className={
+                    product.stockStatus === "OUT_OF_STOCK"
+                      ? "home-v4-stock-label is-out"
+                      : "home-v4-stock-label"
+                  }
+                >
+                  {getStockLabel(product.stockStatus)}
+                </span>
+              )}
+
+              {product.stockStatus === "LOW_STOCK" &&
+                canAddToCart(product) && (
+                  <span className="home-v4-stock-label">
+                    {getStockLabel(product.stockStatus)}
+                  </span>
+                )}
+            </div>
+
+            <button
+              type="button"
+              className="home-v4-add"
+              aria-label={
+                canAddToCart(product)
+                  ? "Добавить в корзину"
+                  : getStockLabel(product.stockStatus)
+              }
+              disabled={!canAddToCart(product)}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onAddToCart?.(product);
+              }}
+            >
+              <Icon name="plus" size={17} />
+            </button>
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="premium-product-card">
@@ -99,7 +222,7 @@ export default function ProductCard({
         <button
           type="button"
           className="product-quick-add"
-          onClick={() => onAddToCart(product)}
+          onClick={() => onAddToCart?.(product)}
           disabled={!canAddToCart(product)}
           aria-disabled={!canAddToCart(product)}
         >
@@ -148,5 +271,4 @@ export default function ProductCard({
     </article>
   );
 }
-
 

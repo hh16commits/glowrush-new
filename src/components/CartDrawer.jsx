@@ -93,7 +93,13 @@ export default function CartDrawer({
                         type="button"
                         onClick={() => increaseQuantity(item.id)}
                         aria-label="Увеличить количество"
-                        disabled={item.stockStatus === "OUT_OF_STOCK"}
+                        disabled={
+                          item.stockStatus === "OUT_OF_STOCK" ||
+                          (
+                            Number.isFinite(Number(item.available)) &&
+                            Number(item.quantity || 0) >= Number(item.available)
+                          )
+                        }
                       >
                         +
                       </button>

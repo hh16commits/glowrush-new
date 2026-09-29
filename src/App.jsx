@@ -164,7 +164,27 @@ function App() {
         };
       });
 
-      setProducts(mappedProducts);
+      const { data: stockData, error: stockError } = await supabase.rpc(
+        "get_product_stock"
+      );
+
+      if (stockError) {
+        console.warn("Не удалось загрузить остатки товаров:", stockError);
+      }
+
+      const stockMap = new Map(
+        (stockData || []).map((row) => [
+          String(row.productId),
+          Math.max(0, Number(row.available) || 0),
+        ])
+      );
+
+      const productsWithStock = mappedProducts.map((product) => ({
+        ...product,
+        available: stockMap.get(String(product.id)) ?? 0,
+      }));
+
+      setProducts(productsWithStock);
       setProductsLoading(false);
     };
 
@@ -313,7 +333,7 @@ const deliveryOptions = [
     }
 
     if (!user) {
-      alert("??????? ??????? ? ???????.");
+      alert("Войдите в аккаунт.");
       setAuthOpen(true);
       return;
     }
@@ -403,7 +423,11 @@ const deliveryOptions = [
   };
 
   const addToCart = (product) => {
-    if (!product || product.stockStatus === "OUT_OF_STOCK") {
+    if (
+      !product ||
+      product.stockStatus === "OUT_OF_STOCK" ||
+      Number(product.available) <= 0
+    ) {
       return;
     }
 
@@ -428,6 +452,16 @@ const deliveryOptions = [
     const item = getCart().find((cartItem) => cartItem.id === id);
 
     if (!item || item.stockStatus === "OUT_OF_STOCK") {
+      return;
+    }
+
+    const available = Number(item.available);
+
+    if (
+      Number.isFinite(available) &&
+      available >= 0 &&
+      Number(item.quantity || 0) >= available
+    ) {
       return;
     }
 
@@ -858,18 +892,3 @@ const deliveryOptions = [
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

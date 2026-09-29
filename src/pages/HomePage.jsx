@@ -1,5 +1,6 @@
 ﻿import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
+import ProductCard from "../components/ProductCard";
 import { sortBestsellers, sortNewProducts } from "../lib/productSort";
 
 const homeCategories = [
@@ -34,103 +35,6 @@ const routineSteps = [
     text: "Увлажните кожу и защитите её днём.",
   },
 ];
-
-function HomeProductCard({
-  product,
-  favorite,
-  onFavorite,
-  onOpen,
-  onAdd,
-  isNew = false,
-}) {
-  return (
-    <article
-      className="home-v4-product-card"
-      onClick={() => onOpen(product)}
-    >
-      <div className="home-v4-product-media">
-        {product.image ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            loading="lazy"
-          />
-        ) : (
-          <div className="home-v4-image-fallback">
-            GLOWRUSH
-          </div>
-        )}
-
-        {isNew && (
-          <span className="home-v4-new-badge">
-            NEW
-          </span>
-        )}
-
-        {product.isBestseller && (
-          <span className="home-v4-hit-badge">
-            ХИТ
-          </span>
-        )}
-
-        <button
-          type="button"
-          className={
-            favorite
-              ? "home-v4-favorite is-active"
-              : "home-v4-favorite"
-          }
-          aria-label="Добавить в избранное"
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onFavorite(product.id);
-          }}
-        >
-          <Icon
-            name="heart"
-            size={18}
-            strokeWidth={favorite ? 2.2 : 1.7}
-          />
-        </button>
-      </div>
-
-      <div className="home-v4-product-info">
-        <span className="home-v4-product-brand">
-          {product.brand}
-        </span>
-
-        <h3>{product.name}</h3>
-
-        <div className="home-v4-product-rating">
-          ★ {product.rating || "—"}
-          <span>
-            ({product.reviewCount || 0})
-          </span>
-        </div>
-
-        <div className="home-v4-product-bottom">
-          <strong>
-            {product.price.toLocaleString("ru-RU")} сум
-          </strong>
-
-          <button
-            type="button"
-            className="home-v4-add"
-            aria-label="Добавить в корзину"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onAdd(product);
-            }}
-          >
-            <Icon name="plus" size={17} />
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 function HomePage({
   selectedCategory,
@@ -400,13 +304,14 @@ function HomePage({
 
         <div className="home-v4-products-grid">
           {popularProducts.map((product) => (
-            <HomeProductCard
+            <ProductCard
+              variant="home"
               key={product.id}
               product={product}
               favorite={favorites.includes(product.id)}
               onFavorite={toggleFavorite}
               onOpen={setSelectedProduct}
-              onAdd={addToCart}
+              onAddToCart={addToCart}
             />
           ))}
         </div>
@@ -432,13 +337,14 @@ function HomePage({
 
           <div className="home-v4-products-grid">
             {newProducts.map((product) => (
-              <HomeProductCard
+              <ProductCard
+              variant="home"
                 key={product.id}
                 product={product}
                 favorite={favorites.includes(product.id)}
                 onFavorite={toggleFavorite}
                 onOpen={setSelectedProduct}
-                onAdd={addToCart}
+                onAddToCart={addToCart}
                 isNew
               />
             ))}
