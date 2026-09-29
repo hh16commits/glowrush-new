@@ -1,9 +1,8 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { supabase } from "../lib/supabase";
 import {
-  getStockLabel,
   canAddToCart,
 } from "../lib/shop";
 

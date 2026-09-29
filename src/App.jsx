@@ -1,5 +1,5 @@
-﻿import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "./lib/supabase";
 import {
   CART_UPDATED_EVENT,
@@ -26,6 +26,7 @@ import "./styles/glowrush.css";
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -117,6 +118,8 @@ function App() {
         return;
       }
 
+      const { data: stockData } = await supabase.rpc("get_product_stock");
+      const stockMap = new Map((stockData || []).map((row) => [String(row.productId), Number(row.available) || 0]));
       const mappedProducts = (data || []).map((product) => {
         const brandTranslation =
           product.brand?.translations?.find(
@@ -159,6 +162,7 @@ function App() {
             productTranslation?.description ||
             "Средство для ежедневного ухода за кожей.",
           stockStatus: product.stockStatus,
+          available: stockMap.get(String(product.id)) ?? 0,
           isNew: product.isNew,
         };
       });
@@ -191,7 +195,6 @@ function App() {
     localStorage.setItem("glowrush-orders", JSON.stringify(orders));
   }, [orders]);
 
-  const [adminOpen, setAdminOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminRoleLoading, setAdminRoleLoading] = useState(true);
 
@@ -425,18 +428,16 @@ const deliveryOptions = [
 
   const increaseQuantity = (id) => {
     const item = getCart().find((cartItem) => cartItem.id === id);
-
-    if (!item || item.stockStatus === "OUT_OF_STOCK") {
-      return;
-    }
-
-    commitCart(
-      updateCartQuantity(
-        id,
-        Number(item.quantity || 0) + 1
-      )
-    );
+    const currentProduct = products.find((product) => product.id === id);
+    if (!item) return;
+    const stockStatus = currentProduct?.stockStatus ?? item.stockStatus;
+    const available = Number(currentProduct?.available ?? item.available) || 0;
+    const currentQuantity = Number(item.quantity) || 0;
+    if (stockStatus === "OUT_OF_STOCK" || available <= 0 || currentQuantity >= available || currentQuantity >= 10) return;
+    const nextCart = getCart().map((cartItem) => cartItem.id === id ? { ...cartItem, ...(currentProduct || {}), available, stockStatus, quantity: Math.min(currentQuantity + 1, 10) } : cartItem);
+    commitCart(nextCart);
   };
+
 
   const removeFromCart = (id) => {
     commitCart(removeProductFromCart(id));
@@ -459,7 +460,7 @@ const deliveryOptions = [
       <Header
         user={user}
         isAdmin={isAdmin}
-        onAdminOpen={() => setAdminOpen(true)}
+        onAdminOpen={() => navigate("/admin")}
         onProfileOpen={() => setProfileOpen(true)}
         onAuthOpen={() => setAuthOpen(true)}
         searchOpen={searchOpen}
@@ -476,10 +477,12 @@ const deliveryOptions = [
         onCartOpen={() => setCartOpen(true)}
       />
 
-      <AuthModal
-        open={authOpen}
-        onClose={() => setAuthOpen(false)}
-      />
+      {authOpen ? (
+        <AuthModal
+          open={authOpen}
+          onClose={() => setAuthOpen(false)}
+        />
+      ) : null}
       {location.pathname === "/" ? (
         <HomePage
           selectedCategory={selectedCategory}
@@ -613,6 +616,7 @@ const deliveryOptions = [
         cartOpen={cartOpen}
         setCartOpen={setCartOpen}
         cart={cart}
+        products={products}
         cartTotal={cartTotal}
         removeFromCart={removeFromCart}
         increaseQuantity={increaseQuantity}
@@ -644,12 +648,12 @@ const deliveryOptions = [
     setAuthOpen={setAuthOpen}
     Icon={Icon}
   />
-  {adminOpen && (
+  {location.pathname === "/admin" && (
     <div className="admin-screen">
       <button
         type="button"
         className="admin-back"
-        onClick={() => setAdminOpen(false)}
+        onClick={() => navigate("/")}
       >
         ← Вернуться в магазин
       </button>
@@ -671,7 +675,7 @@ const deliveryOptions = [
           onLogout={async () => {
             await supabase.auth.signOut();
             setIsAdmin(false);
-            setAdminOpen(false);
+            navigate("/");
           }}
         />
       ) : null}

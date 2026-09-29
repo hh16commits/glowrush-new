@@ -5,6 +5,7 @@ export default function CartDrawer({
   setCartOpen,
   cart,
   cartTotal,
+  products,
   decreaseQuantity,
   increaseQuantity,
   removeFromCart,
@@ -93,7 +94,7 @@ export default function CartDrawer({
                         type="button"
                         onClick={() => increaseQuantity(item.id)}
                         aria-label="Увеличить количество"
-                        disabled={item.stockStatus === "OUT_OF_STOCK"}
+                        disabled={(() => { const currentProduct = products.find((product) => product.id === item.id); const available = Number(currentProduct?.available ?? item.available) || 0; const stockStatus = currentProduct?.stockStatus ?? item.stockStatus; return stockStatus === "OUT_OF_STOCK" || available <= Number(item.quantity || 0); })()}
                       >
                         +
                       </button>

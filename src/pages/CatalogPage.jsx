@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ProductCard from "../components/ProductCard";
@@ -25,10 +25,6 @@ const CATEGORIES = [
   "Маски",
 ];
 
-const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(
-    Number(value || 0)
-  );
 
 const pickTranslation = (translations = []) =>
   translations.find((item) => item.locale === "RU") ||
@@ -179,35 +175,25 @@ export default function CatalogPage() {
     };
   }, []);
 
-  // Синхронизация URL-фильтров с UI
-  useEffect(() => {
-    if (brandFromUrl) {
-      const matchedBrand = products.find(
-        (product) => product.brandSlug === brandFromUrl
-      );
+  const urlBrand = useMemo(() => {
+    if (!brandFromUrl) return "";
 
-      if (matchedBrand?.brand) {
-        setBrand(matchedBrand.brand);
-      }
-    } else {
-      setBrand("Все бренды");
-    }
+    const matchedBrand = products.find(
+      (product) => product.brandSlug === brandFromUrl
+    );
 
-    if (categoryFromUrl) {
-      const matchedCategory =
-        CATEGORY_SLUG_MAP[categoryFromUrl];
+    return matchedBrand?.brand || "";
+  }, [brandFromUrl, products]);
 
-      if (matchedCategory) {
-        setCategory(matchedCategory);
-      }
-    } else {
-      setCategory("Все");
-    }
-  }, [
-    brandFromUrl,
-    categoryFromUrl,
-    products,
-  ]);
+  const effectiveBrand =
+    brandFromUrl
+      ? urlBrand || "Все бренды"
+      : brand;
+
+  const effectiveCategory =
+    categoryFromUrl
+      ? CATEGORY_SLUG_MAP[categoryFromUrl] || "Все"
+      : category;
   const brands = useMemo(
     () => [
       "Все бренды",
@@ -228,16 +214,12 @@ export default function CatalogPage() {
 
     const result = products.filter((product) => {
       const categoryMatch =
-        (category === "Все" ||
-          product.category === category) &&
-        (!categoryFromUrl ||
-          product.categorySlug === categoryFromUrl);
+        effectiveCategory === "Все" ||
+        product.category === effectiveCategory;
 
       const brandMatch =
-        (brand === "Все бренды" ||
-          product.brand === brand) &&
-        (!brandFromUrl ||
-          product.brandSlug === brandFromUrl);
+        effectiveBrand === "Все бренды" ||
+        product.brand === effectiveBrand;
 
       const availabilityMatch =
         availability === "Все" ||
@@ -288,10 +270,8 @@ export default function CatalogPage() {
     });
   }, [
     products,
-    category,
-    brand,
-    brandFromUrl,
-    categoryFromUrl,
+    effectiveCategory,
+    effectiveBrand,
     availability,
     discountOnly,
     search,
@@ -367,7 +347,7 @@ export default function CatalogPage() {
             type="button"
             key={item}
             className={
-              category === item ? "is-active" : ""
+              effectiveCategory === item ? "is-active" : ""
             }
             onClick={() => setCategory(item)}
           >
@@ -378,7 +358,7 @@ export default function CatalogPage() {
 
       <section className="premium-filter-row">
         <select
-          value={brand}
+          value={effectiveBrand}
           onChange={(event) =>
             setBrand(event.target.value)
           }

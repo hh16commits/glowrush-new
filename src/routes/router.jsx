@@ -20,6 +20,10 @@ export const router = createBrowserRouter([
         element: null,
       },
       {
+        path: "admin",
+        element: null,
+      },
+      {
         path: "catalog",
         element: <CatalogPage />,
       },

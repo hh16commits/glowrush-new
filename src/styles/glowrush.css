@@ -3451,16 +3451,19 @@ input:focus-visible {
 
 
 /* =====================================================
-   ADMIN Р Р†Р вЂљРІР‚Сњ CRM ORDER LIST
+   ADMIN ORDER LIST — CLEAN
    ===================================================== */
 
 .admin-orders {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
 .admin-order {
   position: relative;
   width: 100%;
+  min-width: 0;
   min-height: 92px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -3473,6 +3476,7 @@ input:focus-visible {
   color: #292427;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
   box-shadow: 0 3px 14px rgba(45, 30, 37, .025);
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
@@ -3483,13 +3487,20 @@ input:focus-visible {
   transform: translateY(-1px);
 }
 
-/* Р В РІР‚С”Р В Р’ВµР В Р вЂ Р В Р’В°Р РЋР РЏ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР Р‰ */
-
 .admin-order > div:first-child {
   display: grid;
-  grid-template-columns: 95px minmax(130px, 1fr) minmax(130px, auto) auto;
+  grid-template-columns:
+    90px
+    minmax(120px, 1.1fr)
+    minmax(110px, .9fr)
+    minmax(125px, 1fr)
+    96px;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-order > div:first-child > * {
   min-width: 0;
 }
 
@@ -3498,6 +3509,9 @@ input:focus-visible {
   color: #d56d91;
   font-size: 14px;
   font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-order > div:first-child > strong {
@@ -3509,6 +3523,7 @@ input:focus-visible {
 }
 
 .admin-order > div:first-child > small:not(.admin-order-meta) {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3517,25 +3532,25 @@ input:focus-visible {
 }
 
 .admin-order-meta {
+  min-width: 0;
   color: #a09399;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-/* Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“ */
 
 .admin-order > div:first-child > .admin-status {
   justify-self: start;
   min-width: 96px;
 }
 
-/* Р В РЎСџР РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В°Р РЋР РЏ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР Р‰ */
-
 .admin-order-right {
+  min-width: 185px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 22px;
-  min-width: 205px;
+  justify-content: space-between;
+  gap: 18px;
 }
 
 .admin-order-right > strong {
@@ -3552,61 +3567,61 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-/* Р В РІР‚вЂќР В Р’В°Р В РЎвЂ“Р В РЎвЂўР В Р’В»Р В РЎвЂўР В Р вЂ Р В РЎвЂўР В РЎвЂќ Р РЋР С“Р В РЎвЂ”Р В РЎвЂР РЋР С“Р В РЎвЂќР В Р’В° Р Р†Р вЂљРІР‚Сњ Р В Р вЂ Р В РЎвЂР В Р’В·Р РЋРЎвЂњР В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂ”Р В РЎвЂўР В РўвЂР РЋР С“Р В РЎвЂќР В Р’В°Р В Р’В·Р В РЎвЂќР В Р’В° */
-
-.admin-orders::before {
-  content: "Р В РІР‚вЂќР В РЎвЂ™Р В РЎв„ўР В РЎвЂ™Р В РІР‚вЂќ                         Р В РЎв„ўР В РІР‚С”Р В Р’ВР В РІР‚СћР В РЎСљР В РЎС›                         Р В РЎв„ўР В РЎвЂєР В РЎСљР В РЎС›Р В РЎвЂ™Р В РЎв„ўР В РЎС›                         Р В Р Р‹Р В РЎС›Р В РЎвЂ™Р В РЎС›Р В Р в‚¬Р В Р Р‹                                                     Р В Р Р‹Р В Р в‚¬Р В РЎС™Р В РЎС™Р В РЎвЂ™";
-  display: block;
-  padding: 0 22px 8px;
-  color: #a09399;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  white-space: pre;
-  pointer-events: none;
-}
-
-/* Р В Р в‚¬Р В Р’В±Р В РЎвЂР РЋР вЂљР В Р’В°Р В Р’ВµР В РЎВ Р В Р’В·Р В Р’В°Р В РЎвЂ“Р В РЎвЂўР В Р’В»Р В РЎвЂўР В Р вЂ Р В РЎвЂўР В РЎвЂќ Р В Р вЂ¦Р В Р’В° Р В РЎВР В РЎвЂўР В Р’В±Р В РЎвЂР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂўР В РЎВ */
-
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .admin-order {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 18px;
   }
 
   .admin-order > div:first-child {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 5px 12px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      "number name"
+      "phone meta"
+      "status status";
+    gap: 6px 14px;
   }
 
-  .admin-order > div:first-child > .admin-status {
-    grid-column: 2;
+  .admin-order-number {
+    grid-area: number;
+  }
+
+  .admin-order > div:first-child > strong {
+    grid-area: name;
+  }
+
+  .admin-order > div:first-child > small:not(.admin-order-meta) {
+    grid-area: phone;
   }
 
   .admin-order-meta {
-    grid-column: 2;
+    grid-area: meta;
   }
 
-  .admin-orders::before {
-    display: none;
+  .admin-order > div:first-child > .admin-status {
+    grid-area: status;
+    justify-self: start;
+  }
+
+  .admin-order-right {
+    min-width: 185px;
+    flex-shrink: 0;
   }
 }
 
 @media (max-width: 640px) {
   .admin-order {
     grid-template-columns: 1fr;
+    gap: 12px;
     padding: 17px;
   }
 
-  .admin-order > div:first-child {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
   .admin-order-right {
-    justify-content: space-between;
+    width: 100%;
     min-width: 0;
     padding-top: 12px;
     border-top: 1px solid #f0e7ea;
+    justify-content: space-between;
   }
 
   .admin-order-right > span {
@@ -3614,121 +3629,10 @@ input:focus-visible {
   }
 }
 
-
 /* =====================================================
-   ADMIN Р Р†Р вЂљРІР‚Сњ FINAL ORDER ALIGNMENT
+   END ADMIN ORDER LIST
    ===================================================== */
 
-/* Р В Р’В Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂќР В РЎвЂўР В Р’В»Р В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В РЎвЂ Р В Р вЂ  Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РЎвЂќР В Р’Вµ Р В Р’В·Р В Р’В°Р В РЎвЂќР В Р’В°Р В Р’В·Р В Р’В° */
-
-.admin-order > div:first-child {
-  display: grid;
-  grid-template-columns: 90px minmax(120px, 1.1fr) minmax(110px, .9fr) minmax(125px, 1fr) 96px;
-  align-items: center;
-  gap: 14px;
-}
-
-.admin-order > div:first-child > * {
-  min-width: 0;
-}
-
-.admin-order > div:first-child > strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-order > div:first-child > small:not(.admin-order-meta) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-order-meta {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-order > div:first-child > .admin-status {
-  justify-self: start;
-}
-
-/* Р В РЎвЂ™Р В РЎвЂќР В РЎвЂќР РЋРЎвЂњР РЋР вЂљР В Р’В°Р РЋРІР‚С™Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В°Р РЋР РЏ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР Р‰ */
-
-.admin-order-right {
-  min-width: 185px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-/* Р В Р’В Р В Р’В°Р В Р’В·Р В РўвЂР В Р’ВµР В Р’В»Р РЋР РЏР В Р’ВµР В РЎВ Р В Р’В±Р РЋР вЂљР В Р’ВµР В Р вЂ¦Р В РўвЂ / Р В Р вЂ¦Р В Р’В°Р В Р’В·Р В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’Вµ / Р В РЎвЂќР В РЎвЂўР В Р’В»Р В РЎвЂР РЋРІР‚РЋР В Р’ВµР РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂў */
-
-.admin-order-item {
-  word-spacing: 2px;
-}
-
-.admin-order-item strong {
-  margin-left: 5px;
-}
-
-.admin-order-item small {
-  margin-left: 5px;
-}
-
-.admin-order-item > :last-child {
-  margin-left: 12px;
-}
-
-/* Р В РІР‚ВР В РЎвЂўР В Р’В»Р В Р’ВµР В Р’Вµ Р РЋРІР‚РЋР В РЎвЂР РЋР С“Р РЋРІР‚С™Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В Р’В·Р В Р’В°Р В РЎвЂ“Р В РЎвЂўР В Р’В»Р В РЎвЂўР В Р вЂ Р В РЎвЂўР В РЎвЂќ Р РЋРІР‚С™Р В Р’В°Р В Р’В±Р В Р’В»Р В РЎвЂР РЋРІР‚В Р РЋРІР‚в„– */
-
-.admin-orders::before {
-  content: "Р В РІР‚вЂќР В РЎвЂ™Р В РЎв„ўР В РЎвЂ™Р В РІР‚вЂќ        Р В РЎв„ўР В РІР‚С”Р В Р’ВР В РІР‚СћР В РЎСљР В РЎС›        Р В РЎС›Р В РІР‚СћР В РІР‚С”Р В РІР‚СћР В Р’В¤Р В РЎвЂєР В РЎСљ        Р В РІР‚СњР В РІР‚СћР В РЎС›Р В РЎвЂ™Р В РІР‚С”Р В Р’В        Р В Р Р‹Р В РЎС›Р В РЎвЂ™Р В РЎС›Р В Р в‚¬Р В Р Р‹";
-  display: block;
-  padding: 0 22px 9px;
-  color: #a09399;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  white-space: pre;
-}
-
-/* Р В РЎСљР В Р’В° Р В Р вЂ¦Р В Р’ВµР В Р’В±Р В РЎвЂўР В Р’В»Р РЋР Р‰Р РЋРІвЂљВ¬Р В РЎвЂР РЋРІР‚В¦ Р РЋР РЉР В РЎвЂќР РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р’В°Р РЋРІР‚В¦ Р В Р вЂ Р В РЎвЂўР В Р’В·Р В Р вЂ Р РЋР вЂљР В Р’В°Р РЋРІР‚В°Р В Р’В°Р В Р’ВµР В РЎВ Р В Р’В°Р В РўвЂР В Р’В°Р В РЎвЂ”Р РЋРІР‚С™Р В РЎвЂР В Р вЂ  */
-
-@media (max-width: 1000px) {
-  .admin-order {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .admin-order > div:first-child {
-    grid-template-columns: auto minmax(110px, 1fr) minmax(100px, .8fr);
-  }
-
-  .admin-order > div:first-child > .admin-status {
-    grid-column: auto;
-  }
-
-  .admin-orders::before {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .admin-order > div:first-child {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .admin-order > div:first-child > .admin-status,
-  .admin-order-meta {
-    grid-column: 2;
-  }
-
-  .admin-order-right {
-    min-width: 0;
-  }
-}
 /* =========================================================
    GLOWRUSH AUTHENTICATION
 ========================================================= */

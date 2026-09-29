@@ -1,4 +1,5 @@
-﻿const CART_KEY = "glowrush-cart";
+﻿const MAX_CART_QUANTITY = 10;
+const CART_KEY = "glowrush-cart";
 const FAVORITES_KEY = "glowrush-favorites";
 
 export const CART_UPDATED_EVENT = "glowrush:cart-updated";
@@ -19,7 +20,13 @@ function writeArray(key, value, eventName) {
 }
 
 export function getCart() {
-  return readArray(CART_KEY);
+  return readArray(CART_KEY).map((item) => ({
+    ...item,
+    quantity: Math.max(
+      1,
+      Math.min(Number(item.quantity) || 1, MAX_CART_QUANTITY)
+    ),
+  }));
 }
 
 export function setCart(cart) {
@@ -39,7 +46,7 @@ export function addProductToCart(product, quantity = 1) {
     return getCart();
   }
 
-  const safeQuantity = Math.max(1, Number(quantity) || 1);
+  const safeQuantity = Math.min(MAX_CART_QUANTITY, Math.max(1, Number(quantity) || 1));
   const cart = getCart();
   const existing = cart.find((item) => item.id === product.id);
 

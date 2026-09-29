@@ -432,52 +432,34 @@ function AdminPanel({ onLogout }) {
 
     if (fromStatus === dbStatus) return;
 
-    const { error: updateError } = await supabase
-      .from("Order")
-      .update({ status: dbStatus })
-      .eq("id", orderId);
+    const { data, error } = await supabase.rpc(
+      "update_order_status",
+      {
+        p_order_id: orderId,
+        p_new_status: dbStatus,
+      }
+    );
 
-    if (updateError) {
+    if (error) {
       console.error(
         "Failed to update order status:",
-        updateError
+        error
       );
-      alert("Не удалось изменить статус заказа.");
+      alert(error.message || "Не удалось изменить статус заказа.");
       return;
-    }
-
-    const { error: historyError } = await supabase
-      .from("OrderStatusHistory")
-      .insert({
-        id: crypto.randomUUID(),
-        orderId,
-        fromStatus,
-        toStatus: dbStatus,
-        note: "Статус изменён администратором",
-      });
-
-    if (historyError) {
-      console.error(
-        "Failed to save order status history:",
-        historyError
-      );
-
-      alert(
-        "Статус заказа изменён, но история не сохранилась."
-      );
     }
 
     setOrders((current) =>
       current.map((order) =>
         order.id === orderId
-          ? { ...order, dbStatus }
+          ? { ...order, dbStatus: data?.status || dbStatus }
           : order
       )
     );
 
     setSelectedOrder((current) =>
       current?.id === orderId
-        ? { ...current, dbStatus }
+        ? { ...current, dbStatus: data?.status || dbStatus }
         : current
     );
   };

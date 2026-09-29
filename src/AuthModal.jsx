@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "./lib/supabase";
 
 const OTP_LENGTH = 8;
@@ -13,16 +13,6 @@ function AuthModal({ open, onClose }) {
   const [resendSeconds, setResendSeconds] = useState(0);
 
   const otpRefs = useRef([]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    setError("");
-    setEmail("");
-    setOtp(Array(OTP_LENGTH).fill(""));
-    setEmailSent(false);
-    setResendSeconds(0);
-  }, [open]);
 
   useEffect(() => {
     if (resendSeconds <= 0) return;
