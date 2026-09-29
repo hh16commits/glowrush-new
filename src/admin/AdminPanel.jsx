@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 const ORDER_STATUSES = [
@@ -162,6 +162,337 @@ function AdminPanel({ onLogout }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const [inventoryProducts, setInventoryProducts] = useState([]);
+  const [inventoryWarehouses, setInventoryWarehouses] = useState([]);
+  const [inventorySuppliers, setInventorySuppliers] = useState([]);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [inventoryError, setInventoryError] = useState("");
+  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [inventorySubmitting, setInventorySubmitting] = useState(false);
+  const [inventorySuccess, setInventorySuccess] = useState("");
+
+  const [inventoryForm, setInventoryForm] = useState({
+    productId: "",
+    warehouseId: "",
+    quantity: "",
+    costPrice: "",
+    batchNumber: "",
+    expirationDate: "",
+    supplierId: "",
+    reason: "",
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInventoryReferences() {
+      setInventoryLoading(true);
+      setInventoryError("");
+
+      try {
+        const [
+          productsResult,
+          warehousesResult,
+          suppliersResult,
+        ] = await Promise.all([
+          supabase
+            .from("Product")
+            .select(`
+              id,
+              sku,
+              price,
+              costPrice,
+              stockStatus,
+              translations:ProductTranslation (
+                name,
+                locale
+              )
+            `)
+            .eq("isActive", true)
+            .order("sku", { ascending: true }),
+
+          supabase
+            .from("Warehouse")
+            .select(`
+              id,
+              code,
+              name,
+              city,
+              isActive
+            `)
+            .eq("isActive", true)
+            .order("name", { ascending: true }),
+
+          supabase
+            .from("Supplier")
+            .select(`
+              id,
+              name,
+              country,
+              contactName
+            `)
+            .order("name", { ascending: true }),
+        ]);
+
+        if (productsResult.error) {
+          throw productsResult.error;
+        }
+
+        if (warehousesResult.error) {
+          throw warehousesResult.error;
+        }
+
+        if (suppliersResult.error) {
+          throw suppliersResult.error;
+        }
+
+        if (cancelled) return;
+
+        const products = productsResult.data || [];
+        const warehouses = warehousesResult.data || [];
+        const suppliers = suppliersResult.data || [];
+
+        setInventoryProducts(products);
+        setInventoryWarehouses(warehouses);
+        setInventorySuppliers(suppliers);
+
+        setInventoryForm((current) => ({
+          ...current,
+          productId:
+            current.productId ||
+            products[0]?.id ||
+            "",
+          warehouseId:
+            current.warehouseId ||
+            warehouses[0]?.id ||
+            "",
+        }));
+      } catch (error) {
+        console.error(
+          "Failed to load inventory references:",
+          error
+        );
+
+        if (!cancelled) {
+          setInventoryError(
+            error?.message ||
+              "?? ??????? ????????? ?????? ??? ??????? ??????."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setInventoryLoading(false);
+        }
+      }
+    }
+
+    loadInventoryReferences();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const resetInventoryForm = () => {
+    setInventoryForm({
+      productId: inventoryProducts[0]?.id || "",
+      warehouseId: inventoryWarehouses[0]?.id || "",
+      quantity: "",
+      costPrice: "",
+      batchNumber: "",
+      expirationDate: "",
+      supplierId: "",
+      reason: "",
+    });
+
+    setInventorySuccess("");
+    setInventoryError("");
+  };
+
+  const openInventoryModal = () => {
+    setInventoryError("");
+    setInventorySuccess("");
+    setInventoryOpen(true);
+  };
+
+  const closeInventoryModal = () => {
+    if (inventorySubmitting) return;
+
+    setInventoryOpen(false);
+    setInventoryError("");
+    setInventorySuccess("");
+  };
+
+  const updateInventoryForm = (field, value) => {
+    setInventoryForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const submitInventoryReceipt = async (event) => {
+    event.preventDefault();
+
+    const quantity = Number(inventoryForm.quantity);
+    const costPrice = Number(inventoryForm.costPrice);
+
+    if (!inventoryForm.productId) {
+      setInventoryError("???????? ?????.");
+      return;
+    }
+
+    if (!inventoryForm.warehouseId) {
+      setInventoryError("???????? ?????.");
+      return;
+    }
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      setInventoryError(
+        "?????????? ?????? ???? ????? ?????? ?????? ????."
+      );
+      return;
+    }
+
+    if (!Number.isInteger(costPrice) || costPrice < 0) {
+      setInventoryError(
+        "?????????? ???? ?????? ???? ????? ?????? ?? 0."
+      );
+      return;
+    }
+
+    setInventorySubmitting(true);
+    setInventoryError("");
+    setInventorySuccess("");
+
+    try {
+      const { data, error } = await supabase.rpc(
+        "receive_inventory",
+        {
+          p_product_id: inventoryForm.productId,
+          p_warehouse_id: inventoryForm.warehouseId,
+          p_quantity: quantity,
+          p_cost_price: costPrice,
+          p_batch_number:
+            inventoryForm.batchNumber.trim() || null,
+          p_expiration_date:
+            inventoryForm.expirationDate
+              ? `${inventoryForm.expirationDate}T23:59:59`
+              : null,
+          p_supplier_id:
+            inventoryForm.supplierId || null,
+          p_reason:
+            inventoryForm.reason.trim() || null,
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      const result = data || {};
+
+      const product = inventoryProducts.find(
+        (item) => item.id === inventoryForm.productId
+      );
+
+      const productName =
+        product?.translations?.find(
+          (translation) => translation.locale === "RU"
+        )?.name ||
+        product?.translations?.[0]?.name ||
+        product?.sku ||
+        "?????";
+
+      setInventorySuccess(
+        `?????? ??????: ${productName}, ${
+          result.quantityReceived ?? quantity
+        } ??. ????? ???????: ${
+          result.newAvailable ?? "?"
+        } ??.`
+      );
+
+      setInventoryForm((current) => ({
+        ...current,
+        quantity: "",
+        costPrice: "",
+        batchNumber: "",
+        expirationDate: "",
+        reason: "",
+      }));
+
+      setInventoryProducts((current) =>
+        current.map((item) =>
+          item.id === inventoryForm.productId
+            ? {
+                ...item,
+                stockStatus:
+                  result.stockStatus ||
+                  item.stockStatus,
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Failed to receive inventory:",
+        error
+      );
+
+      const message =
+        error?.message ||
+        "?? ??????? ???????? ?????? ??????.";
+
+      if (message.includes("NOT_AUTHENTICATED")) {
+        setInventoryError(
+          "?????? ?????????????? ?? ???????. ??????? ??????."
+        );
+      } else if (message.includes("FORBIDDEN")) {
+        setInventoryError(
+          "? ????? ???? ??? ???? ?? ?????????? ???????."
+        );
+      } else if (message.includes("USER_NOT_ACTIVE")) {
+        setInventoryError(
+          "????????????? ?? ???????."
+        );
+      } else if (
+        message.includes("PRODUCT_NOT_FOUND_OR_INACTIVE")
+      ) {
+        setInventoryError(
+          "????? ?? ?????? ??? ????????."
+        );
+      } else if (
+        message.includes("WAREHOUSE_NOT_FOUND_OR_INACTIVE")
+      ) {
+        setInventoryError(
+          "????? ?? ?????? ??? ????????."
+        );
+      } else if (
+        message.includes("SUPPLIER_NOT_FOUND")
+      ) {
+        setInventoryError(
+          "????????? ????????? ?? ??????."
+        );
+      } else if (
+        message.includes("QUANTITY_MUST_BE_POSITIVE")
+      ) {
+        setInventoryError(
+          "?????????? ?????? ???? ?????? ????."
+        );
+      } else if (
+        message.includes("COST_PRICE_INVALID")
+      ) {
+        setInventoryError(
+          "???????????? ?????????? ????."
+        );
+      } else {
+        setInventoryError(message);
+      }
+    } finally {
+      setInventorySubmitting(false);
+    }
+  };
+
 
 
   const formatPrice = (price) =>
@@ -539,6 +870,30 @@ function AdminPanel({ onLogout }) {
         ))}
       </div>
 
+      <div className="admin-revenue-cards inventory-restore-marker" style={{ marginTop: "20px" }}>
+        <div className="admin-revenue-card admin-revenue-main">
+          <span>Склад</span>
+          <strong>Приход товара</strong>
+          <button
+            type="button"
+            className="admin-export"
+            style={{ marginTop: "12px" }}
+            onClick={openInventoryModal}
+          >
+            Оформить приход
+          </button>
+        </div>
+
+        <div className="admin-revenue-card">
+          <span>Активные товары</span>
+          <strong>{inventoryProducts.length || "—"}</strong>
+        </div>
+
+        <div className="admin-revenue-card">
+          <span>Активные склады</span>
+          <strong>{inventoryWarehouses.length || "—"}</strong>
+        </div>
+      </div>
       <div className="admin-filters">
         <input
           type="search"
@@ -837,6 +1192,275 @@ function AdminPanel({ onLogout }) {
                   {selectedOrder.customer.comment}
                 </p>
               </div>
+            )}
+          </div>
+        </div>
+      )}
+      {inventoryOpen && (
+        <div
+          className="admin-order-overlay"
+          onClick={closeInventoryModal}
+        >
+          <div
+            className="admin-order-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="admin-close"
+              onClick={closeInventoryModal}
+              disabled={inventorySubmitting}
+              aria-label="Закрыть"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+
+            <p className="eyebrow">WAREHOUSE</p>
+            <h2>Приход товара</h2>
+            <p>
+              Добавление новой партии товара на склад.
+            </p>
+
+            {inventoryLoading ? (
+              <div className="admin-empty">
+                <div className="admin-empty-icon">⏳</div>
+                <h2>Загрузка...</h2>
+                <p>Получаем товары, склады и поставщиков.</p>
+              </div>
+            ) : (
+              <form onSubmit={submitInventoryReceipt}>
+                <div className="admin-status-control">
+                  <span>Товар</span>
+                  <select
+                    value={inventoryForm.productId}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "productId",
+                        event.target.value
+                      )
+                    }
+                    required
+                    disabled={inventorySubmitting}
+                  >
+                    <option value="">Выберите товар</option>
+
+                    {inventoryProducts.map((product) => {
+                      const translation =
+                        product.translations?.find(
+                          (item) => item.locale === "RU"
+                        ) ||
+                        product.translations?.[0];
+
+                      return (
+                        <option
+                          key={product.id}
+                          value={product.id}
+                        >
+                          {translation?.name || product.sku} · {product.sku}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Склад</span>
+                  <select
+                    value={inventoryForm.warehouseId}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "warehouseId",
+                        event.target.value
+                      )
+                    }
+                    required
+                    disabled={inventorySubmitting}
+                  >
+                    <option value="">Выберите склад</option>
+
+                    {inventoryWarehouses.map((warehouse) => (
+                      <option
+                        key={warehouse.id}
+                        value={warehouse.id}
+                      >
+                        {warehouse.name}
+                        {warehouse.city
+                          ? " — " + warehouse.city
+                          : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Количество</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={inventoryForm.quantity}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "quantity",
+                        event.target.value
+                      )
+                    }
+                    placeholder="Например, 20"
+                    required
+                    disabled={inventorySubmitting}
+                  />
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Закупочная цена, сум</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={inventoryForm.costPrice}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "costPrice",
+                        event.target.value
+                      )
+                    }
+                    placeholder="Например, 85000"
+                    required
+                    disabled={inventorySubmitting}
+                  />
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Номер партии</span>
+                  <input
+                    type="text"
+                    value={inventoryForm.batchNumber}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "batchNumber",
+                        event.target.value
+                      )
+                    }
+                    placeholder="Необязательно"
+                    disabled={inventorySubmitting}
+                  />
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Срок годности</span>
+                  <input
+                    type="date"
+                    value={inventoryForm.expirationDate}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "expirationDate",
+                        event.target.value
+                      )
+                    }
+                    disabled={inventorySubmitting}
+                  />
+                </div>
+
+                <div className="admin-status-control">
+                  <span>Поставщик</span>
+                  <select
+                    value={inventoryForm.supplierId}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "supplierId",
+                        event.target.value
+                      )
+                    }
+                    disabled={inventorySubmitting}
+                  >
+                    <option value="">Без указания поставщика</option>
+
+                    {inventorySuppliers.map((supplier) => (
+                      <option
+                        key={supplier.id}
+                        value={supplier.id}
+                      >
+                        {supplier.name}
+                        {supplier.country
+                          ? " — " + supplier.country
+                          : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="admin-comment">
+                  <span>Комментарий</span>
+                  <textarea
+                    value={inventoryForm.reason}
+                    onChange={(event) =>
+                      updateInventoryForm(
+                        "reason",
+                        event.target.value
+                      )
+                    }
+                    placeholder="Например: поставка от 29.09.2026"
+                    rows={3}
+                    disabled={inventorySubmitting}
+                  />
+                </div>
+
+                {inventoryError && (
+                  <div className="admin-empty">
+                    <div className="admin-empty-icon">⚠️</div>
+                    <p>{inventoryError}</p>
+                  </div>
+                )}
+
+                {inventorySuccess && (
+                  <div className="admin-empty">
+                    <div className="admin-empty-icon">✅</div>
+                    <p>{inventorySuccess}</p>
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginTop: "16px",
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="admin-reset"
+                    onClick={resetInventoryForm}
+                    disabled={inventorySubmitting}
+                  >
+                    Очистить
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="admin-export"
+                    disabled={inventorySubmitting}
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    {inventorySubmitting
+                      ? "Оформляем приход..."
+                      : "Принять товар"}
+                  </button>
+                </div>
+              </form>
             )}
           </div>
         </div>
