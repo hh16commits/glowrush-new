@@ -36,7 +36,7 @@ export default function CatalogPage() {
     onFavorite,
     onAddToCart: addToCartFromApp,
   } = useOutletContext();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const brandFromUrl = (searchParams.get("brand") || "").toLowerCase();
   const categoryFromUrl = (searchParams.get("category") || "").toLowerCase();
   const [products, setProducts] = useState([]);
@@ -142,6 +142,9 @@ export default function CatalogPage() {
 
         return {
           ...product,
+          brandTranslations: product.brand?.translations || [],
+          categoryTranslations: product.category?.translations || [],
+          translations: product.translations || [],
           brand:
             brandTranslation?.name ||
             product.brand?.slug ||
@@ -364,7 +367,21 @@ export default function CatalogPage() {
             className={
               category === item ? "is-active" : ""
             }
-            onClick={() => setCategory(item)}
+            onClick={() => {
+            setCategory(item);
+
+            const params = new URLSearchParams(searchParams);
+            const categorySlug = Object.entries(CATEGORY_SLUG_MAP)
+              .find(([, name]) => name === item)?.[0];
+
+            if (categorySlug) {
+              params.set("category", categorySlug);
+            } else {
+              params.delete("category");
+            }
+
+            setSearchParams(params);
+          }}
           >
             {item}
           </button>
@@ -374,9 +391,26 @@ export default function CatalogPage() {
       <section className="premium-filter-row">
         <select
           value={brand}
-          onChange={(event) =>
-            setBrand(event.target.value)
-          }
+          onChange={(event) => {
+            const nextBrand = event.target.value;
+            setBrand(nextBrand);
+
+            const params = new URLSearchParams(searchParams);
+
+            if (nextBrand === "Все бренды") {
+              params.delete("brand");
+            } else {
+              const selectedProduct = products.find(
+                (product) => product.brand === nextBrand
+              );
+
+              if (selectedProduct?.brandSlug) {
+                params.set("brand", selectedProduct.brandSlug);
+              }
+            }
+
+            setSearchParams(params);
+          }}
           aria-label="Бренд"
         >
           {brands.map((item) => (
@@ -430,6 +464,7 @@ export default function CatalogPage() {
               setAvailability("Все");
               setDiscountOnly(false);
               setSearch("");
+              setSearchParams({});
             }}
           >
             Сбросить

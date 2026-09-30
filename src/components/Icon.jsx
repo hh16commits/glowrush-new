@@ -64,6 +64,13 @@ function Icon({ name, size = 20, strokeWidth = 1.8, className = "" }) {
         </svg>
       );
 
+    case "search":
+      return (
+        <svg {...common}>
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="M16 16l5 5" />
+        </svg>
+      );
     case "user":
       return (
         <svg {...common}>

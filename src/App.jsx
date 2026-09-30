@@ -1,5 +1,5 @@
-﻿import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "./lib/supabase";
 import {
   CART_UPDATED_EVENT,
@@ -26,6 +26,7 @@ import "./styles/glowrush.css";
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("Все");
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -53,7 +54,6 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("AUTH USER:", session?.user);
       setUser(session?.user ?? null);
     });
 
@@ -118,6 +118,8 @@ function App() {
         return;
       }
 
+      const { data: stockData } = await supabase.rpc("get_product_stock");
+      const stockMap = new Map((stockData || []).map((row) => [String(row.productId), Number(row.available) || 0]));
       const mappedProducts = (data || []).map((product) => {
         const brandTranslation =
           product.brand?.translations?.find(
@@ -141,8 +143,11 @@ function App() {
           )[0];
 
         return {
-          id: product.id,
-          sku: product.sku,
+  id: product.id,
+  sku: product.sku,
+  brandTranslations: product.brand?.translations || [],
+  categoryTranslations: product.category?.translations || [],
+  translations: product.translations || [],
           slug: product.slug,
           brand: brandTranslation?.name || product.brand?.slug || "",
           name: productTranslation?.name || product.slug,
@@ -160,31 +165,12 @@ function App() {
             productTranslation?.description ||
             "Средство для ежедневного ухода за кожей.",
           stockStatus: product.stockStatus,
+          available: stockMap.get(String(product.id)) ?? 0,
           isNew: product.isNew,
         };
       });
 
-      const { data: stockData, error: stockError } = await supabase.rpc(
-        "get_product_stock"
-      );
-
-      if (stockError) {
-        console.warn("Не удалось загрузить остатки товаров:", stockError);
-      }
-
-      const stockMap = new Map(
-        (stockData || []).map((row) => [
-          String(row.productId),
-          Math.max(0, Number(row.available) || 0),
-        ])
-      );
-
-      const productsWithStock = mappedProducts.map((product) => ({
-        ...product,
-        available: stockMap.get(String(product.id)) ?? 0,
-      }));
-
-      setProducts(productsWithStock);
+      setProducts(mappedProducts);
       setProductsLoading(false);
     };
 
@@ -212,7 +198,6 @@ function App() {
     localStorage.setItem("glowrush-orders", JSON.stringify(orders));
   }, [orders]);
 
-  const [adminOpen, setAdminOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminRoleLoading, setAdminRoleLoading] = useState(true);
 
@@ -333,7 +318,7 @@ const deliveryOptions = [
     }
 
     if (!user) {
-      alert("Войдите в аккаунт.");
+      alert("������� ������� � �������.");
       setAuthOpen(true);
       return;
     }
@@ -423,11 +408,7 @@ const deliveryOptions = [
   };
 
   const addToCart = (product) => {
-    if (
-      !product ||
-      product.stockStatus === "OUT_OF_STOCK" ||
-      Number(product.available) <= 0
-    ) {
+    if (!product || product.stockStatus === "OUT_OF_STOCK") {
       return;
     }
 
@@ -450,28 +431,16 @@ const deliveryOptions = [
 
   const increaseQuantity = (id) => {
     const item = getCart().find((cartItem) => cartItem.id === id);
-
-    if (!item || item.stockStatus === "OUT_OF_STOCK") {
-      return;
-    }
-
-    const available = Number(item.available);
-
-    if (
-      Number.isFinite(available) &&
-      available >= 0 &&
-      Number(item.quantity || 0) >= available
-    ) {
-      return;
-    }
-
-    commitCart(
-      updateCartQuantity(
-        id,
-        Number(item.quantity || 0) + 1
-      )
-    );
+    const currentProduct = products.find((product) => product.id === id);
+    if (!item) return;
+    const stockStatus = currentProduct?.stockStatus ?? item.stockStatus;
+    const available = Number(currentProduct?.available ?? item.available) || 0;
+    const currentQuantity = Number(item.quantity) || 0;
+    if (stockStatus === "OUT_OF_STOCK" || available <= 0 || currentQuantity >= available || currentQuantity >= 10) return;
+    const nextCart = getCart().map((cartItem) => cartItem.id === id ? { ...cartItem, ...(currentProduct || {}), available, stockStatus, quantity: Math.min(currentQuantity + 1, 10) } : cartItem);
+    commitCart(nextCart);
   };
+
 
   const removeFromCart = (id) => {
     commitCart(removeProductFromCart(id));
@@ -494,7 +463,7 @@ const deliveryOptions = [
       <Header
         user={user}
         isAdmin={isAdmin}
-        onAdminOpen={() => setAdminOpen(true)}
+        onAdminOpen={() => navigate("/admin")}
         onProfileOpen={() => setProfileOpen(true)}
         onAuthOpen={() => setAuthOpen(true)}
         searchOpen={searchOpen}
@@ -511,10 +480,12 @@ const deliveryOptions = [
         onCartOpen={() => setCartOpen(true)}
       />
 
-      <AuthModal
-        open={authOpen}
-        onClose={() => setAuthOpen(false)}
-      />
+      {authOpen ? (
+        <AuthModal
+          open={authOpen}
+          onClose={() => setAuthOpen(false)}
+        />
+      ) : null}
       {location.pathname === "/" ? (
         <HomePage
           selectedCategory={selectedCategory}
@@ -648,6 +619,7 @@ const deliveryOptions = [
         cartOpen={cartOpen}
         setCartOpen={setCartOpen}
         cart={cart}
+        products={products}
         cartTotal={cartTotal}
         removeFromCart={removeFromCart}
         increaseQuantity={increaseQuantity}
@@ -666,8 +638,8 @@ const deliveryOptions = [
         Icon={Icon}
       />
   <ProfilePanel
-    open={profileOpen}
-    onClose={() => setProfileOpen(false)}
+    profileOpen={profileOpen}
+    setProfileOpen={setProfileOpen}
     user={user}
     favorites={favorites}
     cartCount={cartCount}
@@ -679,14 +651,14 @@ const deliveryOptions = [
     setAuthOpen={setAuthOpen}
     Icon={Icon}
   />
-  {adminOpen && (
+  {location.pathname === "/admin" && (
     <div className="admin-screen">
       <button
         type="button"
         className="admin-back"
-        onClick={() => setAdminOpen(false)}
+        onClick={() => navigate("/")}
       >
-        Вернуться в магазин
+        ← Вернуться в магазин
       </button>
 
       {adminRoleLoading ? (
@@ -706,7 +678,7 @@ const deliveryOptions = [
           onLogout={async () => {
             await supabase.auth.signOut();
             setIsAdmin(false);
-            setAdminOpen(false);
+            navigate("/");
           }}
         />
       ) : null}
@@ -892,3 +864,15 @@ const deliveryOptions = [
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+

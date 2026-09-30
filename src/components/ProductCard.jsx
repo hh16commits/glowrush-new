@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import Icon from "./Icon";
 import { canAddToCart, getStockLabel } from "../lib/shop";
+import {
+  formatPrice,
+  getLocalizedText,
+  useLocale,
+} from "../lib/locale";
 
-const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(Number(value || 0));
 
 export default function ProductCard({
   product,
@@ -14,6 +17,36 @@ export default function ProductCard({
   onOpen,
   isNew = false,
 }) {
+  const { language, currency } = useLocale();
+
+  const localizedName = getLocalizedText(
+    product.translations,
+    language,
+    product.name
+  );
+
+  const localizedBrand = getLocalizedText(
+    product.brandTranslations,
+    language,
+    product.brand
+  );
+
+  const localizedTranslation =
+    product.translations?.find(
+      (item) =>
+        String(item?.locale || "").toUpperCase() === language
+    ) ||
+    product.translations?.find(
+      (item) =>
+        String(item?.locale || "").toUpperCase() === "RU"
+    ) ||
+    product.translations?.[0];
+
+  const localizedDescription =
+    localizedTranslation?.description ||
+    product.description ||
+    "";
+
   const discount =
     product.oldPrice > product.price
       ? Math.round((1 - product.price / product.oldPrice) * 100)
@@ -31,7 +64,7 @@ export default function ProductCard({
           {product.image ? (
             <img
               src={product.image}
-              alt={product.name}
+              alt={localizedName}
               loading="lazy"
             />
           ) : (
@@ -82,10 +115,10 @@ export default function ProductCard({
 
         <div className="home-v4-product-info">
           <span className="home-v4-product-brand">
-            {product.brand}
+            {localizedBrand}
           </span>
 
-          <h3>{product.name}</h3>
+          <h3>{localizedName}</h3>
 
           <div className="home-v4-product-rating">
             ★ {product.rating || "—"}
@@ -97,7 +130,7 @@ export default function ProductCard({
           <div className="home-v4-product-bottom">
             <div className="home-v4-price-block">
               <strong>
-                {formatPrice(product.price)} сум
+                {formatPrice(product.price, currency)}
               </strong>
 
               {!canAddToCart(product) && (
@@ -155,7 +188,7 @@ export default function ProductCard({
               <img
                 className="product-image-main"
                 src={product.image}
-                alt={product.name}
+                alt={localizedName}
                 loading="lazy"
               />
 
@@ -232,18 +265,18 @@ export default function ProductCard({
 
       <div className="premium-product-copy">
         <p className="premium-product-brand">
-          {product.brand}
+          {localizedBrand}
         </p>
 
         <Link
           to={`/product/${product.slug}`}
           className="premium-product-name"
         >
-          {product.name}
+          {localizedName}
         </Link>
 
         <p className="premium-product-benefit">
-          {product.description}
+          {localizedDescription}
         </p>
 
         <div className="premium-product-meta">
@@ -257,12 +290,12 @@ export default function ProductCard({
 
           <div className="premium-product-prices">
             <strong>
-              {formatPrice(product.price)} сум
+              {formatPrice(product.price, currency)}
             </strong>
 
             {product.oldPrice > product.price && (
               <span>
-                {formatPrice(product.oldPrice)} сум
+                {formatPrice(product.oldPrice, currency)}
               </span>
             )}
           </div>

@@ -1,6 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
+﻿import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import CatalogPage from "../pages/CatalogPage";
+import BestsellersPage from "../pages/BestsellersPage";
 import BrandsPage from "../pages/BrandsPage";
 import ProductPage from "../pages/ProductPage";
 import SalePage from "../pages/SalePage";
@@ -8,7 +9,6 @@ import GuidePage from "../pages/GuidePage";
 import AccountPage from "../pages/AccountPage";
 import DeliveryPage from "../pages/DeliveryPage";
 import NewArrivalsPage from "../pages/NewArrivalsPage";
-import BestsellersPage from "../pages/BestsellersPage";
 import CarePage from "../pages/CarePage";
 
 export const router = createBrowserRouter([
@@ -21,8 +21,16 @@ export const router = createBrowserRouter([
         element: null,
       },
       {
+        path: "admin",
+        element: null,
+      },
+      {
         path: "catalog",
         element: <CatalogPage />,
+      },
+      {
+        path: "bestsellers",
+        element: <BestsellersPage />,
       },
       {
         path: "brands",
@@ -35,10 +43,6 @@ export const router = createBrowserRouter([
       {
         path: "new",
         element: <NewArrivalsPage />,
-      },
-      {
-        path: "bestsellers",
-        element: <BestsellersPage />,
       },
       {
         path: "care",

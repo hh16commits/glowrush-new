@@ -109,6 +109,9 @@ export default function ProductCollectionPage({
 
         return {
           ...product,
+          brandTranslations: product.brand?.translations || [],
+          categoryTranslations: product.category?.translations || [],
+          translations: product.translations || [],
           brand:
             brandTranslation?.name ||
             product.brand?.slug ||

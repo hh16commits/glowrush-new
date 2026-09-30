@@ -1,0 +1,192 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Icon from "./Icon";
+import { useLocale } from "../lib/locale";
+
+export default function Header({
+  user,
+  isAdmin,
+  onAdminOpen,
+  onProfileOpen,
+  onAuthOpen,
+  searchOpen,
+  search,
+  onSearchChange,
+  onSearchClose,
+  onSearchToggle,
+  favorites,
+  cartCount,
+  onFavoritesOpen,
+  onCartOpen,
+}) {
+  const { language, currency, labels, setLocale } = useLocale();
+  const [localeOpen, setLocaleOpen] = useState(false);
+
+  return (
+    <header className="site-header">
+      <div className="header-inner">
+
+        <Link to="/" className="brand-logo" aria-label="GlowRush">
+          Glow<span>Rush</span>
+        </Link>
+
+        <nav className="main-nav">
+  <Link to="/catalog">{labels.nav.catalog}</Link>
+  <Link to="/brands">{labels.nav.brands}</Link>
+  <Link to="/new">{labels.nav.new}</Link>
+  <Link to="/care">{labels.nav.care}</Link>
+  <Link to="/sale">{labels.nav.sale}</Link>
+  <Link to="/guide">{labels.nav.guide}</Link>
+</nav>
+
+        <div className="header-actions">
+          <div className="locale-switcher">
+            <button
+              type="button"
+              className="locale-trigger"
+              onClick={() => setLocaleOpen((value) => !value)}
+            >
+              {language} · {currency}
+              <span className="locale-chevron">⌄</span>
+            </button>
+
+            {localeOpen && (
+              <div className="locale-menu">
+                <div className="locale-section-title">{labels.language}</div>
+
+                {["RU", "UZ", "EN"].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={
+                      language === item
+                        ? "locale-option active"
+                        : "locale-option"
+                    }
+                    onClick={() => { setLocale({ language: item }); setLocaleOpen(false); }}
+                  >
+                    {item === "RU"
+                      ? "Русский"
+                      : item === "UZ"
+                        ? "O‘zbekcha"
+                        : "English"}
+                  </button>
+                ))}
+
+                <div className="locale-divider" />
+
+                <div className="locale-section-title">{labels.currency}</div>
+
+                {["UZS", "USD"].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={
+                      currency === item
+                        ? "locale-option active"
+                        : "locale-option"
+                    }
+                    onClick={() => { setLocale({ currency: item }); setLocaleOpen(false); }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+
+          {user ? (
+            <button
+              type="button"
+              className="icon-button auth-header-button"
+              onClick={() => {
+                if (isAdmin) {
+                  onAdminOpen();
+                } else {
+                  onProfileOpen();
+                }
+              }}
+              aria-label="Открыть профиль"
+            >
+              {user?.user_metadata?.name ||
+                user?.user_metadata?.preferred_username ||
+                user?.email?.split("@")[0] ||
+                "Профиль"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="icon-button auth-header-button"
+              onClick={onAuthOpen}
+              aria-label="Войти"
+            >
+              Войти
+            </button>
+          )}
+
+          {searchOpen && (
+            <div className="search-field">
+              <input
+                autoFocus
+                type="search"
+                placeholder="Поиск косметики..."
+                value={search}
+                onChange={(event) => onSearchChange(event.target.value)}
+              />
+
+              <button
+                type="button"
+                aria-label="Закрыть поиск"
+                onClick={onSearchClose}
+              >
+                <Icon name="close" size={18} />
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="Поиск"
+            onClick={onSearchToggle}
+          >
+            ⌕
+          </button>
+
+          <button
+            type="button"
+            className="icon-button favorites-button"
+            aria-label="Избранное"
+            onClick={onFavoritesOpen}
+          >
+            <Icon name="heart" size={20} />
+
+            {favorites.length > 0 && (
+              <span className="favorites-count">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="cart-button"
+            aria-label="Корзина"
+            onClick={onCartOpen}
+          >
+            <Icon name="cart" size={20} />
+
+            {cartCount > 0 && (
+              <span className="cart-count">
+                {cartCount}
+              </span>
+            )}
+          </button>
+
+        </div>
+      </div>
+    </header>
+  );
+}
+

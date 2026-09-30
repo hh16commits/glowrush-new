@@ -1,0 +1,171 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Icon from "./Icon";
+import { useLocale } from "../lib/locale";
+
+export default function Header({
+  user,
+  isAdmin,
+  onAdminOpen,
+  onProfileOpen,
+  onAuthOpen,
+  searchOpen,
+  search,
+  onSearchChange,
+  onSearchClose,
+  onSearchToggle,
+  favorites,
+  cartCount,
+  onFavoritesOpen,
+  onCartOpen,
+}) {
+  const { language, labels, setLocale } = useLocale();
+  const [localeOpen, setLocaleOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <header className="site-header">
+      <div className="header-inner">
+
+        <Link to="/" className="brand-logo" aria-label="GlowRush">
+          Glow<span>Rush</span>
+        </Link>
+
+        <nav className="main-nav">
+  <Link to="/catalog">{labels.nav.catalog}</Link>
+  <Link to="/brands">{labels.nav.brands}</Link>
+  <Link to="/new">{labels.nav.new}</Link>
+  <Link to="/care">{labels.nav.care}</Link>
+  <Link to="/sale">{labels.nav.sale}</Link>
+  <Link to="/guide">{labels.nav.guide}</Link>
+</nav>
+
+        <div className="header-actions">
+          <div className="locale-switcher">
+            <button
+              type="button"
+              className="locale-trigger"
+              onClick={() => setLocaleOpen((value) => !value)}
+            >
+              {language}
+              <span className="locale-chevron" aria-hidden="true"></span>
+            </button>
+
+            {localeOpen && (
+              <div className="locale-menu">
+                <div className="locale-section-title">{labels.language}</div>
+
+                {["RU", "UZ", "EN"].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={
+                      language === item
+                        ? "locale-option active"
+                        : "locale-option"
+                    }
+                    onClick={() => { setLocale({ language: item }); setLocaleOpen(false); }}
+                  >
+                    {item === "RU"
+  ? "\u0420\u0443\u0441\u0441\u043a\u0438\u0439"
+  : item === "UZ"
+    ? "O\u2018zbekcha"
+    : "English"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+
+          {user ? (
+            <button
+              type="button"
+              className="icon-button auth-header-button"
+              onClick={() => {
+                if (isAdmin) {
+                  onAdminOpen();
+                } else {
+                  onProfileOpen();
+                }
+              }}
+              aria-label="РћС‚РєСЂС‹С‚СЊ РїСЂРѕС„РёР»СЊ"
+            >
+              <Icon name="user" size={19} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="icon-button auth-header-button"
+              onClick={onAuthOpen}
+              aria-label="Р’РѕР№С‚Рё"
+            >
+              <Icon name="user" size={19} />
+            </button>
+          )}
+
+          {searchOpen && (
+            <div className="search-field">
+              <input
+                autoFocus
+                type="search"
+                placeholder={"\u041F\u043E\u0438\u0441\u043A \u043A\u043E\u0441\u043C\u0435\u0442\u0438\u043A\u0438\u002E\u002E\u002E"}
+                value={search}
+                onChange={(event) => onSearchChange(event.target.value)}
+              />
+
+              <button
+                type="button"
+                aria-label="Р—Р°РєСЂС‹С‚СЊ РїРѕРёСЃРє"
+                onClick={onSearchClose}
+              >
+                <Icon name="close" size={18} />
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="icon-button"
+            aria-label="РџРѕРёСЃРє"
+            onClick={onSearchToggle}
+          >
+            <Icon name="search" size={18} />
+          </button>
+
+          <button
+            type="button"
+            className="icon-button favorites-button"
+            aria-label="РР·Р±СЂР°РЅРЅРѕРµ"
+            onClick={onFavoritesOpen}
+          >
+            <Icon name="heart" size={20} />
+
+            {favorites.length > 0 && (
+              <span className="favorites-count">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="cart-button"
+            aria-label="РљРѕСЂР·РёРЅР°"
+            onClick={onCartOpen}
+          >
+            <Icon name="cart" size={20} />
+
+            {cartCount > 0 && (
+              <span className="cart-count">
+                {cartCount}
+              </span>
+            )}
+          </button>
+
+        </div>
+      </div>
+    </header>
+  );
+}
+

@@ -5,9 +5,11 @@ import {
   getStockLabel,
   canAddToCart,
 } from "../lib/shop";
-
-const formatPrice = (value) =>
-  new Intl.NumberFormat("ru-RU").format(Number(value || 0));
+import {
+  formatPrice,
+  getLocalizedText,
+  useLocale,
+} from "../lib/locale";
 
 function pickTranslation(translations = []) {
   return (
@@ -20,6 +22,7 @@ function pickTranslation(translations = []) {
 export default function ProductPage() {
   const { slug } = useParams();
   const { onAddToCart: addToCartFromApp } = useOutletContext();
+  const { language, currency } = useLocale();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -115,6 +118,9 @@ export default function ProductPage() {
 
       setProduct({
         ...data,
+        brandTranslations: data.brand?.translations || [],
+        categoryTranslations: data.category?.translations || [],
+        translations: data.translations || [],
         name: productTranslation?.name || data.slug,
         description:
           productTranslation?.description ||
@@ -191,6 +197,39 @@ export default function ProductPage() {
     );
   }
 
+  const localizedName = getLocalizedText(
+    product.translations,
+    language,
+    product.name
+  );
+
+  const localizedBrand = getLocalizedText(
+    product.brandTranslations,
+    language,
+    product.brand
+  );
+
+  const localizedCategory = getLocalizedText(
+    product.categoryTranslations,
+    language,
+    product.category
+  );
+
+  const localizedTranslation =
+    product.translations?.find(
+      (item) =>
+        String(item?.locale || "").toUpperCase() === language
+    ) ||
+    product.translations?.find(
+      (item) =>
+        String(item?.locale || "").toUpperCase() === "RU"
+    ) ||
+    product.translations?.[0];
+
+  const localizedDescription =
+    localizedTranslation?.description ||
+    product.description ||
+    "";
   const productImages = product.images || [];
 
   const activeImage =
@@ -206,7 +245,7 @@ export default function ProductPage() {
         <span>/</span>
         <Link to="/catalog">Каталог</Link>
         <span>/</span>
-        <span>{product.name}</span>
+        <span>{localizedName}</span>
       </div>
 
       <section className="product-main">
@@ -258,12 +297,12 @@ export default function ProductPage() {
         </div>
 
         <div className="product-details">
-          <p className="eyebrow">{product.brand}</p>
+          <p className="eyebrow">{localizedBrand}</p>
 
-          <h1>{product.name}</h1>
+          <h1>{localizedName}</h1>
 
           <p className="product-category">
-            {product.category}
+            {localizedCategory}
           </p>
 
           {product.rating ? (
@@ -278,18 +317,18 @@ export default function ProductPage() {
 
           <div className="product-price">
             <strong>
-              {formatPrice(product.price)} сум
+              {formatPrice(product.price, currency)}
             </strong>
 
             {product.oldPrice > product.price && (
               <span>
-                {formatPrice(product.oldPrice)} сум
+                {formatPrice(product.oldPrice, currency)}
               </span>
             )}
           </div>
 
           <p className="product-description">
-            {product.description}
+            {localizedDescription}
           </p>
 
           <button
