@@ -12131,9 +12131,6 @@ input:focus-visible {
 /* Very small phones */
 @media (max-width: 380px) {
 
-  .brand-logo {
-    font-size: 24px;
-  }
 
   .home-v4-hero h1 {
     font-size: 43px;
