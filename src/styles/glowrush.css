@@ -11857,17 +11857,6 @@ input:focus-visible {
     padding: 0 20px;
   }
 
-  .brand-logo {
-    font-size: 27px;
-    font-weight: 750;
-    letter-spacing: -0.055em;
-    text-decoration: none !important;
-  }
-
-  .brand-logo span {
-    color: #d87499;
-    font-weight: 750;
-  }
 
   .auth-header-button,
   .mobile-menu-button {
