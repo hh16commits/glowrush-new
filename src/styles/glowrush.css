@@ -10693,11 +10693,6 @@ input:focus-visible {
     box-shadow: 0 4px 14px rgba(45, 26, 36, 0.04);
   }
 
-  .locale-chevron {
-    margin-left: 2px;
-    font-size: 10px;
-    opacity: 0.65;
-  }
 
   .auth-header-button {
     width: auto;
