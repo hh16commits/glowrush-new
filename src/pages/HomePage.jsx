@@ -1,5 +1,4 @@
 ﻿import { Link, useNavigate } from "react-router-dom";
-import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
 import { sortBestsellers, sortNewProducts } from "../lib/productSort";
 
