@@ -11,7 +11,7 @@ const getAuthMethodLabel = (user) => {
 
   if (provider.includes("telegram")) {
     return username
-      ? `Telegram В· @${username}`
+      ? `Telegram · @${username}`
       : "Telegram";
   }
 
@@ -19,7 +19,7 @@ const getAuthMethodLabel = (user) => {
     return user.email;
   }
 
-  return "РЎРїРѕСЃРѕР± РІС…РѕРґР° РЅРµ СѓРєР°Р·Р°РЅ";
+  return "Способ входа не указан";
 };
 
 export default function ProfilePanel({
@@ -42,14 +42,14 @@ export default function ProfilePanel({
       <section className="profile-panel">
         <div className="profile-panel-header">
           <p className="eyebrow">
-            Р›РР§РќР«Р™ РљРђР‘РРќР•Рў
+            ЛИЧНЫЙ КАБИНЕТ
           </p>
 
           <h2>
             {user?.user_metadata?.name ||
               user?.user_metadata?.preferred_username ||
               user?.email?.split("@")[0] ||
-              "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"}
+              "Пользователь"}
           </h2>
 
           <button
@@ -82,7 +82,7 @@ export default function ProfilePanel({
                 {user?.user_metadata?.name ||
                   user?.user_metadata?.preferred_username ||
                   user?.email?.split("@")[0] ||
-                  "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"}
+                  "Пользователь"}
               </strong>
 
               <p>
@@ -108,16 +108,16 @@ export default function ProfilePanel({
 
               <div>
                 <strong>
-                  РР·Р±СЂР°РЅРЅРѕРµ
+                  Избранное
                 </strong>
 
                 <small>
-                  {favorites.length} СЃРѕС…СЂР°РЅРµРЅРЅС‹С… С‚РѕРІР°СЂРѕРІ
+                  {favorites.length} сохраненных товаров
                 </small>
               </div>
 
               <b>
-                в†’
+                →
               </b>
             </button>
 
@@ -136,16 +136,16 @@ export default function ProfilePanel({
 
               <div>
                 <strong>
-                  РљРѕСЂР·РёРЅР°
+                  Корзина
                 </strong>
 
                 <small>
-                  {cartCount} С‚РѕРІР°СЂРѕРІ
+                  {cartCount} товаров
                 </small>
               </div>
 
               <b>
-                в†’
+                →
               </b>
             </button>
 
@@ -156,12 +156,12 @@ export default function ProfilePanel({
           <div className="profile-account-info">
 
             <p className="eyebrow">
-              РђРљРљРђРЈРќРў
+              АККАУНТ
             </p>
 
             <div>
               <span>
-                РЎРїРѕСЃРѕР± РІС…РѕРґР°
+                Способ входа
               </span>
 
               <strong>
@@ -192,7 +192,7 @@ export default function ProfilePanel({
               }
             }}
           >
-            Р’С‹Р№С‚Рё РёР· Р°РєРєР°СѓРЅС‚Р°
+            Выйти из аккаунта
           </button>
 
 
