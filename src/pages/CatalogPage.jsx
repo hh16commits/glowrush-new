@@ -42,8 +42,6 @@ export default function CatalogPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [category, setCategory] = useState("Все");
-  const [brand, setBrand] = useState("Все бренды");
   const [availability, setAvailability] = useState("Все");
   const [discountOnly, setDiscountOnly] = useState(false);
   const [search, setSearch] = useState("");
@@ -176,36 +174,10 @@ export default function CatalogPage() {
       mounted = false;
     };
   }, []);
+  const category = categoryFromUrl
+    ? CATEGORY_SLUG_MAP[categoryFromUrl] || CATEGORIES[0]
+    : CATEGORIES[0];
 
-  // Синхронизация URL-фильтров с UI
-  useEffect(() => {
-    if (brandFromUrl) {
-      const matchedBrand = products.find(
-        (product) => product.brandSlug === brandFromUrl
-      );
-
-      if (matchedBrand?.brand) {
-        setBrand(matchedBrand.brand);
-      }
-    } else {
-      setBrand("Все бренды");
-    }
-
-    if (categoryFromUrl) {
-      const matchedCategory =
-        CATEGORY_SLUG_MAP[categoryFromUrl];
-
-      if (matchedCategory) {
-        setCategory(matchedCategory);
-      }
-    } else {
-      setCategory("Все");
-    }
-  }, [
-    brandFromUrl,
-    categoryFromUrl,
-    products,
-  ]);
   const brands = useMemo(
     () => [
       "Все бренды",
@@ -219,6 +191,10 @@ export default function CatalogPage() {
     ],
     [products]
   );
+
+  const brand = brandFromUrl
+    ? products.find((product) => product.brandSlug === brandFromUrl)?.brand || brands[0]
+    : brands[0];
 
 
   const filteredProducts = useMemo(() => {
@@ -368,8 +344,6 @@ export default function CatalogPage() {
               category === item ? "is-active" : ""
             }
             onClick={() => {
-            setCategory(item);
-
             const params = new URLSearchParams(searchParams);
             const categorySlug = Object.entries(CATEGORY_SLUG_MAP)
               .find(([, name]) => name === item)?.[0];
@@ -393,8 +367,6 @@ export default function CatalogPage() {
           value={brand}
           onChange={(event) => {
             const nextBrand = event.target.value;
-            setBrand(nextBrand);
-
             const params = new URLSearchParams(searchParams);
 
             if (nextBrand === "Все бренды") {
@@ -459,8 +431,6 @@ export default function CatalogPage() {
             type="button"
             className="filter-reset"
             onClick={() => {
-              setCategory("Все");
-              setBrand("Все бренды");
               setAvailability("Все");
               setDiscountOnly(false);
               setSearch("");
