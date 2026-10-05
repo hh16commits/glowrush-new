@@ -10812,16 +10812,6 @@ input:focus-visible {
     border-radius: 16px;
   }
 }
-.locale-chevron {
-  width: 6px;
-  height: 6px;
-  margin-left: 5px;
-  margin-top: -3px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg);
-  opacity: 0.55;
-}
 /* FINAL LOCALE CHEVRON */
 .locale-chevron {
   display: inline-block;
