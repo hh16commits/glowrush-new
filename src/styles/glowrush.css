@@ -11821,12 +11821,6 @@ input:focus-visible {
     text-decoration: none !important;
   }
 
-  .brand-logo {
-    font-size: 27px;
-    font-weight: 750;
-    letter-spacing: -0.055em;
-    line-height: 1;
-  }
 
   .brand-logo span {
     color: #d87499;
