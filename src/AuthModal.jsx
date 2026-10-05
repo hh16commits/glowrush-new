@@ -15,16 +15,6 @@ function AuthModal({ open, onClose }) {
   const otpRefs = useRef([]);
 
   useEffect(() => {
-    if (!open) return;
-
-    setError("");
-    setEmail("");
-    setOtp(Array(OTP_LENGTH).fill(""));
-    setEmailSent(false);
-    setResendSeconds(0);
-  }, [open]);
-
-  useEffect(() => {
     if (resendSeconds <= 0) return;
 
     const timer = window.setInterval(() => {
