@@ -10972,12 +10972,6 @@ input:focus-visible {
   }
 }
 
-/* Desktop final header starts only on wide screens */
-@media (min-width: 1001px) {
-  .header-inner {
-    width: min(1440px, calc(100% - 72px));
-  }
-}
 /* =========================================================
    GLOWRUSH — TABLET INLINE SEARCH
    ========================================================= */
