@@ -11719,37 +11719,8 @@ input:focus-visible {
 
 /* ===== Mobile Header — centered logo ===== */
 @media (max-width: 760px) {
-  .site-header {
-    height: 72px;
-  }
 
-  .header-inner {
-    position: relative;
-    height: 72px;
-    width: 100%;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-  /* Logo strictly in the center */
-  .brand-logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    font-size: 25px;
-    line-height: 1;
-    white-space: nowrap;
-  }
-
-  /* Let individual mobile controls position themselves */
-  .header-actions {
-    position: static;
-    display: contents;
-  }
 
   /* Profile — left corner */
   .auth-header-button {
