@@ -10593,35 +10593,6 @@ input:focus-visible {
     display: none;
   }
 }
-/* GlowRush header refinement вЂ” language only */
-.locale-trigger {
-  min-height: 38px;
-  padding: 0 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.locale-menu {
-  width: 176px;
-  padding: 8px;
-  border-radius: 16px;
-}
-
-.locale-option {
-  padding: 8px 9px;
-  font-size: 13px;
-}
-
-.locale-section-title {
-  padding: 6px 8px 5px;
-  font-size: 10px;
-  letter-spacing: 0.1em;
-}
 
 .header-actions {
   align-items: center;
