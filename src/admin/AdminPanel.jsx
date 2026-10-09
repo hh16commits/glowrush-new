@@ -253,6 +253,10 @@ function AdminPanel({ onLogout }) {
     }
   };
 
+  useEffect(() => {
+    loadInventoryData();
+  }, []);
+
   const openInventory = async () => {
     setInventoryOpen(true);
     setInventorySuccess("");
@@ -1359,4 +1363,3 @@ function AdminPanel({ onLogout }) {
 }
 
 export default AdminPanel;
-
